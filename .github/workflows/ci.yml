@@ -1,0 +1,43 @@
+name: Tests & Intégration Continue (CI)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Tests automatisés (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 20.x, 22.x ]
+
+    steps:
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Configuration de l'environnement Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Installation des dépendances
+        run: npm ci || npm install
+
+      - name: Vérification de la syntaxe du code (Dry-run)
+        run: |
+          node --check src/server.js
+          node --check src/services/db.js
+          node --check src/services/cryptoService.js
+          node --check src/utils/postalCodes.js
+
+      - name: Exécution de la suite de tests automatisés
+        run: npm test
+        env:
+          NODE_ENV: test
+          PORT: 3000
+          SERVER_SALT: github_actions_ci_secret_salt_canada_test

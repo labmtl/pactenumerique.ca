@@ -1,0 +1,109 @@
+{
+  "lang_code": "en",
+  "nav": {
+    "title": "DigitalPact.ca",
+    "mission": "Our Vision",
+    "how_it_works": "How It Works",
+    "territories": "Regional Mobilization",
+    "directory": "Sovereign Directory",
+    "ecosystem": "Ecosystem",
+    "switch_lang": "FR"
+  },
+  "hero": {
+    "badge": "🇨🇦 Canadian Collective Action & Digital Sovereignty",
+    "title_main": "Reclaiming control over our social connections",
+    "title_gradient": "Together. Through the Pact.",
+    "subtitle": "Millions of Canadians want to leave toxic American Big Tech platforms. But nobody wants to be the first to jump alone. Commit conditionally: take the leap once your circle of friends and your region are ready!",
+    "cta_sign": "Sign the Pact",
+    "cta_learn": "Understand Network Effects"
+  },
+  "stats": {
+    "national_signers": "Committed Canadians",
+    "active_circles": "Active Friend Circles",
+    "top_fsa": "Mobilized Neighborhoods"
+  },
+  "invite_banner": {
+    "title": "You've been invited by a friend!",
+    "text": "A close friend has shared their digital liberation pact with you. By signing below, you commit to making the leap to a sovereign social network alongside them as soon as your circle is complete.",
+    "badge": "Private Friend Circle Detected"
+  },
+  "form": {
+    "title": "Your Conditional Commitment",
+    "subtitle": "Your data remains private thanks to Zero-Knowledge encryption. No profiling, no reselling.",
+    "step1_title": "1. Your Territory",
+    "postal_label": "Canadian Postal Code",
+    "postal_placeholder": "e.g.: H2T 2N5 or K1A 0B1",
+    "postal_help": "Only the first 3 characters (FSA) are stored to preserve your privacy.",
+    "detected_prov": "Detected Region:",
+    "step_networks_title": "2. Platforms You Wish to Leave",
+    "step_networks_desc": "Select the Big Tech platforms you want to replace with sovereign alternatives:",
+    "recom_title": "Recommended local sovereign alternatives for you:",
+    "recom_pick": "Pick your preferred alternative (or let your circle decide):",
+    "step2_title": "3. Your Personal Critical Mass",
+    "threshold_label": "How many friends must join to trigger your collective departure?",
+    "threshold_opt_3": "3 close friends (Fast)",
+    "threshold_opt_5": "5 friends (Recommended)",
+    "threshold_opt_10": "10 friends (Extended circle)",
+    "threshold_opt_custom": "Custom",
+    "step3_title": "4. Leap Notification (The Leap)",
+    "push_title": "Browser Push Notifications (Recommended)",
+    "push_desc": "Receive a discreet alert as soon as your circle or neighborhood reaches critical mass.",
+    "enable_push": "Enable browser notification",
+    "email_label": "Email Address (Optional)",
+    "email_placeholder": "name@example.ca",
+    "email_help": "Cryptographically hashed with a secret salt. Never stored in plain text.",
+    "submit_btn": "Sign the Digital Pact",
+    "submitting": "Generating your encrypted keys...",
+    "legal_notice": "Hosted in Canada (WHC.ca). Strictly compliant with Quebec's Law 25 and PIPEDA."
+  },
+  "directory": {
+    "title": "Directory of Sovereign Social Networks",
+    "subtitle": "Quebec and Canadian digital infrastructure operated by cooperatives, non-profits, and civic groups (2024-2026). Data hosted on Canadian soil.",
+    "filter_all_cats": "All needs",
+    "filter_all_regions": "All regions",
+    "filter_qc": "🍁 Quebec",
+    "filter_ca": "🇨🇦 Canada",
+    "search_placeholder": "Search an instance, protocol, or platform...",
+    "btn_visit": "Visit Instance",
+    "btn_choose": "Select for My Pact"
+  },
+  "modal_success": {
+    "title": "🎉 Congratulations, you are part of the Pact!",
+    "subtitle": "Here is your private invite link. Share it with your friends to unlock your collective transition.",
+    "copy_btn": "Copy My Private Link",
+    "copied": "Link copied to clipboard!",
+    "circle_status": "Your circle's progress:",
+    "privacy_note": "🔒 Privacy Notice: The invitation key is encoded after the hash symbol (#). Our server cannot map your friends.",
+    "share_signal": "Share via Signal / SMS",
+    "close_btn": "Go to Dashboard"
+  },
+  "dashboard": {
+    "title": "Canadian Territorial Mobilization",
+    "subtitle": "Critical mass by province and neighborhood (Forward Sortation Area - FSA)",
+    "provinces_title": "Commitments by Province",
+    "top_fsa_title": "Neighborhoods leading the march to critical mass",
+    "target_reached": "Target Reached!",
+    "in_progress": "progress toward threshold"
+  },
+  "ecosystem": {
+    "title": "Where are we migrating to?",
+    "subtitle": "Sovereign social networks are not algorithmic prisons: they are decentralized, ad-free, and locally hosted.",
+    "fediverse_title": "The Fediverse (Mastodon, Pixelfed)",
+    "fediverse_desc": "Thousands of independent, interconnected servers. Just like email, you can follow anyone regardless of their home server.",
+    "bluesky_title": "AT Protocol (Bluesky)",
+    "bluesky_desc": "An open architecture providing total choice of algorithms and full portability of your account and followers.",
+    "matrix_title": "Matrix & Open Messaging",
+    "matrix_desc": "End-to-end encrypted, sovereign, and self-hostable communication protocols to replace closed big tech messengers.",
+    "canada_instances": "Canadian-hosted nodes and community instances ready upon unlock!"
+  },
+  "zero_knowledge": {
+    "title": "Why Zero-Knowledge matters?",
+    "p1": "On Facebook or X, your relationship graph is the primary commodity being sold. At DigitalPact.ca, we reject that model.",
+    "p2": "Your invite link contains a secret key in the URL fragment (#k=...). This fragment never travels over the web to our servers. Your friends increment a blind counter without ever revealing who they are to each other or to us."
+  },
+  "footer": {
+    "hosted_in_canada": "🍁 Proudly hosted in Canada at Web Hosting Canada (WHC.ca)",
+    "open_source": "Civic open source project under MIT license.",
+    "rights": "Digital Pact Canada. All rights reserved."
+  }
+}

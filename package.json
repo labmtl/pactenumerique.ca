@@ -1,0 +1,31 @@
+{
+  "name": "pactenumerique.ca",
+  "version": "1.0.0",
+  "description": "Pacte Numérique Canada - Plateforme d'engagement conditionnel pour réseaux sociaux souverains",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test tests/**/*.test.js",
+    "db:init": "node src/db/init.js",
+    "vapid:generate": "node src/utils/generateVapid.js"
+  },
+  "keywords": [
+    "pacte-numerique",
+    "canada",
+    "quebec",
+    "souverainete-numerique",
+    "fediverse",
+    "privacy-by-design",
+    "zero-knowledge"
+  ],
+  "author": "Pacte Numérique Canada",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "mysql2": "^3.11.3",
+    "web-push": "^3.6.7"
+  }
+}

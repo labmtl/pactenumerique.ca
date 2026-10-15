@@ -1,0 +1,109 @@
+{
+  "lang_code": "fr",
+  "nav": {
+    "title": "PacteNumérique.ca",
+    "mission": "Notre Vision",
+    "how_it_works": "Comment ça marche",
+    "territories": "Mobilisation par Région",
+    "directory": "Répertoire Souverain",
+    "ecosystem": "Écosystème",
+    "switch_lang": "EN"
+  },
+  "hero": {
+    "badge": "🇨🇦 Action Collective Canadienne & Souveraineté Numérique",
+    "title_main": "Reprenons le contrôle de nos interactions sociales",
+    "title_gradient": "Ensemble. Par le Pacte.",
+    "subtitle": "Nous sommes des millions à vouloir quitter les plateformes toxiques de la Big Tech américaine. Mais personne ne veut être le premier à partir seul. Engagez-vous conditionnellement : faites le saut dès que vos proches et votre région sont prêts !",
+    "cta_sign": "Signer le Pacte",
+    "cta_learn": "Comprendre l'effet de réseau"
+  },
+  "stats": {
+    "national_signers": "Canadiens engagés",
+    "active_circles": "Cercles d'amis actifs",
+    "top_fsa": "Quartiers mobilisés"
+  },
+  "invite_banner": {
+    "title": "Vous avez été invité(e) par un ami !",
+    "text": "Un de vos proches vous a partagé son pacte de libération numérique. En signant ci-dessous, vous vous engagez à faire le saut vers un réseau social souverain avec lui dès que votre cercle est au complet.",
+    "badge": "Cercle privé d'amis détecté"
+  },
+  "form": {
+    "title": "Votre Engagement Conditionnel",
+    "subtitle": "Vos données restent privées grâce au chiffrement Zero-Knowledge. Aucun profilage, aucune revente.",
+    "step1_title": "1. Votre Territoire",
+    "postal_label": "Code Postal Canadien",
+    "postal_placeholder": "ex: H2T 2N5 ou K1A 0B1",
+    "postal_help": "Seuls les 3 premiers caractères (RTA) sont enregistrés pour préserver votre anonymat.",
+    "detected_prov": "Région détectée :",
+    "step_networks_title": "2. Réseaux que vous souhaitez quitter",
+    "step_networks_desc": "Sélectionnez les plateformes que vous souhaitez remplacer par des solutions souveraines :",
+    "recom_title": "Alternatives locales recommandées pour vous :",
+    "recom_pick": "Choisissez votre alternative prioritaire (ou laissez le cercle décider) :",
+    "step2_title": "3. Votre Masse Critique Personnelle",
+    "threshold_label": "Combien d'amis doivent vous rejoindre pour déclencher votre départ ?",
+    "threshold_opt_3": "3 amis proches (Rapide)",
+    "threshold_opt_5": "5 amis (Recommandé)",
+    "threshold_opt_10": "10 amis (Cercle étendu)",
+    "threshold_opt_custom": "Personnalisé",
+    "step3_title": "4. Notification de Bascule (The Leap)",
+    "push_title": "Notifications Fureteur (Recommandé)",
+    "push_desc": "Recevez une alerte discrète dès que votre cercle ou votre quartier a atteint sa masse critique.",
+    "enable_push": "Activer la notification fureteur",
+    "email_label": "Adresse courriel (Facultative)",
+    "email_placeholder": "nom@exemple.ca",
+    "email_help": "Hachée cryptographiquement avec un sel secret. Jamais stockée en clair.",
+    "submit_btn": "Signer le Pacte Numérique",
+    "submitting": "Génération de vos clés chiffrées...",
+    "legal_notice": "Hébergé au Canada (WHC.ca). Respect strict de la Loi 25 (Québec) et de la LPRPDE."
+  },
+  "directory": {
+    "title": "Répertoire des Réseaux Sociaux Souverains",
+    "subtitle": "Infrastructures numériques québécoises et canadiennes opérées par des coopératives, OBNL et collectifs citoyens (2024-2026). Données hébergées en sol canadien.",
+    "filter_all_cats": "Tous les besoins",
+    "filter_all_regions": "Toutes les régions",
+    "filter_qc": "🍁 Québec",
+    "filter_ca": "🇨🇦 Canada",
+    "search_placeholder": "Rechercher une instance, un protocole ou une plateforme...",
+    "btn_visit": "Visiter l'instance",
+    "btn_choose": "Choisir pour mon pacte"
+  },
+  "modal_success": {
+    "title": "🎉 Félicitations, vous faites partie du Pacte !",
+    "subtitle": "Voici votre lien d'invitation privé. Partagez-le avec vos proches pour déverrouiller votre bascule collective.",
+    "copy_btn": "Copier mon lien privé",
+    "copied": "Lien copié dans le presse-papier !",
+    "circle_status": "Progression de votre cercle :",
+    "privacy_note": "🔒 Note de confidentialité : La clé d'invitation est encodée après le dièse (#). Notre serveur ne connaît pas vos amis.",
+    "share_signal": "Partager sur Signal / SMS",
+    "close_btn": "Accéder au tableau de bord"
+  },
+  "dashboard": {
+    "title": "Mobilisation Territoriale Canadienne",
+    "subtitle": "La masse critique par province et par quartier (Région de Tri d'Acheminement - RTA)",
+    "provinces_title": "Engagement par Province",
+    "top_fsa_title": "Quartiers en tête vers la masse critique",
+    "target_reached": "Objectif atteint !",
+    "in_progress": "progression vers le seuil"
+  },
+  "ecosystem": {
+    "title": "Vers quoi allons-nous migrer ?",
+    "subtitle": "Les réseaux sociaux souverains ne sont pas des prisons algorithmiques : ils sont décentralisés, sans publicité intrusive et hébergés localement.",
+    "fediverse_title": "Le Fédiverse (Mastodon, Pixelfed)",
+    "fediverse_desc": "Des milliers de serveurs indépendants et interopérables. Comme le courriel, vous pouvez suivre n'importe qui peu importe son serveur.",
+    "bluesky_title": "AT Protocol (Bluesky)",
+    "bluesky_desc": "Une architecture ouverte offrant un choix total d'algorithmes et la portabilité complète de votre compte et de vos abonnés.",
+    "matrix_title": "Matrix & Messageries Libres",
+    "matrix_desc": "Communications chiffrées de bout en bout, souveraines et auto-hébergeables pour remplacer les messageries fermées.",
+    "canada_instances": "Instances et nœuds hébergés au Québec et au Canada disponibles dès le déblocage !"
+  },
+  "zero_knowledge": {
+    "title": "Pourquoi le Zero-Knowledge est essentiel ?",
+    "p1": "Sur Facebook ou X, votre graphe relationnel est la marchandise principale. Chez PacteNumérique.ca, nous refusons ce modèle.",
+    "p2": "Votre lien d'invitation contient une clé secrète dans le fragment d'adresse URL (#k=...). Ce fragment ne voyage jamais sur Internet jusqu'à nos serveurs. Vos amis incrémentent un compteur aveugle sans jamais relier leurs identités à la vôtre."
+  },
+  "footer": {
+    "hosted_in_canada": "🍁 Fièrement hébergé au Canada chez Web Hosting Canada (WHC.ca)",
+    "open_source": "Projet civique à code ouvert sous licence MIT.",
+    "rights": "Pacte Numérique Canada. Tous droits réservés."
+  }
+}
