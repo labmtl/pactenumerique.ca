@@ -65,10 +65,17 @@ export async function initDatabase() {
   try {
     const schemaPath = path.join(__dirname, '../db/schema.sql');
     const sql = fs.readFileSync(schemaPath, 'utf-8');
-    const statements = sql
+    
+    // Nettoie les commentaires SQL (lignes et blocs) pour éviter que les instructions
+    // précédées d'un en-tête de commentaire soient ignorées
+    const cleanSql = sql
+      .replace(/--.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+
+    const statements = cleanSql
       .split(';')
       .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+      .filter(s => s.length > 0);
 
     for (const statement of statements) {
       await p.query(statement);
@@ -76,6 +83,7 @@ export async function initDatabase() {
     console.log('[DB] Schéma PostgreSQL validé et tables vérifiées avec succès.');
   } catch (err) {
     console.error(`[DB] Erreur lors de l'initialisation du schéma PostgreSQL: ${err.message}`);
+    throw err;
   }
 }
 

@@ -7,8 +7,14 @@ import {
   markCircleTriggered,
   addCirclePushListener,
   getCirclePushListeners,
-  getTerritoryStats
+  getTerritoryStats,
+  initDatabase
 } from '../src/services/db.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('Service de Persistance & Logique de Masse Critique', () => {
   const testBlindId = 'e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0';
@@ -71,5 +77,38 @@ describe('Service de Persistance & Logique de Masse Critique', () => {
     assert.strictEqual(step3.current_count, 4);
     assert.strictEqual(step3.unlocked, true);
     assert.strictEqual(step3.is_newly_unlocked, false);
+  });
+
+  it('exécute initDatabase sans erreur en mode mémoire', async () => {
+    await assert.doesNotReject(async () => {
+      await initDatabase();
+    });
+  });
+
+  it('valide que schema.sql extrait correctement toutes les tables et index sans être tronqué par les commentaires', () => {
+    const schemaPath = path.join(__dirname, '../src/db/schema.sql');
+    const sql = fs.readFileSync(schemaPath, 'utf-8');
+
+    const cleanSql = sql
+      .replace(/--.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+
+    const statements = cleanSql
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    // Vérifie la présence des 4 CREATE TABLE
+    const createTables = statements.filter(s => s.toUpperCase().startsWith('CREATE TABLE'));
+    assert.strictEqual(createTables.length, 4);
+
+    assert.ok(createTables.some(s => s.includes('pact_commitments')));
+    assert.ok(createTables.some(s => s.includes('blind_circles')));
+    assert.ok(createTables.some(s => s.includes('circle_push_listeners')));
+    assert.ok(createTables.some(s => s.includes('territory_stats')));
+
+    // Vérifie la présence des 7 CREATE INDEX
+    const createIndexes = statements.filter(s => s.toUpperCase().startsWith('CREATE INDEX'));
+    assert.strictEqual(createIndexes.length, 7);
   });
 });
