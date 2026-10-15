@@ -41,3 +41,10 @@ export function verifyProofOfWork(payload, nonce) {
 export function generateUUID() {
   return crypto.randomUUID();
 }
+
+/**
+ * Génère un sel cryptographique aléatoire sécurisé (hexadécimal de 64 caractères par défaut)
+ */
+export function generateSalt(bytes = 32) {
+  return crypto.randomBytes(bytes).toString('hex');
+}

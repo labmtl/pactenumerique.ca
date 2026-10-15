@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { hashEmail, isValidBlindId, verifyProofOfWork, generateUUID } from '../src/services/cryptoService.js';
+import { hashEmail, isValidBlindId, verifyProofOfWork, generateUUID, generateSalt } from '../src/services/cryptoService.js';
 import crypto from 'node:crypto';
 
 describe('Service Cryptographique & Zero-Knowledge', () => {
@@ -67,5 +67,20 @@ describe('Service Cryptographique & Zero-Knowledge', () => {
     assert.strictEqual(typeof uuid1, 'string');
     assert.match(uuid1, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
     assert.notStrictEqual(uuid1, uuid2);
+  });
+
+  it('génère un sel cryptographique sécurisé', () => {
+    const salt1 = generateSalt();
+    const salt2 = generateSalt();
+
+    assert.ok(salt1);
+    assert.strictEqual(typeof salt1, 'string');
+    assert.strictEqual(salt1.length, 64); // 32 octets = 64 caractères hex
+    assert.match(salt1, /^[0-9a-f]{64}$/i);
+    assert.notStrictEqual(salt1, salt2);
+
+    // Test avec taille personnalisée
+    const customSalt = generateSalt(16);
+    assert.strictEqual(customSalt.length, 32); // 16 octets = 32 caractères hex
   });
 });

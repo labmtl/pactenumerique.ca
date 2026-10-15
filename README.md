@@ -44,6 +44,12 @@ npm run vapid:generate
 ```
 Copiez les deux clés obtenues dans votre fichier `.env`.
 
+Pour générer un sel cryptographique aléatoire de 64 caractères pour `SERVER_SALT` :
+```bash
+npm run salt:generate
+```
+Copiez la valeur obtenue dans votre fichier `.env`.
+
 ### 3. Lancement des tests automatisés
 Une suite complète de tests sans dépendance externe (utilisant le test runner natif de Node.js) valide la cryptographie, les codes postaux, la logique de masse critique et l'API :
 ```bash
@@ -98,7 +104,7 @@ cd /home/votrenom/pactenumerique.ca
 # Installer les modules
 npm install --production
 
-# Créer automatiquement les tables MySQL
+# Créer automatiquement les tables PostgreSQL
 npm run db:init
 ```
 
@@ -130,15 +136,16 @@ pactenumerique.ca/
 │   │   ├── pact.js           # API de signature et incrément de cercle aveugle
 │   │   └── stats.js          # API de statistiques territoriales et clé VAPID
 │   ├── services/
-│   │   ├── db.js             # Pool de connexions MySQL (mysql2/promise) avec fallback
-│   │   ├── cryptoService.js  # Utilitaires de sécurité et anti-spam PoW
+│   │   ├── db.js             # Pool de connexions PostgreSQL (pg) avec fallback mémoire
+│   │   ├── cryptoService.js  # Utilitaires de sécurité, sel HMAC et anti-spam PoW
 │   │   └── notifier.js       # Émetteur de notifications Web Push RFC 8291
 │   ├── utils/
 │   │   ├── postalCodes.js    # Validateur et extracteur de RTA (FSA) canadiennes
-│   │   └── generateVapid.js  # Générateur de clés cryptographiques VAPID
+│   │   ├── generateVapid.js  # Générateur de clés cryptographiques VAPID
+│   │   └── generateSalt.js   # Générateur de sel cryptographique sécurisé (SERVER_SALT)
 │   └── db/
-│       ├── schema.sql        # Définition des tables MySQL optimisées InnoDB
-│       └── init.js           # Script de migration automatique
+│       ├── schema.sql        # Définition des tables PostgreSQL
+│       └── init.js           # Script d'initialisation automatique des tables
 ├── .env.example              # Gabarit des variables d'environnement
 ├── DESIGN.md                 # Architecture technique détaillée
 ├── package.json
