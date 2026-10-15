@@ -56,17 +56,17 @@ npm run dev
 ```
 Ouvrez votre fureteur sur [http://localhost:3000](http://localhost:3000).
 
-*(Note : Si votre base MySQL n'est pas encore démarrée en local, l'application bascule automatiquement en mode simulation mémoire pour vous permettre de tester l'interface et les flux cryptographiques sans interruption).*
+*(Note : Si votre base PostgreSQL n'est pas encore démarrée en local, l'application bascule automatiquement en mode simulation mémoire pour vous permettre de tester l'interface et les flux cryptographiques sans interruption).*
 
 ---
 
 ## 🍁 Déploiement chez Web Hosting Canada (WHC.ca)
 
-### Étape 1 : Créer la base de données MySQL sur cPanel
+### Étape 1 : Créer la base de données PostgreSQL sur cPanel
 1. Connectez-vous à votre cPanel WHC.ca.
-2. Allez dans **Bases de données MySQL** (ou l'*Assistant bases de données MySQL*).
+2. Allez dans **Bases de données PostgreSQL** (ou l'*Assistant bases de données PostgreSQL*).
 3. Créez une nouvelle base de données (ex: `votrenom_pacte`).
-4. Créez un utilisateur MySQL avec un mot de passe sécurisé et associez-le à la base avec **Tous les privilèges**.
+4. Créez un utilisateur PostgreSQL avec un mot de passe sécurisé et associez-le à la base de données avec **Tous les privilèges**.
 
 ### Étape 2 : Configurer l'application Node.js sur cPanel
 1. Dans cPanel, cliquez sur **Setup Node.js App** (Gestionnaire d'applications Node.js).
@@ -77,9 +77,9 @@ Ouvrez votre fureteur sur [http://localhost:3000](http://localhost:3000).
    - **Application URL :** `pactenumerique.ca`
    - **Application startup file :** `src/server.js`
 3. Cliquez sur **Create**.
-4. Dans la section **Environment variables**, ajoutez vos accès MySQL :
+4. Dans la section **Environment variables**, ajoutez vos accès PostgreSQL :
    - `DB_HOST` = `localhost` (ou `127.0.0.1`)
-   - `DB_PORT` = `3306`
+   - `DB_PORT` = `5432`
    - `DB_NAME` = `votrenom_pacte`
    - `DB_USER` = `votrenom_utilisateur`
    - `DB_PASSWORD` = `votre_mot_de_passe`

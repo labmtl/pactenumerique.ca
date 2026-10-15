@@ -140,12 +140,12 @@ pactenumerique.ca/
 │   │   ├── stats.js          # Statistiques territoriales anonymes par RTA
 │   │   └── push.js           # Gestion des abonnements push VAPID et déclenchements
 │   ├── services/
-│   │   ├── db.js             # Couche persistance MySQL (pool de connexions via mysql2/promise)
+│   │   ├── db.js             # Couche persistance PostgreSQL (pool de connexions via pg)
 │   │   ├── cryptoService.js  # Utilitaires cryptographiques et validations anti-rejeu
 │   │   └── notifier.js       # Déclencheur des notifications VAPID Web Push
 │   └── utils/
 │       └── postalCodes.js    # Validation et classification des codes postaux canadiens
-├── .env.example              # Variables d'environnement pour connexion MySQL et clés VAPID
+├── .env.example              # Variables d'environnement pour connexion PostgreSQL et clés VAPID
 ├── package.json
 └── DESIGN.md
 ```
@@ -153,8 +153,8 @@ pactenumerique.ca/
 ### 5.1 Pile Technologique Sélectionnée
 - **Frontend :** HTML5 sémantique, CSS moderne vanilla (design système sur-mesure, typographie moderne, tokens HSL, animations subtiles, micro-interactions), JavaScript ES modules natifs.
 - **Sécurité Client :** `window.crypto.subtle` (Web Crypto API standard) pour garantir qu'aucune dépendance tierce ne puisse fuiter les clés.
-- **Backend :** Node.js 20+ (Express / Fastify) compatible avec l'environnement d'hébergement Node.js de WHC.ca (Web Hosting Canada via cPanel Node.js Selector ou conteneur Cloud/VPS).
-- **Base de données :** MySQL 8.0 / MariaDB (hébergée sur WHC.ca) avec le pilote `mysql2/promise` et pool de connexions optimisé.
+- **Backend :** Node.js 20+ (Express) compatible avec l'environnement d'hébergement Node.js de WHC.ca (Web Hosting Canada via cPanel Node.js Selector ou conteneur Cloud/VPS).
+- **Base de données :** PostgreSQL 15 / 16 (hébergée sur WHC.ca) avec le pilote `pg` (node-postgres) et pool de connexions optimisé.
 - **Notifications :** `web-push` (implémentation du protocole standard RFC 8291 / 8292 avec clés VAPID).
 - **Anti-Abus :** Défi Proof-of-Work léger (type SHA-256 hashcash dans le navigateur) pour chaque signature, empêchant les fermes de bots de fausser les compteurs territoriaux.
 
@@ -162,52 +162,53 @@ pactenumerique.ca/
 
 ## 6. Spécification des APIs & Données
 
-### 6.1 Schéma de la Base de Données MySQL (Anonymisée)
+### 6.1 Schéma de la Base de Données PostgreSQL (Anonymisée)
 
 ```sql
--- Encodage recommandé : utf8mb4 / utf8mb4_unicode_ci
-
 -- 1. Engagements individuels (sans lien direct avec les cercles)
 CREATE TABLE IF NOT EXISTS pact_commitments (
     id VARCHAR(36) PRIMARY KEY,                    -- UUID v4
     fsa VARCHAR(3) NOT NULL,                       -- 3 caractères RTA (ex: 'H2T')
     province VARCHAR(2) NOT NULL,                  -- Dérivé du FSA (ex: 'QC', 'ON')
-    email_hash VARCHAR(64) UNIQUE NULL,            -- HMAC-SHA256(email, SERVER_SECRET) pour anti-doublon
-    encrypted_email TEXT NULL,                     -- Optionnel, chiffré avec clé publique administrateur
-    push_subscription TEXT NULL,                   -- JSON chiffré {endpoint, keys} pour notification fureteur
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_fsa (fsa),
-    INDEX idx_province (province)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    email_hash VARCHAR(64) UNIQUE,                 -- HMAC-SHA256(email, SERVER_SECRET) pour anti-doublon
+    encrypted_email TEXT,                          -- Optionnel, chiffré avec clé publique administrateur
+    push_subscription TEXT,                        -- JSON {endpoint, keys} pour notification fureteur
+    target_networks TEXT,                          -- JSON des réseaux ciblés
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_pact_fsa ON pact_commitments (fsa);
+CREATE INDEX IF NOT EXISTS idx_pact_province ON pact_commitments (province);
+CREATE INDEX IF NOT EXISTS idx_pact_created_at ON pact_commitments (created_at);
 
--- 2. Cercles d'invitation aveugles (Blind Circles)
+-- 2. Cercles d'invitation aveugles (Zero-Knowledge Blind Circles)
 CREATE TABLE IF NOT EXISTS blind_circles (
     blind_id VARCHAR(64) PRIMARY KEY,              -- Hachage public de la clé du cercle
     target_count INT NOT NULL DEFAULT 5,           -- Seuil fixé par l'initiateur (ex: 5)
     current_count INT NOT NULL DEFAULT 1,          -- Nombre actuel d'adhérents
-    is_triggered TINYINT(1) NOT NULL DEFAULT 0,    -- 1 si la masse critique a été notifiée
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_triggered (is_triggered)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    is_triggered BOOLEAN NOT NULL DEFAULT FALSE,   -- TRUE si la masse critique a été notifiée
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_blind_triggered ON blind_circles (is_triggered);
 
--- 3. Liaisons de notification de cercle (sans identité)
+-- 3. Abonnements Web Push liés aux cercles aveugles (sans données nominatives)
 CREATE TABLE IF NOT EXISTS circle_push_listeners (
     id VARCHAR(36) PRIMARY KEY,
-    blind_id VARCHAR(64) NOT NULL,
+    blind_id VARCHAR(64) NOT NULL REFERENCES blind_circles(blind_id) ON DELETE CASCADE,
     push_subscription TEXT NOT NULL,               -- Endpoint Web Push pour avertir ce membre
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_blind_id (blind_id),
-    CONSTRAINT fk_circle FOREIGN KEY (blind_id) REFERENCES blind_circles(blind_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_listener_blind_id ON circle_push_listeners (blind_id);
 
--- 4. Agrégats territoriaux en cache pour performances temps réel
+-- 4. Statistiques territoriales en cache (RTA / FSA)
 CREATE TABLE IF NOT EXISTS territory_stats (
     fsa VARCHAR(3) PRIMARY KEY,
+    province VARCHAR(2) NOT NULL,
     signers_count INT NOT NULL DEFAULT 0,
-    target_threshold INT NOT NULL DEFAULT 100,
-    INDEX idx_count (signers_count)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    target_threshold INT NOT NULL DEFAULT 100
+);
+CREATE INDEX IF NOT EXISTS idx_territory_signers ON territory_stats (signers_count);
+CREATE INDEX IF NOT EXISTS idx_territory_province ON territory_stats (province);
 ```
 
 ### 6.2 Points d'accès d'API (Endpoints)
@@ -280,16 +281,17 @@ Obtenir les statistiques d'adhésion pour la carte et les jauges publiques.
    - **Infrastructure WHC (Web Hosting Canada) :** Les données résident 100% en sol canadien (centres de données écologiques certifiés à Montréal et Vancouver), assurant une conformité totale avec les lois canadiennes et québécoises sur la protection des données et éliminant tout assujettissement au *Cloud Act* américain.
    - **Configuration cPanel / Node.js Selector ou Cloud WHC :**
      - Port écouté configurable via variable d'environnement `PORT` (indispensable pour Phusion Passenger de cPanel).
-     - Paramètres de connexion MySQL via fichier `.env` protégé (en dehors du répertoire web racine `public_html` si applicable).
+     - Paramètres de connexion PostgreSQL via fichier `.env` protégé (port standard `5432`).
 
 ---
 
 ## 9. Plan d'Implémentation & Prochaines Étapes
 
-- [x] **Étape 1 :** Finalisation de l'architecture et validation du `DESIGN.md` (adapté pour WHC.ca & MySQL).
-- [ ] **Étape 2 :** Initialisation du projet Node.js (`package.json`, pilotes `mysql2`, scripts de migration SQL, variables d'environnement `.env`).
-- [ ] **Étape 3 :** Développement du module cryptographique client (`crypto.js`) avec Web Crypto API (génération de clé, chiffrement d'URL par fragment `#`, calcul du blind hash).
-- [ ] **Étape 4 :** Développement de l'interface utilisateur bilingue (FR/EN) : design moderne, épuré, dynamique, jauges de masse critique par code postal (RTA).
-- [ ] **Étape 5 :** Intégration du Service Worker et protocole Web Push pour les notifications en temps réel.
-- [ ] **Étape 6 :** Script de configuration et instructions de déploiement spécifiques pour WHC.ca (Node.js App Selector, MySQL cPanel).
+- [x] **Étape 1 :** Finalisation de l'architecture et validation du `DESIGN.md` (adapté pour WHC.ca & PostgreSQL).
+- [x] **Étape 2 :** Initialisation du projet Node.js (`package.json`, pilote `pg`, scripts d'initialisation SQL, variables d'environnement `.env`).
+- [x] **Étape 3 :** Développement du module cryptographique client (`crypto.js`) avec Web Crypto API (génération de clé, chiffrement d'URL par fragment `#`, calcul du blind hash).
+- [x] **Étape 4 :** Développement de l'interface utilisateur bilingue (FR/EN) : design moderne, épuré, dynamique, jauges de masse critique par code postal (RTA) et sélection d'alternatives ciblées.
+- [x] **Étape 5 :** Intégration du Service Worker et protocole Web Push pour les notifications en temps réel.
+- [x] **Étape 6 :** Suite de tests automatisés (17 tests) et workflow GitHub Actions CI.
+- [x] **Étape 7 :** Script de configuration et instructions de déploiement spécifiques pour WHC.ca (Node.js App Selector, PostgreSQL cPanel).
 
