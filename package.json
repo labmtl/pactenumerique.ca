@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "node --test tests/**/*.test.js",
+    "test:urls": "node scripts/check-urls.js",
     "db:init": "node src/db/init.js",
     "vapid:generate": "node src/utils/generateVapid.js",
     "salt:generate": "node src/utils/generateSalt.js"

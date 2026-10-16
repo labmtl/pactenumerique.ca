@@ -17,35 +17,36 @@ const state = {
   targetCount: 5,
   pushSubscription: null,
   isPushActive: false,
-  userProvince: 'QC', // Détecté via code postal
+  userProvince: 'QC', // Détecté via code postal (par défaut QC)
   alternatives: [],
   selectedNetworks: new Set(['X / Twitter', 'Instagram']),
   chosenAlternativeId: null,
   currentDirectoryCat: 'all',
   currentDirectoryRegion: 'all',
+  currentDirectoryLang: 'all',
   directorySearchQuery: ''
 };
 
 // Dictionnaire des provinces canadiennes pour badge interactif
 const PROVINCE_MAP = {
-  A: { code: 'NL', fr: 'Terre-Neuve-et-Labrador', en: 'Newfoundland & Labrador' },
-  B: { code: 'NS', fr: 'Nouvelle-Écosse', en: 'Nova Scotia' },
-  C: { code: 'PE', fr: 'Île-du-Prince-Édouard', en: 'Prince Edward Island' },
-  E: { code: 'NB', fr: 'Nouveau-Brunswick', en: 'New Brunswick' },
-  G: { code: 'QC', fr: 'Québec (Est)', en: 'Quebec (East)' },
-  H: { code: 'QC', fr: 'Québec (Montréal / Laval)', en: 'Quebec (Montreal / Laval)' },
-  J: { code: 'QC', fr: 'Québec (Ouest & Nord)', en: 'Quebec (West & North)' },
-  K: { code: 'ON', fr: 'Ontario (Est / Ottawa)', en: 'Ontario (East / Ottawa)' },
-  L: { code: 'ON', fr: 'Ontario (Centre)', en: 'Ontario (Central)' },
-  M: { code: 'ON', fr: 'Ontario (Grand Toronto)', en: 'Ontario (Greater Toronto)' },
-  N: { code: 'ON', fr: 'Ontario (Sud-Ouest)', en: 'Ontario (Southwest)' },
-  P: { code: 'ON', fr: 'Ontario (Nord)', en: 'Ontario (North)' },
-  R: { code: 'MB', fr: 'Manitoba', en: 'Manitoba' },
-  S: { code: 'SK', fr: 'Saskatchewan', en: 'Saskatchewan' },
-  T: { code: 'AB', fr: 'Alberta', en: 'Alberta' },
-  V: { code: 'BC', fr: 'Colombie-Britannique', en: 'British Columbia' },
-  X: { code: 'NT', fr: 'Territoires du Nord-Ouest / Nunavut', en: 'Northwest Territories / Nunavut' },
-  Y: { code: 'YT', fr: 'Yukon', en: 'Yukon' }
+  A: { code: 'NL', fr: 'Terre-Neuve-et-Labrador', en: 'Newfoundland & Labrador', icon: '🇨🇦' },
+  B: { code: 'NS', fr: 'Nouvelle-Écosse', en: 'Nova Scotia', icon: '🇨🇦' },
+  C: { code: 'PE', fr: 'Île-du-Prince-Édouard', en: 'Prince Edward Island', icon: '🇨🇦' },
+  E: { code: 'NB', fr: 'Nouveau-Brunswick', en: 'New Brunswick', icon: '🇨🇦' },
+  G: { code: 'QC', fr: 'Québec (Est)', en: 'Quebec (East)', icon: '⚜️' },
+  H: { code: 'QC', fr: 'Québec (Montréal / Laval)', en: 'Quebec (Montreal / Laval)', icon: '⚜️' },
+  J: { code: 'QC', fr: 'Québec (Ouest & Nord)', en: 'Quebec (West & North)', icon: '⚜️' },
+  K: { code: 'ON', fr: 'Ontario (Est / Ottawa)', en: 'Ontario (East / Ottawa)', icon: '🇨🇦' },
+  L: { code: 'ON', fr: 'Ontario (Centre)', en: 'Ontario (Central)', icon: '🇨🇦' },
+  M: { code: 'ON', fr: 'Ontario (Grand Toronto)', en: 'Ontario (Greater Toronto)', icon: '🇨🇦' },
+  N: { code: 'ON', fr: 'Ontario (Sud-Ouest)', en: 'Ontario (Southwest)', icon: '🇨🇦' },
+  P: { code: 'ON', fr: 'Ontario (Nord)', en: 'Ontario (North)', icon: '🇨🇦' },
+  R: { code: 'MB', fr: 'Manitoba', en: 'Manitoba', icon: '🇨🇦' },
+  S: { code: 'SK', fr: 'Saskatchewan', en: 'Saskatchewan', icon: '🇨🇦' },
+  T: { code: 'AB', fr: 'Alberta', en: 'Alberta', icon: '🇨🇦' },
+  V: { code: 'BC', fr: 'Colombie-Britannique', en: 'British Columbia', icon: '🇨🇦' },
+  X: { code: 'NT', fr: 'Territoires du Nord-Ouest / Nunavut', en: 'Northwest Territories / Nunavut', icon: '🇨🇦' },
+  Y: { code: 'YT', fr: 'Yukon', en: 'Yukon', icon: '🇨🇦' }
 };
 
 // Initialisation au chargement du DOM
@@ -65,9 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Gestion de la langue et de l'i18n
  */
 async function setupLanguage() {
-  const browserLang = (navigator.language || 'fr').toLowerCase();
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlLang = urlParams.get('lang');
   const savedLang = localStorage.getItem('pacte_lang');
-  state.lang = savedLang || (browserLang.startsWith('en') ? 'en' : 'fr');
+  state.lang = (urlLang === 'en' || urlLang === 'fr') ? urlLang : (savedLang || 'fr');
 
   await loadTranslations(state.lang);
   applyTranslations();
@@ -210,7 +212,7 @@ function setupEventListeners() {
           state.isPushActive = true;
           pushBtn.classList.add('active');
           pushBtn.textContent = '✓ ' + (state.lang === 'fr' ? 'Activé' : 'Enabled');
-          showToast(state.lang === 'fr' ? 'Notifications fureteur activées !' : 'Browser notifications enabled!');
+          showToast(state.lang === 'fr' ? 'Notifications du fureteur activées !' : 'Browser notifications enabled!');
         } else {
           pushBtn.disabled = false;
           pushBtn.textContent = t('form.enable_push');
@@ -239,6 +241,16 @@ function setupEventListeners() {
       document.querySelectorAll('[data-region]').forEach(b => b.classList.remove('active'));
       e.currentTarget.classList.add('active');
       state.currentDirectoryRegion = e.currentTarget.dataset.region;
+      renderDirectory();
+    });
+  });
+
+  // Filtres du répertoire (Langues)
+  document.querySelectorAll('[data-lang-filter]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('[data-lang-filter]').forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      state.currentDirectoryLang = e.currentTarget.dataset.langFilter;
       renderDirectory();
     });
   });
@@ -279,6 +291,7 @@ function setupEventListeners() {
 function updatePostalCodeFeedback() {
   const input = document.getElementById('postalCodeInput');
   const badge = document.getElementById('geoBadge');
+  const qcRecomBadge = document.getElementById('recomQcBadge');
   if (!input || !badge) return;
 
   const val = input.value.trim().toUpperCase().replace(/\s+/g, '');
@@ -289,11 +302,19 @@ function updatePostalCodeFeedback() {
       state.userProvince = prov.code;
       badge.style.display = 'inline-flex';
       const provName = state.lang === 'fr' ? prov.fr : prov.en;
-      badge.textContent = `📍 ${prov.code} - ${provName}`;
+      const icon = prov.icon || (prov.code === 'QC' ? '⚜️' : '🇨🇦');
+      badge.textContent = `📍 ${icon} ${prov.code} - ${provName}`;
+      badge.className = prov.code === 'QC' ? 'geo-badge qc' : 'geo-badge';
+      if (qcRecomBadge) {
+        qcRecomBadge.style.display = prov.code === 'QC' ? 'inline-flex' : 'none';
+      }
       return;
     }
   }
   badge.style.display = 'none';
+  if (qcRecomBadge) {
+    qcRecomBadge.style.display = state.userProvince === 'QC' ? 'inline-flex' : 'none';
+  }
 }
 
 /**
@@ -302,6 +323,7 @@ function updatePostalCodeFeedback() {
 function renderRecommendations() {
   const box = document.getElementById('recommendationsBox');
   const container = document.getElementById('recomCards');
+  const qcRecomBadge = document.getElementById('recomQcBadge');
   if (!box || !container || state.alternatives.length === 0) return;
 
   // Filtrer les alternatives qui remplacent les réseaux cochés
@@ -321,11 +343,22 @@ function renderRecommendations() {
     return;
   }
 
-  // Trier pour mettre en avant la province de l'utilisateur (QC ou CA)
+  // Trier pour mettre en avant les solutions hébergées au Québec si l'usager est au Québec
   matching.sort((a, b) => {
-    const aIsLocal = a.region === state.userProvince ? 1 : 0;
-    const bIsLocal = b.region === state.userProvince ? 1 : 0;
-    return bIsLocal - aIsLocal;
+    if (state.userProvince === 'QC') {
+      const aIsQc = (a.region === 'QC' || a.hosted_in_qc) ? 1 : 0;
+      const bIsQc = (b.region === 'QC' || b.hosted_in_qc) ? 1 : 0;
+      if (bIsQc !== aIsQc) return bIsQc - aIsQc;
+      // Prioriser le support en français
+      const aFr = a.support_fr ? 1 : 0;
+      const bFr = b.support_fr ? 1 : 0;
+      if (bFr !== aFr) return bFr - aFr;
+    } else {
+      const aIsLocal = a.region === state.userProvince ? 1 : 0;
+      const bIsLocal = b.region === state.userProvince ? 1 : 0;
+      if (bIsLocal !== aIsLocal) return bIsLocal - aIsLocal;
+    }
+    return 0;
   });
 
   const topMatches = matching.slice(0, 4);
@@ -336,16 +369,37 @@ function renderRecommendations() {
   }
 
   box.style.display = 'block';
+  if (qcRecomBadge) {
+    qcRecomBadge.style.display = state.userProvince === 'QC' ? 'inline-flex' : 'none';
+  }
+
   container.innerHTML = topMatches.map(alt => {
     const isSelected = alt.id === state.chosenAlternativeId;
-    const regionFlag = alt.region === 'QC' ? '🍁 Québec' : '🇨🇦 Canada';
+    const isQc = alt.region === 'QC' || alt.hosted_in_qc;
+    const hostTag = alt.hosted_in_qc 
+      ? `<span class="recom-host-pill qc" title="${alt.host}">⚜️ Hébergé au QC</span>`
+      : `<span class="recom-host-pill ca" title="${alt.host}">🇨🇦 Hébergé au CA</span>`;
+
+    let langPill = '';
+    if (alt.support_fr && alt.support_en) {
+      langPill = '<span class="recom-lang-badge bilingual" title="Support bilingue (FR / EN)">FR/EN</span>';
+    } else if (alt.support_fr) {
+      langPill = '<span class="recom-lang-badge fr" title="Support en français">FR</span>';
+    } else if (alt.support_en) {
+      langPill = '<span class="recom-lang-badge en" title="Support en anglais">EN</span>';
+    }
+
     return `
-      <div class="recom-card ${isSelected ? 'selected' : ''}" data-recom-id="${alt.id}">
+      <div class="recom-card ${isSelected ? 'selected' : ''} ${isQc ? 'qc-card' : ''}" data-recom-id="${alt.id}">
         <div class="recom-card-title">
-          <span>${alt.name}</span>
-          <span class="recom-card-badge">${regionFlag}</span>
+          <span class="recom-name">${alt.name}</span>
+          <div class="recom-badges-row">
+            ${hostTag}
+            ${langPill}
+          </div>
         </div>
         <div class="recom-card-sub">${alt.protocol}</div>
+        <div class="recom-card-host"><small>${alt.host}</small></div>
       </div>
     `;
   }).join('');
@@ -373,13 +427,26 @@ function renderDirectory() {
       return false;
     }
     // Filtre région
-    if (state.currentDirectoryRegion !== 'all' && alt.region !== state.currentDirectoryRegion) {
+    if (state.currentDirectoryRegion === 'QC' && !(alt.region === 'QC' || alt.hosted_in_qc)) {
+      return false;
+    }
+    if (state.currentDirectoryRegion === 'CA' && alt.region !== 'CA' && alt.hosted_in_qc) {
+      return false;
+    }
+    // Filtre langue
+    if (state.currentDirectoryLang === 'fr' && !alt.support_fr) {
+      return false;
+    }
+    if (state.currentDirectoryLang === 'en' && !alt.support_en) {
+      return false;
+    }
+    if (state.currentDirectoryLang === 'bilingual' && (!alt.support_fr || !alt.support_en)) {
       return false;
     }
     // Filtre recherche textuelle
     if (state.directorySearchQuery) {
       const q = state.directorySearchQuery;
-      const haystack = `${alt.name} ${alt.protocol} ${alt.desc_fr} ${alt.desc_en} ${alt.host} ${alt.replaces.join(' ')}`.toLowerCase();
+      const haystack = `${alt.name} ${alt.protocol} ${alt.desc_fr} ${alt.desc_en} ${alt.host} ${alt.org} ${alt.replaces.join(' ')} ${alt.lang}`.toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     return true;
@@ -394,21 +461,51 @@ function renderDirectory() {
     return;
   }
 
+  // Si l'utilisateur est au Québec, trier pour mettre en premier les solutions hébergées au Québec
+  filtered.sort((a, b) => {
+    if (state.userProvince === 'QC') {
+      const aQc = (a.hosted_in_qc || a.region === 'QC') ? 1 : 0;
+      const bQc = (b.hosted_in_qc || b.region === 'QC') ? 1 : 0;
+      if (bQc !== aQc) return bQc - aQc;
+    }
+    return 0;
+  });
+
   grid.innerHTML = filtered.map(alt => {
-    const isQc = alt.region === 'QC';
-    const flagBadge = isQc ? '<span class="badge-tag qc">🍁 Québec</span>' : '<span class="badge-tag ca">🇨🇦 Canada</span>';
+    const isQc = alt.region === 'QC' || alt.hosted_in_qc;
+    const flagBadge = isQc 
+      ? '<span class="badge-tag qc">⚜️ Québec</span>' 
+      : '<span class="badge-tag ca">🇨🇦 Canada</span>';
+    
+    const hostBadge = alt.hosted_in_qc
+      ? `<span class="badge-tag qc-host" title="Données hébergées en sol québécois, conformité Loi 25">⚜️ ${t('directory.hosted_in_qc') || 'Hébergé au Québec'}</span>`
+      : `<span class="badge-tag ca-host" title="Données hébergées en sol canadien">🇨🇦 ${t('directory.hosted_in_ca') || 'Hébergé au Canada'}</span>`;
+
+    let langBadges = '';
+    if (alt.support_fr && alt.support_en) {
+      langBadges = '<span class="badge-lang bilingual" title="Support complet français et anglais">🌐 Bilingue FR / EN</span>';
+    } else if (alt.support_fr) {
+      langBadges = '<span class="badge-lang fr" title="Support complet en français">⚜️ Support FR</span>';
+    } else if (alt.support_en) {
+      langBadges = '<span class="badge-lang en" title="Support en anglais">🇨🇦 Support EN</span>';
+    }
+
     const replacesText = alt.replaces.join(', ');
     const desc = state.lang === 'fr' ? alt.desc_fr : alt.desc_en;
-    const catName = state.lang === 'fr' ? alt.categoryName_fr : alt.categoryName_en;
+    const langDisplay = state.lang === 'fr' 
+      ? (alt.lang_display_fr || alt.lang)
+      : (alt.lang_display_en || alt.lang);
 
     return `
-      <div class="instance-card">
+      <div class="instance-card ${isQc ? 'qc-card' : ''}">
         <div>
           <div class="instance-header">
             <h4 class="instance-name">${alt.name}</h4>
             <div class="instance-badges">
               ${flagBadge}
-              <span class="badge-tag ca">${alt.protocol.split(' ')[0]}</span>
+              ${hostBadge}
+              ${langBadges}
+              <span class="badge-tag proto">${alt.protocol.split(' ')[0]}</span>
             </div>
           </div>
           <div class="instance-replaces">
@@ -419,9 +516,9 @@ function renderDirectory() {
         
         <div>
           <div class="instance-meta">
-            <div>📍 <strong>Hébergement :</strong> ${alt.host}</div>
-            <div>🏛️ <strong>Organisation :</strong> ${alt.org}</div>
-            <div>💬 <strong>Langue :</strong> ${alt.lang}</div>
+            <div>📍 <strong>${state.lang === 'fr' ? 'Hébergement :' : 'Hosting:'}</strong> ${alt.host}</div>
+            <div>🏛️ <strong>${state.lang === 'fr' ? 'Organisation :' : 'Organization:'}</strong> ${alt.org}</div>
+            <div>💬 <strong>${state.lang === 'fr' ? 'Langues et support :' : 'Language & support:'}</strong> ${langDisplay} ${alt.support_fr ? '<span class="lang-check" title="Support français validé">✔ FR</span>' : ''} ${alt.support_en ? '<span class="lang-check" title="Support anglais validé">✔ EN</span>' : ''}</div>
           </div>
           <div class="instance-actions">
             <a href="${alt.url}" target="_blank" rel="noopener noreferrer" class="btn-instance-visit">

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pacte Numérique Canada | Pour des Réseaux Sociaux Souverains</title>
-  <meta name="description" content="Engagez-vous conditionnellement à quitter la Big Tech américaine dès que vos amis et votre quartier au Canada sont prêts. Chiffrement Zero-Knowledge.">
+  <title>Pacte numérique Canada | Pour des réseaux sociaux souverains</title>
+  <meta name="description" content="Engagez-vous conditionnellement à quitter la Big Tech américaine dès que vos proches et votre quartier au Canada sont prêts. Chiffrement zéro-connaissance.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
         <ul class="nav-links">
           <li><a href="#engagement" data-i18n="nav.how_it_works">Comment ça marche</a></li>
           <li><a href="#territoires" data-i18n="nav.territories">Mobilisation</a></li>
-          <li><a href="#repertoire" data-i18n="nav.directory">Répertoire Souverain</a></li>
+          <li><a href="#repertoire" data-i18n="nav.directory">Répertoire souverain</a></li>
           <li><a href="#ecosysteme" data-i18n="nav.ecosystem">Écosystème</a></li>
         </ul>
         <button id="btnLangToggle" class="btn-lang" aria-label="Changer de langue">EN</button>
@@ -44,10 +44,10 @@
   <!-- Section Héro -->
   <main>
     <section class="hero-section">
-      <div class="hero-badge" data-i18n="hero.badge">🇨🇦 Action Collective Canadienne & Souveraineté Numérique</div>
+      <div class="hero-badge" data-i18n="hero.badge">🇨🇦 Action collective canadienne et souveraineté numérique</div>
       <h1 class="hero-title">
         <span data-i18n="hero.title_main">Reprenons le contrôle de nos interactions sociales</span><br>
-        <span class="gradient-text" data-i18n="hero.title_gradient">Ensemble. Par le Pacte.</span>
+        <span class="gradient-text" data-i18n="hero.title_gradient">Ensemble. Par le pacte.</span>
       </h1>
       <p class="hero-subtitle" data-i18n="hero.subtitle">
         Nous sommes des millions à vouloir quitter les plateformes toxiques de la Big Tech américaine. Mais personne ne veut être le premier à partir seul. Engagez-vous conditionnellement : faites le saut dès que vos proches et votre région sont prêts !
@@ -60,11 +60,11 @@
         </div>
         <div class="counter-card">
           <div class="counter-num" id="counterCircles">100%</div>
-          <div class="counter-label">Zero-Knowledge</div>
+          <div class="counter-label">Zéro-connaissance</div>
         </div>
         <div class="counter-card">
           <div class="counter-num" id="counterHost">🍁 WHC</div>
-          <div class="counter-label">Hébergement Souverain</div>
+          <div class="counter-label">Hébergement souverain</div>
         </div>
       </div>
     </section>
@@ -73,15 +73,15 @@
     <section id="engagement" class="form-section">
       <div class="pact-card">
         <div class="card-header">
-          <h2 data-i18n="form.title">Votre Engagement Conditionnel</h2>
-          <p data-i18n="form.subtitle">Vos données restent privées grâce au chiffrement Zero-Knowledge. Aucun profilage, aucune revente.</p>
+          <h2 data-i18n="form.title">Votre engagement conditionnel</h2>
+          <p data-i18n="form.subtitle">Vos données restent privées grâce au chiffrement zéro-connaissance. Aucun profilage, aucune revente.</p>
         </div>
 
         <form id="pactForm">
           <!-- Étape 1 : Territoire -->
           <div class="form-group-block">
-            <h3 class="block-title" data-i18n="form.step1_title">1. Votre Territoire</h3>
-            <label for="postalCodeInput" class="input-help" data-i18n="form.postal_label">Code Postal Canadien</label>
+            <h3 class="block-title" data-i18n="form.step1_title">1. Votre territoire</h3>
+            <label for="postalCodeInput" class="input-help" data-i18n="form.postal_label">Code postal canadien</label>
             <input 
               type="text" 
               id="postalCodeInput" 
@@ -126,12 +126,19 @@
                 <span class="network-chip-icon">💼</span>
                 <span>LinkedIn</span>
               </div>
+              <div class="network-chip" data-network="Facebook Événements">
+                <span class="network-chip-icon">📅</span>
+                <span>Événements Facebook / Meetup</span>
+              </div>
             </div>
 
             <!-- Boîte de recommandation souveraine dynamique -->
             <div id="recommendationsBox" class="recommendations-box">
               <div class="recom-header">
-                <h4 data-i18n="form.recom_title">Alternatives locales recommandées pour vous :</h4>
+                <div class="recom-title-row">
+                  <h4 data-i18n="form.recom_title">Alternatives locales recommandées pour vous :</h4>
+                  <span id="recomQcBadge" class="recom-qc-badge" style="display:none;" data-i18n="directory.recom_qc_priority">⚜️ Solutions hébergées au Québec priorisées (Loi 25)</span>
+                </div>
                 <p class="input-help" data-i18n="form.recom_pick">Choisissez votre alternative prioritaire (ou laissez le cercle décider) :</p>
               </div>
               <div id="recomCards" class="recom-cards">
@@ -142,7 +149,7 @@
 
           <!-- Étape 3 : Masse critique personnelle -->
           <div class="form-group-block">
-            <h3 class="block-title" data-i18n="form.step2_title">3. Votre Masse Critique Personnelle</h3>
+            <h3 class="block-title" data-i18n="form.step2_title">3. Votre masse critique personnelle</h3>
             <p class="input-help" style="margin-bottom: 0.75rem;" data-i18n="form.threshold_label">Combien d'amis doivent vous rejoindre pour déclencher votre départ ?</p>
             <div class="threshold-options">
               <button type="button" class="threshold-btn" data-threshold="3">
@@ -162,11 +169,11 @@
 
           <!-- Étape 4 : Notification de bascule -->
           <div class="form-group-block">
-            <h3 class="block-title" data-i18n="form.step3_title">4. Notification de Bascule (The Leap)</h3>
+            <h3 class="block-title" data-i18n="form.step3_title">4. Notification de bascule</h3>
             
             <div class="push-toggle-box">
               <div class="push-info">
-                <h5 data-i18n="form.push_title">Notifications Fureteur (Recommandé)</h5>
+                <h5 data-i18n="form.push_title">Notifications du fureteur (recommandé)</h5>
                 <p data-i18n="form.push_desc">Recevez une alerte discrète dès que votre cercle ou votre quartier a atteint sa masse critique.</p>
               </div>
               <button type="button" id="btnTogglePush" class="btn-toggle-push" data-i18n="form.enable_push">
@@ -174,12 +181,12 @@
               </button>
             </div>
 
-            <label for="emailInput" class="input-help" data-i18n="form.email_label">Adresse courriel (Facultative)</label>
+            <label for="emailInput" class="input-help" data-i18n="form.email_label">Adresse courriel (facultative)</label>
             <input 
               type="email" 
               id="emailInput" 
               class="input-field" 
-              placeholder="nom@exemple.ca"
+              placeholder="nom@exemple.ca" 
               data-i18n-placeholder="form.email_placeholder"
               autocomplete="email"
             >
@@ -188,7 +195,7 @@
 
           <button type="submit" id="btnSubmitPact" class="btn-submit">
             <span>✍️</span>
-            <span data-i18n="form.submit_btn">Signer le Pacte Numérique</span>
+            <span data-i18n="form.submit_btn">Signer le pacte numérique</span>
           </button>
 
           <p class="legal-notice" data-i18n="form.legal_notice">
@@ -201,7 +208,7 @@
     <!-- Modal de Succès & Lien d'invitation -->
     <div id="successModal" class="modal-backdrop">
       <div class="modal-dialog">
-        <h3 data-i18n="modal_success.title">🎉 Félicitations, vous faites partie du Pacte !</h3>
+        <h3 data-i18n="modal_success.title">🎉 Félicitations, vous faites partie du pacte !</h3>
         <p data-i18n="modal_success.subtitle">Voici votre lien d'invitation privé. Partagez-le avec vos proches pour déverrouiller votre bascule collective.</p>
 
         <div class="invite-link-box">
@@ -235,7 +242,7 @@
     <!-- Répertoire interactif des réseaux souverains -->
     <section id="repertoire" class="directory-section">
       <div class="section-title">
-        <h2 data-i18n="directory.title">Répertoire des Réseaux Sociaux Souverains</h2>
+        <h2 data-i18n="directory.title">Répertoire des réseaux sociaux souverains</h2>
         <p data-i18n="directory.subtitle">Infrastructures numériques québécoises et canadiennes opérées par des coopératives, OBNL et collectifs citoyens (2024-2026). Données hébergées en sol canadien.</p>
       </div>
 
@@ -259,12 +266,20 @@
           <button type="button" class="filter-pill" data-cat="messaging">🛡️ Messagerie (WhatsApp)</button>
           <button type="button" class="filter-pill" data-cat="video">🎬 Vidéo (YouTube)</button>
           <button type="button" class="filter-pill" data-cat="professional">💼 Professionnel (LinkedIn)</button>
+          <button type="button" class="filter-pill" data-cat="events">📅 Événements (Facebook, Meetup)</button>
         </div>
 
         <div class="filter-pills-bar">
           <button type="button" class="filter-pill active" data-region="all" data-i18n="directory.filter_all_regions">Toutes les régions</button>
-          <button type="button" class="filter-pill" data-region="QC" data-i18n="directory.filter_qc">🍁 Québec</button>
+          <button type="button" class="filter-pill" data-region="QC" data-i18n="directory.filter_qc">⚜️ Québec</button>
           <button type="button" class="filter-pill" data-region="CA" data-i18n="directory.filter_ca">🇨🇦 Canada</button>
+        </div>
+
+        <div class="filter-pills-bar filter-pills-lang">
+          <button type="button" class="filter-pill active" data-lang-filter="all" data-i18n="directory.filter_lang_all">Toutes les langues</button>
+          <button type="button" class="filter-pill" data-lang-filter="fr" data-i18n="directory.filter_lang_fr">⚜️ Support français</button>
+          <button type="button" class="filter-pill" data-lang-filter="en" data-i18n="directory.filter_lang_en">🇨🇦 Support anglais</button>
+          <button type="button" class="filter-pill" data-lang-filter="bilingual" data-i18n="directory.filter_lang_bilingual">🌐 Bilingue (FR/EN)</button>
         </div>
       </div>
 
@@ -276,13 +291,13 @@
     <!-- Dashboard Territorial -->
     <section id="territoires" class="dashboard-section">
       <div class="section-title">
-        <h2 data-i18n="dashboard.title">Mobilisation Territoriale Canadienne</h2>
+        <h2 data-i18n="dashboard.title">Mobilisation territoriale canadienne</h2>
         <p data-i18n="dashboard.subtitle">La masse critique par province et par quartier (Région de Tri d'Acheminement - RTA)</p>
       </div>
 
       <div class="dashboard-grid">
         <div class="dash-panel">
-          <h3 data-i18n="dashboard.provinces_title">Engagement par Province</h3>
+          <h3 data-i18n="dashboard.provinces_title">Engagement par province</h3>
           <div id="provinceStatsList" class="province-list">
             <p style="color:var(--text-dim);font-size:0.9rem;">Chargement des données provinciales...</p>
           </div>
@@ -319,7 +334,7 @@
 
         <div class="eco-card">
           <div class="eco-icon">🛡️</div>
-          <h4 data-i18n="ecosystem.matrix_title">Matrix & Messageries Libres</h4>
+          <h4 data-i18n="ecosystem.matrix_title">Matrix et messageries libres</h4>
           <p data-i18n="ecosystem.matrix_desc">Communications chiffrées de bout en bout, souveraines et auto-hébergeables pour remplacer les messageries fermées.</p>
         </div>
       </div>
@@ -330,7 +345,7 @@
   <footer class="footer">
     <p data-i18n="footer.hosted_in_canada">🍁 Fièrement hébergé au Canada chez Web Hosting Canada (WHC.ca)</p>
     <p data-i18n="footer.open_source">Projet civique à code ouvert sous licence MIT.</p>
-    <p data-i18n="footer.rights">© 2026 Pacte Numérique Canada. Tous droits réservés.</p>
+    <p data-i18n="footer.rights">© 2026 Pacte numérique Canada. Tous droits réservés.</p>
   </footer>
 
   <!-- Conteneur pour toasts -->
