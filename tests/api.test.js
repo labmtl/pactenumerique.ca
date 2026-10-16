@@ -57,8 +57,9 @@ describe('Intégration API HTTP REST', () => {
     // Vérifier les propriétés d'une entrée
     const qlub = data.find(item => item.id === 'qlub');
     assert.ok(qlub);
-    assert.strictEqual(qlub.name, 'Qlub');
-    assert.strictEqual(qlub.region, 'QC');
+    assert.strictEqual(qlub.location.province, 'QC');
+    assert.strictEqual(qlub.location.country, 'CA');
+    assert.strictEqual(qlub.stack.is_opensource, true);
     assert.ok(qlub.replaces.includes('X / Twitter'));
   });
 

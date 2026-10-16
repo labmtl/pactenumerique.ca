@@ -10,13 +10,19 @@ Ce guide fournit l'ensemble des procédures pour tester, valider et vérifier le
 ```bash
 npm test
 ```
-**Ce qui est validé (25 tests, 5 suites) :**
+**Ce qui est validé (29 tests, 5 suites) :**
 - **Catalogue des alternatives (`alternatives.test.js`) :**
-  - Validité du JSON dans `public/data/alternatives.json`.
-  - Présence des champs obligatoires et URLs HTTPS.
-  - Vérification que **100% des solutions québécoises offrent un support en français** (`support_fr === true`).
+  - Validité du JSON normalisé et non-redondant dans `public/data/alternatives.json`.
+  - Présence des champs canoniques obligatoires (`id`, `name`, `url`, `category`, `protocol`, `support_fr`, `support_en`).
+  - **Audit de transparence & souveraineté logicielle :**
+    - Présence de la pile logicielle (`stack.name`, `stack.is_opensource`, `stack.repo_url`).
+    - Présence du code source du projet / déploiement (`project_source.is_available`, `project_source.repo_url`).
+    - **100% des plateformes reposent sur une pile logicielle libre** (`stack.is_opensource === true`).
+  - **Élimination des redondances :** Aucune clé de traduction ou booléen redondant dans le JSON; textes multilingues et descriptions gérés proprement dans `locales/fr.json` et `locales/en.json`.
+  - **Hiérarchie territoriale :** Toute solution avec `city === 'Montreal'` est automatiquement reconnue à Montréal, au Québec et au Canada (`city` $\subset$ `province` $\subset$ `country`).
+  - Vérification que **100% des solutions montréalaises et québécoises offrent un support en français** (`support_fr === true`).
   - Présence d'au moins une alternative québécoise pour chaque besoin majeur (microblogging, photos, forums, vidéo, messagerie, pro, événements).
-  - Validation de l'algorithme de tri prioritaire pour les résidents du Québec.
+  - Validation des algorithmes de tri prioritaire territorial (Montréal puis Québec puis Canada).
 - **Intégration API HTTP REST (`api.test.js`) :**
   - `GET /api/health` (200 OK).
   - `GET /api/stats/territory` (agrégats nationaux et par FSA).
@@ -53,54 +59,55 @@ npm run dev
 ```
 Ouvrez votre navigateur sur : **`http://localhost:3000/?lang=fr`**
 
-### Étape A : Fleur de lys et détection territoriale (Étape 1 du formulaire)
-1. Dans le champ **Code postal**, saisissez un code postal du Québec :
-   - Exemple : `H2T 2N5` (Montréal) ou `G1R 2J7` (Québec) ou `J4B 5K1` (Boucherville).
-2. **Résultats attendus :**
-   - Le badge affiche une **fleur de lys** : `📍 ⚜️ QC - Québec (Montréal / Laval)`.
-   - Le badge utilise la couleur bleue azur du fleurdelisé québécois (et non le rouge canadien).
-   - Dans l'encart d'étape 2, le bandeau d'alerte apparaît :  
-     `⚜️ Solutions hébergées au Québec priorisées (Loi 25)`.
-3. Saisissez un code postal hors Québec (ex: `M5V 2T6` pour Toronto ou `V6B 1A1` pour Vancouver) :
-   - Le badge affiche : `📍 🇨🇦 ON - Ontario (Grand Toronto)` ou `📍 🇨🇦 BC - Colombie-Britannique`.
-   - Le bandeau de priorité québécoise se masque automatiquement.
+### Étape A : Parité des emblèmes (⚜️, 🍁 et Rosace de Montréal) et détection territoriale
+1. **En-tête et identité visuelle :**
+   - Observez le logo dans la barre de navigation : il affiche les deux emblèmes sur un pied d'égalité **`⚜️ 🍁 PacteNumérique.ca`**.
+   - Observez le badge héro : **`⚜️ 🍁 Action collective québécoise & canadienne pour la souveraineté numérique`**.
+   - Observez les compteurs : **`Québécois et Canadiens engagés`** et **`⚜️ 🍁 WHC - Hébergement souverain (QC & CA)`**.
+2. **Champ Code postal (Étape 1) - Détection Montréal vs Québec vs Canada :**
+   - **Montréal (RTA commençant par 'H', ex: `H2T 2N5` Plateau, `H3A 0G4` Ville-Marie) :**
+     - Le badge affiche : `📍 [Rosace MTL] QC - Montréal / Laval` avec le style rouge montréalais (`.geo-badge.mtl`).
+     - L'alerte d'étape 2 affiche : `[Rosace MTL] Solutions hébergées à Montréal priorisées (Loi 25)`.
+     - Les 7 solutions hébergées à Montréal (La Pataterie, Jasette FACiLe, Koumbit, PeerTube DIRO, Canal FACiLe, Passerelles, Babillard En commun) sont **triées en toute première position**.
+   - **Reste du Québec (RTA commençant par 'G' ou 'J', ex: `G1R 2J7` Québec, `J8X 1A1` Gatineau) :**
+     - Le badge affiche : `📍 ⚜️ QC - Québec (...)` en bleu azur fleurdelisé (`.geo-badge.qc`).
+     - L'alerte d'étape 2 affiche : `⚜️ Solutions hébergées au Québec priorisées (Loi 25)`.
+   - **Reste du Canada (hors Québec, ex: `M5V 2T6` Toronto, `V6B 1A1` Vancouver) :**
+     - Le badge affiche : `📍 🍁 ON - Ontario (...)` en rouge érable canadien (`.geo-badge.ca`).
 
 ---
 
-### Étape B : Recommandations prioritaires pour le Québec (Étape 2 du formulaire)
-1. Sélectionnez vos réseaux à quitter (ex: `X / Twitter` et `Instagram`).
-2. Pour un résident du Québec (code postal commençant par G, H ou J) :
-   - Les cartes proposées sont **prioritairement les solutions hébergées au Québec** :
-     - **Qlub** (`⚜️ Hébergé au QC`, `FR/EN`)
-     - **Mastodon Québec** (`⚜️ Hébergé au QC`, `FR/EN`)
-     - **Pixelfed Canada** (`⚜️ Hébergé au QC - Beauharnois`, `FR/EN`)
-     - **La Pataterie** (`⚜️ Hébergé au QC`, `FR/EN`)
-     - **Jasette FACiLe** (`⚜️ Hébergé au QC`, `FR`)
-   - Chaque carte affiche la pastille `⚜️ Hébergé au QC` et son badge de langue (`FR` ou `FR/EN`).
-   - Cliquez sur une carte pour la sélectionner : une bordure verte et une coche de validation confirment la sélection.
+### Étape B : Recommandations locales (Étape 2 du formulaire)
+1. Cochez vos réseaux à quitter (ex: `X / Twitter` et `Instagram`).
+2. **Pour un résident de Montréal (code postal en H) :**
+   - Les fiches montréalaises affichent la pastille rouge `[Rosace MTL] Hébergé à MTL` et un liseré rouge montréalais (`.recom-card.mtl-card`).
+   - Les autres fiches québécoises affichent `⚜️ Hébergé au QC` et un liseré bleu royal.
+   - Les fiches pancanadiennes affichent `🍁 Hébergé au CA` et un liseré rouge érable.
+3. **Pastilles de langues :**
+   - Affichent clairement : `⚜️ FR`, `🍁 EN` ou `⚜️ 🍁 FR/EN`.
 
 ---
 
-### Étape C : Répertoire interactif et filtres linguistiques
-Faites défiler la page jusqu'à la section **Répertoire des réseaux sociaux souverains** (`#repertoire`) :
+### Étape C : Répertoire interactif et filtres régionaux & linguistiques
+Faites défiler la page jusqu'au **Répertoire des réseaux sociaux souverains** (`#repertoire`) :
 
-1. **Icône du filtre Québec :**
-   - Vérifiez que le bouton de filtre de région affiche bien **`⚜️ Québec`** avec une fleur de lys (et non la feuille d'érable).
+1. **Filtres de région :**
+   - `⚜️ 🍁 Toutes les régions` (affiche l'ensemble des 17 plateformes)
+   - `[Rosace MTL] Montréal` (filtre immédiatement sur les 7 plateformes hébergées à Montréal)
+   - `⚜️ Québec` (affiche les 13 plateformes québécoises, **incluant automatiquement toutes les solutions de Montréal**)
+   - `🍁 Canada` (affiche les plateformes d'envergure pancanadienne)
 2. **Filtres linguistiques :**
-   - La barre de filtres propose :
-     - `Toutes les langues`
-     - `⚜️ Support français`
-     - `🇨🇦 Support anglais`
-     - `🌐 Bilingue (FR/EN)`
-3. **Tester le filtre `⚜️ Québec` :**
-   - Cliquez sur `⚜️ Québec` : seules les 13 solutions québécoises s'affichent.
-   - Les cartes arborent un bandeau latéral bleu azur, le tag `⚜️ Québec` et le badge `⚜️ Hébergé au Québec`.
-4. **Tester le filtre linguistique `⚜️ Support français` :**
-   - Cliquez sur `⚜️ Support français` : toutes les plateformes disposant d'un support francophone validé apparaissent avec la pastille `✔ FR`.
-5. **Tester le filtre linguistique `🇨🇦 Support anglais` :**
-   - Cliquez sur `🇨🇦 Support anglais` : les plateformes bilingues offrant également un support anglophone apparaissent (`✔ EN`).
-6. **Tester la recherche textuelle :**
-   - Tapez `Lévis` ou `Beauharnois` ou `Matrix` dans le champ de recherche pour valider le filtrage instantané.
+   - `Toutes les langues`
+   - `⚜️ Support français`
+   - `🍁 Support anglais`
+   - `⚜️ 🍁 Bilingue (FR/EN)`
+3. **Identification des solutions de Montréal dans les cartes :**
+   - Les cartes hébergées à Montréal affichent :
+     - Un liseré supérieur rouge montréalais (`.instance-card.mtl-card`).
+     - Le badge territorial : `[Rosace MTL] Montréal`.
+     - Le badge provincial : `⚜️ Québec` (démontrant l'inclusion automatique Montréal $\subset$ Québec $\subset$ Canada).
+     - Le badge d'hébergement : `[Rosace MTL] Hébergé à Montréal` (conformité Loi 25).
+     - Le badge linguistique et le protocole ouvert.
 
 ---
 

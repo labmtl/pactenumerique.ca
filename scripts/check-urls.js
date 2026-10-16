@@ -27,7 +27,9 @@ async function checkUrl(alt) {
     const duration = Date.now() - start;
 
     if (res.ok) {
-      const qcFlag = alt.hosted_in_qc ? '⚜️ QC' : '🇨🇦 CA';
+      const isMtl = alt.location?.city === 'Montreal' || alt.location?.city === 'Montréal';
+      const isQc = isMtl || alt.location?.province === 'QC';
+      const qcFlag = isMtl ? '🌹 MTL' : (isQc ? '⚜️ QC ' : '🍁 CA ');
       const langBadge = alt.support_fr && alt.support_en ? 'FR/EN' : (alt.support_fr ? 'FR' : 'EN');
       return {
         id: alt.id,

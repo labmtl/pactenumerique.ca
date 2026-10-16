@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pacte numérique Canada | Pour des réseaux sociaux souverains</title>
-  <meta name="description" content="Engagez-vous conditionnellement à quitter la Big Tech américaine dès que vos proches et votre quartier au Canada sont prêts. Chiffrement zéro-connaissance.">
+  <title>Pacte numérique Québec & Canada | Pour des réseaux sociaux souverains</title>
+  <meta name="description" content="Engagez-vous conditionnellement à quitter la Big Tech américaine dès que vos proches et votre région au Québec et au Canada sont prêts. Chiffrement zéro-connaissance.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍁</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.82em%22 font-size=%2246%22>⚜️🍁</text></svg>">
 </head>
 <body>
 
@@ -17,7 +17,9 @@
   <header class="navbar">
     <div class="nav-container">
       <a href="/" class="brand-logo" id="brandLogo">
-        <span class="maple-leaf">🍁</span>
+        <span class="brand-emblems" aria-label="Québec et Canada">
+          <span class="emblem-qc">⚜️</span><span class="emblem-ca">🍁</span>
+        </span>
         <span>PacteNumérique<span class="brand-suffix">.ca</span></span>
       </a>
       <div class="nav-actions">
@@ -44,7 +46,7 @@
   <!-- Section Héro -->
   <main>
     <section class="hero-section">
-      <div class="hero-badge" data-i18n="hero.badge">🇨🇦 Action collective canadienne et souveraineté numérique</div>
+      <div class="hero-badge" data-i18n="hero.badge">⚜️ 🍁 Action collective québécoise & canadienne pour la souveraineté numérique</div>
       <h1 class="hero-title">
         <span data-i18n="hero.title_main">Reprenons le contrôle de nos interactions sociales</span><br>
         <span class="gradient-text" data-i18n="hero.title_gradient">Ensemble. Par le pacte.</span>
@@ -56,15 +58,15 @@
       <div class="hero-counters">
         <div class="counter-card">
           <div class="counter-num" id="counterNational">0</div>
-          <div class="counter-label" data-i18n="stats.national_signers">Canadiens engagés</div>
+          <div class="counter-label" data-i18n="stats.national_signers">Québécois et Canadiens engagés</div>
         </div>
         <div class="counter-card">
           <div class="counter-num" id="counterCircles">100%</div>
-          <div class="counter-label">Zéro-connaissance</div>
+          <div class="counter-label" data-i18n="stats.zero_knowledge">Zéro-connaissance</div>
         </div>
         <div class="counter-card">
-          <div class="counter-num" id="counterHost">🍁 WHC</div>
-          <div class="counter-label">Hébergement souverain</div>
+          <div class="counter-num" id="counterHost">⚜️ 🍁 WHC</div>
+          <div class="counter-label" data-i18n="stats.sovereign_hosting">Hébergement souverain (QC & CA)</div>
         </div>
       </div>
     </section>
@@ -270,16 +272,17 @@
         </div>
 
         <div class="filter-pills-bar">
-          <button type="button" class="filter-pill active" data-region="all" data-i18n="directory.filter_all_regions">Toutes les régions</button>
+          <button type="button" class="filter-pill active" data-region="all" data-i18n="directory.filter_all_regions">⚜️ 🍁 Toutes les régions</button>
+          <button type="button" class="filter-pill" data-region="MTL"><span class="mtl-rosette-icon" aria-hidden="true"><svg viewBox="0 0 100 100" class="svg-mtl-rosette"><path d="M 50,50 C 42,38 24,24 24,14 C 24,5 37,2 50,15 C 63,2 76,5 76,14 C 76,24 58,38 50,50 Z" /><path d="M 50,50 C 42,38 24,24 24,14 C 24,5 37,2 50,15 C 63,2 76,5 76,14 C 76,24 58,38 50,50 Z" transform="rotate(90 50 50)" /><path d="M 50,50 C 42,38 24,24 24,14 C 24,5 37,2 50,15 C 63,2 76,5 76,14 C 76,24 58,38 50,50 Z" transform="rotate(180 50 50)" /><path d="M 50,50 C 42,38 24,24 24,14 C 24,5 37,2 50,15 C 63,2 76,5 76,14 C 76,24 58,38 50,50 Z" transform="rotate(270 50 50)" /></svg></span> <span data-i18n="directory.filter_mtl">Montréal</span></button>
           <button type="button" class="filter-pill" data-region="QC" data-i18n="directory.filter_qc">⚜️ Québec</button>
-          <button type="button" class="filter-pill" data-region="CA" data-i18n="directory.filter_ca">🇨🇦 Canada</button>
+          <button type="button" class="filter-pill" data-region="CA" data-i18n="directory.filter_ca">🍁 Canada</button>
         </div>
 
         <div class="filter-pills-bar filter-pills-lang">
           <button type="button" class="filter-pill active" data-lang-filter="all" data-i18n="directory.filter_lang_all">Toutes les langues</button>
           <button type="button" class="filter-pill" data-lang-filter="fr" data-i18n="directory.filter_lang_fr">⚜️ Support français</button>
-          <button type="button" class="filter-pill" data-lang-filter="en" data-i18n="directory.filter_lang_en">🇨🇦 Support anglais</button>
-          <button type="button" class="filter-pill" data-lang-filter="bilingual" data-i18n="directory.filter_lang_bilingual">🌐 Bilingue (FR/EN)</button>
+          <button type="button" class="filter-pill" data-lang-filter="en" data-i18n="directory.filter_lang_en">🍁 Support anglais</button>
+          <button type="button" class="filter-pill" data-lang-filter="bilingual" data-i18n="directory.filter_lang_bilingual">⚜️ 🍁 Bilingue (FR/EN)</button>
         </div>
       </div>
 
@@ -291,7 +294,7 @@
     <!-- Dashboard Territorial -->
     <section id="territoires" class="dashboard-section">
       <div class="section-title">
-        <h2 data-i18n="dashboard.title">Mobilisation territoriale canadienne</h2>
+        <h2 data-i18n="dashboard.title">Mobilisation territoriale au Québec et au Canada</h2>
         <p data-i18n="dashboard.subtitle">La masse critique par province et par quartier (Région de Tri d'Acheminement - RTA)</p>
       </div>
 
@@ -343,9 +346,9 @@
 
   <!-- Pied de page -->
   <footer class="footer">
-    <p data-i18n="footer.hosted_in_canada">🍁 Fièrement hébergé au Canada chez Web Hosting Canada (WHC.ca)</p>
+    <p data-i18n="footer.hosted_in_canada">⚜️ 🍁 Fièrement hébergé au Québec et au Canada chez Web Hosting Canada (WHC.ca)</p>
     <p data-i18n="footer.open_source">Projet civique à code ouvert sous licence MIT.</p>
-    <p data-i18n="footer.rights">© 2026 Pacte numérique Canada. Tous droits réservés.</p>
+    <p data-i18n="footer.rights">© 2026 Pacte numérique Québec & Canada. Tous droits réservés.</p>
   </footer>
 
   <!-- Conteneur pour toasts -->

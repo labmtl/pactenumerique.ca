@@ -121,15 +121,36 @@ button {
   color: var(--text-main);
 }
 
-.maple-leaf {
-  color: var(--accent-red);
-  font-size: 1.4rem;
-  animation: pulse-leaf 3s ease-in-out infinite;
+.brand-emblems {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 1.35rem;
+  line-height: 1;
+  animation: pulse-emblems 4s ease-in-out infinite;
 }
 
-@keyframes pulse-leaf {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px var(--accent-red-glow)); }
-  50% { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.5)); }
+.brand-emblems .emblem-qc {
+  filter: drop-shadow(0 1px 2px rgba(30, 64, 175, 0.35));
+  transition: transform 0.2s ease;
+}
+
+.brand-emblems .emblem-ca {
+  filter: drop-shadow(0 1px 2px rgba(225, 29, 72, 0.35));
+  transition: transform 0.2s ease;
+}
+
+.brand-logo:hover .emblem-qc {
+  transform: rotate(-10deg) scale(1.15);
+}
+
+.brand-logo:hover .emblem-ca {
+  transform: rotate(10deg) scale(1.15);
+}
+
+@keyframes pulse-emblems {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
 }
 
 .brand-suffix {
@@ -403,10 +424,22 @@ button {
   font-weight: 600;
 }
 
+.geo-badge.mtl {
+  background: rgba(234, 29, 45, 0.08);
+  border: 1px solid rgba(234, 29, 45, 0.3);
+  color: #c81e2b;
+}
+
 .geo-badge.qc {
   background: rgba(30, 64, 175, 0.08);
   border: 1px solid rgba(30, 64, 175, 0.3);
   color: #1e40af;
+}
+
+.geo-badge.ca {
+  background: rgba(225, 29, 72, 0.08);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  color: #be123c;
 }
 
 /* Choix de seuil de cercle */
@@ -890,6 +923,12 @@ button {
   border: 1px solid rgba(30, 64, 175, 0.25);
 }
 
+.recom-qc-badge.mtl {
+  background: rgba(234, 29, 45, 0.09);
+  color: #c81e2b;
+  border: 1px solid rgba(234, 29, 45, 0.25);
+}
+
 .recom-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -908,8 +947,16 @@ button {
   box-shadow: var(--shadow-sm);
 }
 
+.recom-card.mtl-card {
+  border-left: 3px solid #ea1d2d;
+}
+
 .recom-card.qc-card {
   border-left: 3px solid #1e40af;
+}
+
+.recom-card.ca-card {
+  border-left: 3px solid #be123c;
 }
 
 .recom-card:hover {
@@ -949,6 +996,15 @@ button {
   font-weight: 700;
   padding: 0.12rem 0.4rem;
   border-radius: var(--radius-full);
+}
+
+.recom-host-pill.mtl {
+  background: rgba(234, 29, 45, 0.09);
+  color: #c81e2b;
+  border: 1px solid rgba(234, 29, 45, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .recom-host-pill.qc {
@@ -1091,6 +1147,32 @@ button {
   box-shadow: 0 2px 8px var(--accent-indigo-glow);
 }
 
+/* Rosace officielle de la Ville de Montréal */
+.mtl-rosette-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.svg-mtl-rosette {
+  width: 1em;
+  height: 1em;
+  fill: #ea1d2d;
+  display: inline-block;
+  vertical-align: -0.125em;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-pill:hover .svg-mtl-rosette {
+  transform: rotate(45deg);
+}
+
+.filter-pill.active .svg-mtl-rosette {
+  fill: #ffffff;
+}
+
 .instances-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -1113,6 +1195,18 @@ button {
   transform: translateY(-3px);
   border-color: #cbd5e1;
   box-shadow: var(--shadow-lg);
+}
+
+.instance-card.mtl-card {
+  border-top: 3px solid #ea1d2d;
+}
+
+.instance-card.qc-card {
+  border-top: 3px solid #1e40af;
+}
+
+.instance-card.ca-card {
+  border-top: 3px solid #be123c;
 }
 
 .instance-header {
@@ -1141,6 +1235,15 @@ button {
   border-radius: var(--radius-full);
 }
 
+.badge-tag.mtl {
+  background: rgba(234, 29, 45, 0.08);
+  color: #c81e2b;
+  border: 1px solid rgba(234, 29, 45, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .badge-tag.qc {
   background: rgba(30, 64, 175, 0.09);
   color: #1e40af;
@@ -1151,6 +1254,15 @@ button {
   background: rgba(225, 29, 72, 0.08);
   color: #be123c;
   border: 1px solid rgba(225, 29, 72, 0.25);
+}
+
+.badge-tag.mtl-host {
+  background: #fff1f2;
+  color: #c81e2b;
+  border: 1px solid #fecdd3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .badge-tag.qc-host {
@@ -1238,7 +1350,50 @@ button {
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
+  gap: 0.35rem;
+}
+
+.meta-link-badge {
+  display: inline-flex;
+  align-items: center;
   gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.12rem 0.5rem;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+.meta-link-badge.open {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.meta-link-badge.open:hover {
+  background: #047857;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(4, 120, 87, 0.25);
+}
+
+.meta-link-badge.source {
+  background: rgba(99, 102, 241, 0.1);
+  color: #4338ca;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.meta-link-badge.source:hover {
+  background: #4338ca;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(67, 56, 202, 0.25);
+}
+
+.meta-text-muted {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-style: italic;
 }
 
 .instance-actions {

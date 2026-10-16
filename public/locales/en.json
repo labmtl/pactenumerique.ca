@@ -10,17 +10,19 @@
     "switch_lang": "FR"
   },
   "hero": {
-    "badge": "🇨🇦 Canadian Collective Action & Digital Sovereignty",
+    "badge": "⚜️ 🍁 Quebec & Canadian Collective Action for Digital Sovereignty",
     "title_main": "Reclaiming control over our social connections",
     "title_gradient": "Together. Through the Pact.",
-    "subtitle": "Millions of Canadians want to leave toxic American Big Tech platforms. But nobody wants to be the first to jump alone. Commit conditionally: take the leap once your circle of friends and your region are ready!",
+    "subtitle": "Millions of Quebec and Canadian citizens want to leave toxic American Big Tech platforms. But nobody wants to be the first to jump alone. Commit conditionally: take the leap once your circle of friends and your region are ready!",
     "cta_sign": "Sign the Pact",
     "cta_learn": "Understand Network Effects"
   },
   "stats": {
-    "national_signers": "Committed Canadians",
+    "national_signers": "Quebec & Canadian Citizens Pledged",
     "active_circles": "Active Friend Circles",
-    "top_fsa": "Mobilized Neighborhoods"
+    "top_fsa": "Mobilized Neighborhoods",
+    "zero_knowledge": "Zero-Knowledge",
+    "sovereign_hosting": "Sovereign Hosting (QC & CA)"
   },
   "invite_banner": {
     "title": "You've been invited by a friend!",
@@ -54,27 +56,113 @@
     "email_help": "Cryptographically hashed with a secret salt. Never stored in plain text.",
     "submit_btn": "Sign the Digital Pact",
     "submitting": "Generating your encrypted keys...",
-    "legal_notice": "Hosted in Canada (WHC.ca). Strictly compliant with Quebec's Law 25 and PIPEDA."
+    "legal_notice": "Hosted in Quebec & Canada (WHC.ca). Strictly compliant with Quebec's Law 25 and PIPEDA (Canada)."
   },
   "directory": {
     "title": "Directory of Sovereign Social Networks",
-    "subtitle": "Quebec and Canadian digital infrastructure operated by cooperatives, non-profits, and civic groups (2024-2026). Data hosted on Canadian soil.",
+    "subtitle": "Quebec and Canadian digital infrastructure operated by cooperatives, non-profits, and civic groups (2024-2026). Data hosted on Quebec and Canadian soil.",
     "filter_all_cats": "All needs",
-    "filter_all_regions": "All regions",
+    "filter_all_regions": "⚜️ 🍁 All regions",
+    "filter_mtl": "Montreal",
     "filter_qc": "⚜️ Quebec",
-    "filter_ca": "🇨🇦 Canada",
+    "filter_ca": "🍁 Canada",
     "filter_lang_all": "All languages",
     "filter_lang_fr": "⚜️ French support",
-    "filter_lang_en": "🇨🇦 English support",
-    "filter_lang_bilingual": "🌐 Bilingual (FR/EN)",
+    "filter_lang_en": "🍁 English support",
+    "filter_lang_bilingual": "⚜️ 🍁 Bilingual (FR/EN)",
+    "recom_mtl_priority": "Montreal-hosted solutions prioritized (Law 25)",
     "recom_qc_priority": "⚜️ Quebec-hosted solutions prioritized (Law 25)",
+    "hosted_in_mtl": "Hosted in Montreal",
     "hosted_in_qc": "Hosted in Quebec",
     "hosted_in_ca": "Hosted in Canada",
     "lang_support_fr": "French support verified",
     "lang_support_en": "English support verified",
     "search_placeholder": "Search an instance, protocol, or platform...",
     "btn_visit": "Visit Instance",
-    "btn_choose": "Select for My Pact"
+    "btn_choose": "Select for My Pact",
+    "stack_label": "Software stack",
+    "stack_open_source": "Open Source",
+    "project_source_label": "Project source code",
+    "project_source_public": "Public repository",
+    "project_source_standard": "Standard deployment"
+  },
+  "categories": {
+    "microblogging": "Microblogging",
+    "photos": "Photos & Art",
+    "forums": "Civic Forums & Links",
+    "video": "Video Streaming",
+    "messaging": "Chat & Messaging",
+    "professional": "Professional Network",
+    "events": "Events & Announcements"
+  },
+  "locations": {
+    "cities": {
+      "Montreal": "Montreal",
+      "Quebec": "Quebec City",
+      "Levis": "Levis",
+      "Beauharnois": "Beauharnois",
+      "Toronto": "Toronto"
+    },
+    "provinces": {
+      "QC": "Quebec",
+      "ON": "Ontario"
+    },
+    "countries": {
+      "CA": "Canada"
+    }
+  },
+  "alternatives": {
+    "qlub": {
+      "desc": "Regional microblogging and local discussions without amplification algorithms. 100% Quebec hosting."
+    },
+    "mastodon-quebec": {
+      "desc": "General Quebec Fediverse server; adheres to the Mastodon Server Covenant with active moderation."
+    },
+    "pataterie": {
+      "desc": "Community, artistic and cultural space rooted in Montreal's local reality."
+    },
+    "jasette-facil": {
+      "desc": "Promoting digital commons, public debates, and software sovereignty by FACiL."
+    },
+    "pds-stockage-quebec": {
+      "desc": "Personal Data Server (PDS) hosting your Bluesky identity and keys outside the United States."
+    },
+    "cosocial": {
+      "desc": "Cooperative social utility; democratic member governance (one member, one vote)."
+    },
+    "mstdn-ca": {
+      "desc": "Major Canadian Fediverse community hub; strict adherence to kindness and inclusion."
+    },
+    "pixelfed-ca": {
+      "desc": "Major sovereign photography community; hosted in Quebec (Beauharnois) with automatic EXIF GPS stripping."
+    },
+    "pxlfd-ca": {
+      "desc": "Alternative, creative photography sharing without tracking or AI exploitation. #FediPact signatory."
+    },
+    "forumsdulibre-quebec": {
+      "desc": "Civic deliberation, open-source mutual help, and public policy debates on digital sovereignty and Law 25."
+    },
+    "lemmy-ca": {
+      "desc": "The leading Canadian open forum and link aggregator: thematic communities, news, and civic life."
+    },
+    "canal-facile": {
+      "desc": "Civic conferences, educational videos, and panels without behavioral tracking or targeted ads."
+    },
+    "peertube-diro": {
+      "desc": "University course materials, computer science research, and open scientific lectures."
+    },
+    "beluga-convo": {
+      "desc": "End-to-end encrypted team messaging on dedicated bare-metal servers in Quebec. Strict Law 25 compliance."
+    },
+    "matrix-koumbit": {
+      "desc": "Secure coordination rooms operated by a worker-managed solidarity cooperative for over 20 years."
+    },
+    "passerelles": {
+      "desc": "Civic professional networking, communities of practice, and project matchmaking for social innovation."
+    },
+    "babillard-encommun": {
+      "desc": "Shared, customizable community boards to discover and promote events, activities, and calls to action without commercial algorithms."
+    }
   },
   "modal_success": {
     "title": "🎉 Congratulations, you are part of the Pact!",
@@ -87,7 +175,7 @@
     "close_btn": "Go to Dashboard"
   },
   "dashboard": {
-    "title": "Canadian Territorial Mobilization",
+    "title": "Territorial Mobilization in Quebec and Canada",
     "subtitle": "Critical mass by province and neighborhood (Forward Sortation Area - FSA)",
     "provinces_title": "Commitments by Province",
     "top_fsa_title": "Neighborhoods leading the march to critical mass",
@@ -111,8 +199,8 @@
     "p2": "Your invite link contains a secret key in the URL fragment (#k=...). This fragment never travels over the web to our servers. Your friends increment a blind counter without ever revealing who they are to each other or to us."
   },
   "footer": {
-    "hosted_in_canada": "🍁 Proudly hosted in Canada at Web Hosting Canada (WHC.ca)",
+    "hosted_in_canada": "⚜️ 🍁 Proudly hosted in Quebec and Canada at Web Hosting Canada (WHC.ca)",
     "open_source": "Civic open source project under MIT license.",
-    "rights": "Digital Pact Canada. All rights reserved."
+    "rights": "Digital Pact Quebec & Canada. All rights reserved."
   }
 }

@@ -4,407 +4,458 @@
     "name": "Qlub",
     "url": "https://qlub.social",
     "category": "microblogging",
-    "categoryName_fr": "Microblogging",
-    "categoryName_en": "Microblogging",
     "replaces": ["X / Twitter"],
     "protocol": "ActivityPub (Mastodon v4.4+)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Centre de données québécois (FediHost)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": null,
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "FediHost (Saint-Eustache / Montréal, QC)",
     "org": "Collectif d'entrepreneurs civiques québécois",
     "status": "open",
-    "lang": "FR",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Français (Interface bilingue FR/EN)",
-    "lang_display_en": "French (Bilingual UI FR/EN)",
-    "desc_fr": "Échanges régionaux, redécouverte de l'information locale sans algorithmes d'amplification. Hébergement 100% québécois.",
-    "desc_en": "Regional microblogging and local discussions without amplification algorithms. 100% Quebec hosting."
+    "stack": {
+      "name": "Mastodon",
+      "is_opensource": true,
+      "repo_url": "https://github.com/mastodon/mastodon"
+    },
+    "project_source": {
+      "is_available": false,
+      "repo_url": null
+    }
   },
   {
     "id": "mastodon-quebec",
     "name": "Mastodon Québec",
     "url": "https://mastodon.quebec",
     "category": "microblogging",
-    "categoryName_fr": "Microblogging",
-    "categoryName_en": "Microblogging",
     "replaces": ["X / Twitter"],
     "protocol": "ActivityPub (Mastodon)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Québec / Canada (Sauvegardes chiffrées)",
-    "hosted_in_qc": true,
-    "org": "Administrateur citoyen (Pascal Giguère)",
+    "location": {
+      "city": "Quebec",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "Québec, QC (Pascal Giguère)",
+    "org": "Collectif citoyen Mastodon Québec",
     "status": "open",
-    "lang": "FR / Bilingue",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Français et bilingue",
-    "lang_display_en": "French and bilingual",
-    "desc_fr": "Serveur généraliste québécois; adhésion formelle au Mastodon Server Covenant, modération proactive contre la haine.",
-    "desc_en": "General Quebec Fediverse server; adheres to the Mastodon Server Covenant with active moderation."
+    "stack": {
+      "name": "Mastodon",
+      "is_opensource": true,
+      "repo_url": "https://github.com/mastodon/mastodon"
+    },
+    "project_source": {
+      "is_available": false,
+      "repo_url": null
+    }
   },
   {
     "id": "pataterie",
     "name": "La Pataterie",
     "url": "https://pataterie.ca",
     "category": "microblogging",
-    "categoryName_fr": "Microblogging",
-    "categoryName_en": "Microblogging",
     "replaces": ["X / Twitter"],
     "protocol": "ActivityPub (Mastodon)",
-    "region": "QC",
-    "regionName_fr": "Québec (Montréal)",
-    "regionName_en": "Quebec (Montreal)",
-    "host": "Québec (Montréal, Tiohtià:ke)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Montreal",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "Koumbit (Montréal, Tiohtià:ke)",
     "org": "Collectif communautaire local montréalais",
     "status": "open",
-    "lang": "Bilingue (FR / EN)",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Bilingue (FR / EN)",
-    "lang_display_en": "Bilingual (FR / EN)",
-    "desc_fr": "Espace culturel, militant, artistique et communautaire ancré dans la réalité montréalaise.",
-    "desc_en": "Community, artistic and cultural space rooted in Montreal's local reality."
+    "stack": {
+      "name": "Mastodon",
+      "is_opensource": true,
+      "repo_url": "https://github.com/mastodon/mastodon"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://github.com/lapataterie"
+    }
   },
   {
     "id": "jasette-facil",
     "name": "Jasette FACiLe",
     "url": "https://jasette.facil.services",
     "category": "microblogging",
-    "categoryName_fr": "Microblogging",
-    "categoryName_en": "Microblogging",
     "replaces": ["X / Twitter"],
     "protocol": "ActivityPub (Mastodon)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Québec (Lévis / Montréal)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Montreal",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "FACiL (Montréal / Lévis, QC)",
     "org": "FACiL (OBNL pour l'informatique libre)",
     "status": "open",
-    "lang": "FR",
     "support_fr": true,
     "support_en": false,
-    "lang_display_fr": "Français (OSBL québécois)",
-    "lang_display_en": "French (Quebec non-profit)",
-    "desc_fr": "Promotion des biens communs numériques, débats de société et souveraineté logicielle par FACiL.",
-    "desc_en": "Promoting digital commons, public debates, and software sovereignty by FACiL."
+    "stack": {
+      "name": "Mastodon",
+      "is_opensource": true,
+      "repo_url": "https://github.com/mastodon/mastodon"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://gitlab.com/facil-qc"
+    }
   },
   {
     "id": "pds-stockage-quebec",
     "name": "PDS Stockage Québec",
     "url": "https://pds.stockage.quebec",
     "category": "microblogging",
-    "categoryName_fr": "AT Protocol / Bluesky",
-    "categoryName_en": "AT Protocol / Bluesky",
     "replaces": ["X / Twitter"],
     "protocol": "AT Protocol (Bluesky PDS)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Québec (Infrastructures locales)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": null,
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "Centre de données local (Québec, QC)",
     "org": "Opérateur de données québécois",
     "status": "invite",
-    "lang": "FR",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Français (Protocole ouvert bilingue)",
-    "lang_display_en": "French (Bilingual open protocol)",
-    "desc_fr": "Serveur de données personnelles (PDS) décentralisé hébergeant vos clés d'identité Bluesky hors des États-Unis.",
-    "desc_en": "Personal Data Server (PDS) hosting your Bluesky identity and keys outside the United States."
+    "stack": {
+      "name": "Bluesky PDS",
+      "is_opensource": true,
+      "repo_url": "https://github.com/bluesky-social/pds"
+    },
+    "project_source": {
+      "is_available": false,
+      "repo_url": null
+    }
   },
   {
     "id": "cosocial",
     "name": "CoSocial",
     "url": "https://cosocial.ca",
     "category": "microblogging",
-    "categoryName_fr": "Microblogging et pro",
-    "categoryName_en": "Microblogging & Pro",
     "replaces": ["X / Twitter", "LinkedIn"],
     "protocol": "ActivityPub (Mastodon)",
-    "region": "CA",
-    "regionName_fr": "Pancanadien",
-    "regionName_en": "All-Canada",
+    "location": {
+      "city": null,
+      "province": null,
+      "country": "CA"
+    },
     "host": "Centres de données canadiens",
-    "hosted_in_qc": false,
     "org": "CoSocial Community Service Co-operative",
     "status": "open",
-    "lang": "Bilingue (FR / EN)",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Bilingue intégral (FR / EN)",
-    "lang_display_en": "Full Bilingual (FR / EN)",
-    "desc_fr": "Service d'utilité collective coopératif; gouvernance démocratique des membres (un membre, une voix).",
-    "desc_en": "Cooperative social utility; democratic member governance (one member, one vote)."
+    "stack": {
+      "name": "Mastodon",
+      "is_opensource": true,
+      "repo_url": "https://github.com/mastodon/mastodon"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://github.com/cosocialorg"
+    }
   },
   {
     "id": "mstdn-ca",
     "name": "mstdn.ca",
     "url": "https://mstdn.ca",
     "category": "microblogging",
-    "categoryName_fr": "Microblogging",
-    "categoryName_en": "Microblogging",
     "replaces": ["X / Twitter"],
     "protocol": "ActivityPub (Mastodon)",
-    "region": "CA",
-    "regionName_fr": "Pancanadien",
-    "regionName_en": "All-Canada",
-    "host": "Canada (Toronto, Montréal)",
-    "hosted_in_qc": false,
+    "location": {
+      "city": null,
+      "province": null,
+      "country": "CA"
+    },
+    "host": "Centres de données canadiens (Toronto, Montréal)",
     "org": "Collectif citoyen indépendant",
     "status": "open",
-    "lang": "Bilingue (EN / FR)",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Bilingue (EN / FR)",
-    "lang_display_en": "Bilingual (EN / FR)",
-    "desc_fr": "Grande agora pancanadienne; application stricte de règles de bienveillance et d'inclusion.",
-    "desc_en": "Major Canadian Fediverse community hub; strict adherence to kindness and inclusion."
+    "stack": {
+      "name": "Mastodon",
+      "is_opensource": true,
+      "repo_url": "https://github.com/mastodon/mastodon"
+    },
+    "project_source": {
+      "is_available": false,
+      "repo_url": null
+    }
   },
   {
     "id": "pixelfed-ca",
     "name": "Pixelfed Canada",
     "url": "https://pixelfed.ca",
     "category": "photos",
-    "categoryName_fr": "Photographie et images",
-    "categoryName_en": "Photos & Art",
     "replaces": ["Instagram", "VSCO"],
     "protocol": "ActivityPub (Pixelfed)",
-    "region": "QC",
-    "regionName_fr": "Québec (OVH Beauharnois)",
-    "regionName_en": "Quebec (OVH Beauharnois)",
-    "host": "Québec (OVHcloud Beauharnois)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Beauharnois",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "OVHcloud (Beauharnois, QC)",
     "org": "Fedecan (OBNL fédérale)",
     "status": "approval",
-    "lang": "Bilingue (FR / EN)",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Bilingue (FR / EN) - Hébergé au Québec",
-    "lang_display_en": "Bilingual (FR / EN) - Hosted in Quebec",
-    "desc_fr": "Grande communauté photographique souveraine; hébergée au Québec (Beauharnois), décapage automatique des métadonnées EXIF GPS.",
-    "desc_en": "Major sovereign photography community; hosted in Quebec (Beauharnois) with automatic EXIF GPS stripping."
+    "stack": {
+      "name": "Pixelfed",
+      "is_opensource": true,
+      "repo_url": "https://github.com/pixelfed/pixelfed"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://github.com/fedecan"
+    }
   },
   {
     "id": "pxlfd-ca",
     "name": "pxlfd.ca",
     "url": "https://pxlfd.ca",
     "category": "photos",
-    "categoryName_fr": "Photographie et images",
-    "categoryName_en": "Photos & Art",
     "replaces": ["Instagram", "Flickr"],
     "protocol": "ActivityPub (Pixelfed)",
-    "region": "CA",
-    "regionName_fr": "Canada",
-    "regionName_en": "Canada",
-    "host": "Canada",
-    "hosted_in_qc": false,
+    "location": {
+      "city": null,
+      "province": null,
+      "country": "CA"
+    },
+    "host": "Centres de données canadiens",
     "org": "Collectif photographique indépendant",
     "status": "open",
-    "lang": "Bilingue (FR / EN)",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Bilingue (FR / EN)",
-    "lang_display_en": "Bilingual (FR / EN)",
-    "desc_fr": "Partage photographique alternatif, créatif et sans pistage ni exploitation par l'IA. Signataire du #FediPact.",
-    "desc_en": "Alternative, creative photography sharing without tracking or AI exploitation. #FediPact signatory."
+    "stack": {
+      "name": "Pixelfed",
+      "is_opensource": true,
+      "repo_url": "https://github.com/pixelfed/pixelfed"
+    },
+    "project_source": {
+      "is_available": false,
+      "repo_url": null
+    }
   },
   {
     "id": "forumsdulibre-quebec",
     "name": "Forums du libre du Québec",
     "url": "https://forumsdulibre.quebec",
     "category": "forums",
-    "categoryName_fr": "Forums civiques",
-    "categoryName_en": "Civic Forums",
     "replaces": ["Reddit", "Groupes Facebook"],
     "protocol": "Discourse (Forum ouvert)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Québec (Lévis, FACiL)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Levis",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "FACiL (Lévis, QC)",
     "org": "Association FACiL (OSBL)",
     "status": "open",
-    "lang": "FR",
     "support_fr": true,
     "support_en": false,
-    "lang_display_fr": "Français (Communauté québécoise)",
-    "lang_display_en": "French (Quebec community)",
-    "desc_fr": "Délibération civique, entraide logicielle, débats d'intérêt public sur la souveraineté numérique et la Loi 25.",
-    "desc_en": "Civic deliberation, open-source mutual help, and public policy debates on digital sovereignty and Law 25."
+    "stack": {
+      "name": "Discourse",
+      "is_opensource": true,
+      "repo_url": "https://github.com/discourse/discourse"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://gitlab.com/facil-qc"
+    }
   },
   {
     "id": "lemmy-ca",
     "name": "Lemmy Canada",
     "url": "https://lemmy.ca",
     "category": "forums",
-    "categoryName_fr": "Forums et liens",
-    "categoryName_en": "Forums & Links",
     "replaces": ["Reddit", "Groupes Facebook"],
     "protocol": "ActivityPub (Lemmy)",
-    "region": "CA",
-    "regionName_fr": "Pancanadien",
-    "regionName_en": "All-Canada",
-    "host": "Canada",
-    "hosted_in_qc": false,
+    "location": {
+      "city": null,
+      "province": null,
+      "country": "CA"
+    },
+    "host": "Centres de données canadiens",
     "org": "Fedecan (OBNL fédérale)",
     "status": "open",
-    "lang": "Bilingue (FR / EN)",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Bilingue (FR / EN)",
-    "lang_display_en": "Bilingual (FR / EN)",
-    "desc_fr": "Le hub canadien de forums libres et agrégation de liens : sous-communautés thématiques, actualités et vie civique.",
-    "desc_en": "The leading Canadian open forum and link aggregator: thematic communities, news, and civic life."
+    "stack": {
+      "name": "Lemmy",
+      "is_opensource": true,
+      "repo_url": "https://github.com/LemmyNet/lemmy"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://github.com/fedecan"
+    }
   },
   {
     "id": "canal-facile",
     "name": "Canal FACiLe",
     "url": "https://canal.facil.services",
     "category": "video",
-    "categoryName_fr": "Diffusion vidéo",
-    "categoryName_en": "Video Streaming",
     "replaces": ["YouTube", "Vimeo", "TikTok"],
     "protocol": "ActivityPub (PeerTube v7)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Québec (Montréal / Lévis)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Montreal",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "FACiL (Montréal / Lévis, QC)",
     "org": "Association FACiL",
     "status": "open",
-    "lang": "FR",
     "support_fr": true,
     "support_en": false,
-    "lang_display_fr": "Français",
-    "lang_display_en": "French",
-    "desc_fr": "Vidéos éducatives, conférences citoyennes et panels sans publicité ciblée ni captation de l'attention.",
-    "desc_en": "Civic conferences, educational videos, and panels without behavioral tracking or targeted ads."
+    "stack": {
+      "name": "PeerTube",
+      "is_opensource": true,
+      "repo_url": "https://framagit.org/framasoft/peertube/PeerTube"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://gitlab.com/facil-qc"
+    }
   },
   {
     "id": "peertube-diro",
     "name": "PeerTube DIRO (UdeM)",
     "url": "https://classe.iro.umontreal.ca",
     "category": "video",
-    "categoryName_fr": "Diffusion vidéo",
-    "categoryName_en": "Video Streaming",
     "replaces": ["YouTube Éducation", "Panopto"],
     "protocol": "ActivityPub (PeerTube)",
-    "region": "QC",
-    "regionName_fr": "Québec (Montréal)",
-    "regionName_en": "Quebec (Montreal)",
-    "host": "Québec (Montréal, Université de Montréal)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Montreal",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "Université de Montréal (Montréal, QC)",
     "org": "Département d'informatique DIRO",
     "status": "open",
-    "lang": "FR",
     "support_fr": true,
     "support_en": false,
-    "lang_display_fr": "Français (Université de Montréal)",
-    "lang_display_en": "French (Université de Montréal)",
-    "desc_fr": "Matériel pédagogique universitaire, recherche informatique et vulgarisation scientifique ouverte.",
-    "desc_en": "University course materials, computer science research, and open scientific lectures."
+    "stack": {
+      "name": "PeerTube",
+      "is_opensource": true,
+      "repo_url": "https://framagit.org/framasoft/peertube/PeerTube"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://github.com/diro-udem"
+    }
   },
   {
     "id": "beluga-convo",
     "name": "Béluga Convo",
     "url": "https://beluga.quebec",
     "category": "messaging",
-    "categoryName_fr": "Messagerie chiffrée",
-    "categoryName_en": "Encrypted Chat",
     "replaces": ["WhatsApp", "Messenger", "Slack", "Teams"],
     "protocol": "Matrix (Synapse isolé)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Québec (Serveurs bare-metal à Québec)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Quebec",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "Serveurs dédiés bare-metal (Québec, QC)",
     "org": "Béluga (Entreprise d'utilité collective)",
     "status": "open",
-    "lang": "FR",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Français (Support québécois dédié)",
-    "lang_display_en": "French (Dedicated Quebec support)",
-    "desc_fr": "Messagerie chiffrée de bout en bout (E2EE) sur serveurs physiques à Québec. Conformité stricte Loi 25.",
-    "desc_en": "End-to-end encrypted team messaging on dedicated bare-metal servers in Quebec. Strict Law 25 compliance."
+    "stack": {
+      "name": "Matrix Synapse",
+      "is_opensource": true,
+      "repo_url": "https://github.com/element-hq/synapse"
+    },
+    "project_source": {
+      "is_available": false,
+      "repo_url": null
+    }
   },
   {
     "id": "matrix-koumbit",
     "name": "Infrastructure Matrix Koumbit",
     "url": "https://koumbit.org",
     "category": "messaging",
-    "categoryName_fr": "Salons et clavardage",
-    "categoryName_en": "Chat & Channels",
     "replaces": ["Discord", "Slack"],
     "protocol": "Matrix (Synapse fédéré)",
-    "region": "QC",
-    "regionName_fr": "Québec (Montréal)",
-    "regionName_en": "Quebec (Montreal)",
-    "host": "Québec (Montréal, Koumbit)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Montreal",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "Koumbit (Montréal, QC)",
     "org": "Coopérative de solidarité Koumbit",
     "status": "open",
-    "lang": "FR / Bilingue",
     "support_fr": true,
     "support_en": true,
-    "lang_display_fr": "Bilingue (FR / EN)",
-    "lang_display_en": "Bilingual (FR / EN)",
-    "desc_fr": "Salons de coordination sécurisés opérés par une coopérative autogérée depuis plus de 20 ans.",
-    "desc_en": "Secure coordination rooms operated by a worker-managed solidarity cooperative for over 20 years."
+    "stack": {
+      "name": "Matrix Synapse",
+      "is_opensource": true,
+      "repo_url": "https://github.com/element-hq/synapse"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://git.koumbit.net"
+    }
   },
   {
     "id": "passerelles",
     "name": "Passerelles",
     "url": "https://passerelles.encommun.io/",
     "category": "professional",
-    "categoryName_fr": "Réseau professionnel",
-    "categoryName_en": "Professional Network",
     "replaces": ["LinkedIn", "Workplace", "Groupes Facebook"],
     "protocol": "Plateforme collaborative sociale (En commun)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Québec (Montréal)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Montreal",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "TIESS & En commun (Montréal, QC)",
     "org": "Projet collectif & TIESS",
     "status": "open",
-    "lang": "FR",
     "support_fr": true,
     "support_en": false,
-    "lang_display_fr": "Français (Écosystème En commun)",
-    "lang_display_en": "French (En commun ecosystem)",
-    "desc_fr": "Mise en réseau professionnelle, maillage de projets et communautés de pratique pour l'innovation sociale et le développement territorial.",
-    "desc_en": "Civic professional networking, communities of practice, and project matchmaking for social innovation."
+    "stack": {
+      "name": "Open Social / Drupal",
+      "is_opensource": true,
+      "repo_url": "https://github.com/goalgorilla/open_social"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://gitlab.com/encommun/passerelles"
+    }
   },
   {
     "id": "babillard-encommun",
     "name": "Babillard (En commun)",
     "url": "https://encommun.io/initiatives/babillard",
     "category": "events",
-    "categoryName_fr": "Événements et annonces",
-    "categoryName_en": "Events & Announcements",
     "replaces": ["Facebook Événements", "Meetup", "Eventbrite"],
     "protocol": "Plateforme d'annonces et d'agendas partagés (En commun)",
-    "region": "QC",
-    "regionName_fr": "Québec",
-    "regionName_en": "Quebec",
-    "host": "Québec (Montréal)",
-    "hosted_in_qc": true,
+    "location": {
+      "city": "Montreal",
+      "province": "QC",
+      "country": "CA"
+    },
+    "host": "En commun (Montréal, QC)",
     "org": "Projet collectif (OBNL)",
     "status": "open",
-    "lang": "FR",
     "support_fr": true,
     "support_en": false,
-    "lang_display_fr": "Français",
-    "lang_display_en": "French",
-    "desc_fr": "Babillards partagés et personnalisables pour diffuser et découvrir des événements, actualités et appels à tous sans algorithmes marchands.",
-    "desc_en": "Shared, customizable community boards to discover and promote events, activities, and calls to action without commercial algorithms."
+    "stack": {
+      "name": "Babillard libre",
+      "is_opensource": true,
+      "repo_url": "https://gitlab.com/encommun/babillard"
+    },
+    "project_source": {
+      "is_available": true,
+      "repo_url": "https://gitlab.com/encommun/babillard"
+    }
   }
 ]

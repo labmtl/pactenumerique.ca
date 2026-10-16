@@ -10,7 +10,7 @@
     "switch_lang": "EN"
   },
   "hero": {
-    "badge": "🇨🇦 Action collective canadienne et souveraineté numérique",
+    "badge": "⚜️ 🍁 Action collective québécoise & canadienne pour la souveraineté numérique",
     "title_main": "Reprenons le contrôle de nos interactions sociales",
     "title_gradient": "Ensemble. Par le pacte.",
     "subtitle": "Nous sommes des millions à vouloir quitter les plateformes toxiques de la Big Tech américaine. Mais personne ne veut être le premier à partir seul. Engagez-vous conditionnellement : faites le saut dès que vos proches et votre région sont prêts !",
@@ -18,9 +18,11 @@
     "cta_learn": "Comprendre l'effet de réseau"
   },
   "stats": {
-    "national_signers": "Canadiens engagés",
+    "national_signers": "Québécois et Canadiens engagés",
     "active_circles": "Cercles d'amis actifs",
-    "top_fsa": "Quartiers mobilisés"
+    "top_fsa": "Quartiers mobilisés",
+    "zero_knowledge": "Zéro-connaissance",
+    "sovereign_hosting": "Hébergement souverain (QC & CA)"
   },
   "invite_banner": {
     "title": "Vous avez été invité(e) par un ami !",
@@ -54,27 +56,113 @@
     "email_help": "Hachée cryptographiquement avec un sel secret. Jamais stockée en clair.",
     "submit_btn": "Signer le pacte numérique",
     "submitting": "Génération de vos clés chiffrées...",
-    "legal_notice": "Hébergé au Canada (WHC.ca). Respect strict de la Loi 25 (Québec) et de la LPRPDE."
+    "legal_notice": "Hébergement québécois et canadien (WHC.ca). Respect strict de la Loi 25 (Québec) et de la LPRPDE (Canada)."
   },
   "directory": {
     "title": "Répertoire des réseaux sociaux souverains",
-    "subtitle": "Infrastructures numériques québécoises et canadiennes opérées par des coopératives, OBNL et collectifs citoyens (2024-2026). Données hébergées en sol canadien.",
+    "subtitle": "Infrastructures numériques québécoises et canadiennes opérées par des coopératives, OBNL et collectifs citoyens (2024-2026). Données hébergées en sol québécois et canadien.",
     "filter_all_cats": "Tous les besoins",
-    "filter_all_regions": "Toutes les régions",
+    "filter_all_regions": "⚜️ 🍁 Toutes les régions",
+    "filter_mtl": "Montréal",
     "filter_qc": "⚜️ Québec",
-    "filter_ca": "🇨🇦 Canada",
+    "filter_ca": "🍁 Canada",
     "filter_lang_all": "Toutes les langues",
     "filter_lang_fr": "⚜️ Support français",
-    "filter_lang_en": "🇨🇦 Support anglais",
-    "filter_lang_bilingual": "🌐 Bilingue (FR/EN)",
+    "filter_lang_en": "🍁 Support anglais",
+    "filter_lang_bilingual": "⚜️ 🍁 Bilingue (FR/EN)",
+    "recom_mtl_priority": "Solutions hébergées à Montréal priorisées (Loi 25)",
     "recom_qc_priority": "⚜️ Solutions hébergées au Québec priorisées (Loi 25)",
+    "hosted_in_mtl": "Hébergé à Montréal",
     "hosted_in_qc": "Hébergé au Québec",
     "hosted_in_ca": "Hébergé au Canada",
     "lang_support_fr": "Support français validé",
     "lang_support_en": "Support anglais validé",
     "search_placeholder": "Rechercher une instance, un protocole ou une plateforme...",
     "btn_visit": "Visiter l'instance",
-    "btn_choose": "Choisir pour mon pacte"
+    "btn_choose": "Choisir pour mon pacte",
+    "stack_label": "Pile logicielle",
+    "stack_open_source": "Libre / Open source",
+    "project_source_label": "Code source du projet",
+    "project_source_public": "Dépôt public",
+    "project_source_standard": "Déploiement standard"
+  },
+  "categories": {
+    "microblogging": "Microblogging",
+    "photos": "Photographie et images",
+    "forums": "Forums et liens civiques",
+    "video": "Diffusion vidéo",
+    "messaging": "Messagerie et clavardage",
+    "professional": "Réseau professionnel",
+    "events": "Événements et annonces"
+  },
+  "locations": {
+    "cities": {
+      "Montreal": "Montréal",
+      "Quebec": "Québec",
+      "Levis": "Lévis",
+      "Beauharnois": "Beauharnois",
+      "Toronto": "Toronto"
+    },
+    "provinces": {
+      "QC": "Québec",
+      "ON": "Ontario"
+    },
+    "countries": {
+      "CA": "Canada"
+    }
+  },
+  "alternatives": {
+    "qlub": {
+      "desc": "Échanges régionaux, redécouverte de l'information locale sans algorithmes d'amplification. Hébergement 100% québécois."
+    },
+    "mastodon-quebec": {
+      "desc": "Serveur généraliste québécois; adhésion formelle au Mastodon Server Covenant, modération proactive contre la haine."
+    },
+    "pataterie": {
+      "desc": "Espace culturel, militant, artistique et communautaire ancré dans la réalité montréalaise."
+    },
+    "jasette-facil": {
+      "desc": "Promotion des biens communs numériques, débats de société et souveraineté logicielle par FACiL."
+    },
+    "pds-stockage-quebec": {
+      "desc": "Serveur de données personnelles (PDS) décentralisé hébergeant vos clés d'identité Bluesky hors des États-Unis."
+    },
+    "cosocial": {
+      "desc": "Service d'utilité collective coopératif; gouvernance démocratique des membres (un membre, une voix)."
+    },
+    "mstdn-ca": {
+      "desc": "Grande agora pancanadienne; application stricte de règles de bienveillance et d'inclusion."
+    },
+    "pixelfed-ca": {
+      "desc": "Grande communauté photographique souveraine; hébergée au Québec (Beauharnois), décapage automatique des métadonnées EXIF GPS."
+    },
+    "pxlfd-ca": {
+      "desc": "Partage photographique alternatif, créatif et sans pistage ni exploitation par l'IA. Signataire du #FediPact."
+    },
+    "forumsdulibre-quebec": {
+      "desc": "Délibération civique, entraide logicielle, débats d'intérêt public sur la souveraineté numérique et la Loi 25."
+    },
+    "lemmy-ca": {
+      "desc": "Le hub canadien de forums libres et agrégation de liens : sous-communautés thématiques, actualités et vie civique."
+    },
+    "canal-facile": {
+      "desc": "Vidéos éducatives, conférences citoyennes et panels sans publicité ciblée ni captation de l'attention."
+    },
+    "peertube-diro": {
+      "desc": "Matériel pédagogique universitaire, recherche informatique et vulgarisation scientifique ouverte."
+    },
+    "beluga-convo": {
+      "desc": "Messagerie chiffrée de bout en bout (E2EE) sur serveurs physiques à Québec. Conformité stricte Loi 25."
+    },
+    "matrix-koumbit": {
+      "desc": "Salons de coordination sécurisés opérés par une coopérative autogérée depuis plus de 20 ans."
+    },
+    "passerelles": {
+      "desc": "Mise en réseau professionnelle, maillage de projets et communautés de pratique pour l'innovation sociale et le développement territorial."
+    },
+    "babillard-encommun": {
+      "desc": "Babillards partagés et personnalisables pour diffuser et découvrir des événements, actualités et appels à tous sans algorithmes marchands."
+    }
   },
   "modal_success": {
     "title": "🎉 Félicitations, vous faites partie du pacte !",
@@ -87,7 +175,7 @@
     "close_btn": "Accéder au tableau de bord"
   },
   "dashboard": {
-    "title": "Mobilisation territoriale canadienne",
+    "title": "Mobilisation territoriale au Québec et au Canada",
     "subtitle": "La masse critique par province et par quartier (Région de tri d'acheminement - RTA)",
     "provinces_title": "Engagement par province",
     "top_fsa_title": "Quartiers en tête vers la masse critique",
@@ -111,8 +199,8 @@
     "p2": "Votre lien d'invitation contient une clé secrète dans le fragment d'adresse URL (#k=...). Ce fragment ne voyage jamais sur Internet jusqu'à nos serveurs. Vos amis incrémentent un compteur aveugle sans jamais relier leurs identités à la vôtre."
   },
   "footer": {
-    "hosted_in_canada": "🍁 Fièrement hébergé au Canada chez Web Hosting Canada (WHC.ca)",
+    "hosted_in_canada": "⚜️ 🍁 Fièrement hébergé au Québec et au Canada chez Web Hosting Canada (WHC.ca)",
     "open_source": "Projet civique à code ouvert sous licence MIT.",
-    "rights": "Pacte numérique Canada. Tous droits réservés."
+    "rights": "Pacte numérique Québec & Canada. Tous droits réservés."
   }
 }
