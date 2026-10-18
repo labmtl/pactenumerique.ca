@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import express from 'express';
 import pactRoutes from '../src/routes/pact.js';
 import statsRoutes from '../src/routes/stats.js';
+import relayRoutes from '../src/routes/relay.js';
 
 describe('Intégration API HTTP REST', () => {
   let server;
@@ -14,6 +15,7 @@ describe('Intégration API HTTP REST', () => {
     app.use('/api/pact', pactRoutes);
     app.use('/api/circle', pactRoutes);
     app.use('/api/stats', statsRoutes);
+    app.use('/api/relay', relayRoutes);
     app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
     await new Promise((resolve) => {
@@ -162,5 +164,74 @@ describe('Intégration API HTTP REST', () => {
     });
     assert.strictEqual(resBad.status, 400);
   });
+
+  it('POST & GET /api/relay/:circleHash gère la boîte morte chiffrée Zero-Knowledge', async () => {
+    const validCircleHash = 'a1b2c3d4e5f60718293a4b5c6d7e8f00112233445566778899aabbccddeeff00';
+
+    // 1. Rejet d'un hash de cercle invalide
+    const resBadHash = await fetch(`${baseUrl}/api/relay/not-a-valid-hash`, {
+      method: 'GET'
+    });
+    assert.strictEqual(resBadHash.status, 400);
+
+    // Calcul d'un nonce PoW valide pour validCircleHash (hash commençant par '00')
+    const crypto = await import('node:crypto');
+    let validNonce = 0;
+    while (true) {
+      const hash = crypto.createHash('sha256').update(`${validCircleHash}:${validNonce}`).digest('hex');
+      if (hash.startsWith('00')) break;
+      validNonce++;
+    }
+
+    // 2a. Rejet si la preuve de travail est erronée
+    const resBadPow = await fetch(`${baseUrl}/api/relay/${validCircleHash}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        iv: 'dGVzdF9pdl8xMmJ5dGVz',
+        ciphertext: 'ZW5jcnlwdGVkX2NoYXJfeXB0b19kYXRhX2hlcmU',
+        pow_nonce: 99999999
+      })
+    });
+    assert.strictEqual(resBadPow.status, 400);
+
+    // 2b. Dépôt réussi avec PoW valide d'un blob chiffré (< 4 Ko)
+    const resPost = await fetch(`${baseUrl}/api/relay/${validCircleHash}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        iv: 'dGVzdF9pdl8xMmJ5dGVz',
+        ciphertext: 'ZW5jcnlwdGVkX2NoYXJfeXB0b19kYXRhX2hlcmU',
+        pow_nonce: validNonce
+      })
+    });
+    assert.strictEqual(resPost.status, 201);
+    const postData = await resPost.json();
+    assert.strictEqual(postData.success, true);
+    assert.strictEqual(postData.circle_hash, validCircleHash);
+
+    // 3. Récupération des blobs chiffrés pour ce cercle
+    const resGet = await fetch(`${baseUrl}/api/relay/${validCircleHash}`);
+    assert.strictEqual(resGet.status, 200);
+    const getData = await resGet.json();
+    assert.strictEqual(getData.success, true);
+    assert.ok(getData.count >= 1);
+    const found = getData.blobs.find(b => b.iv === 'dGVzdF9pdl8xMmJ5dGVz');
+    assert.ok(found);
+    assert.strictEqual(found.ciphertext, 'ZW5jcnlwdGVkX2NoYXJfeXB0b19kYXRhX2hlcmU');
+
+    // 4. Rejet d'un paquet dépassant 4096 octets
+    const giantPayload = 'A'.repeat(5000);
+    const resTooLarge = await fetch(`${baseUrl}/api/relay/${validCircleHash}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        iv: 'iv_ok',
+        ciphertext: giantPayload
+      })
+    });
+    assert.strictEqual(resTooLarge.status, 413);
+  });
 });
+
 

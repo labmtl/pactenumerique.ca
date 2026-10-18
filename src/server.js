@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pactRoutes from './routes/pact.js';
 import statsRoutes from './routes/stats.js';
+import relayRoutes from './routes/relay.js';
 import { initDatabase } from './services/db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,6 +39,7 @@ app.use(express.static(publicDir, {
 // Routes API
 app.use('/api/pact', pactRoutes);
 app.use('/api/circle', pactRoutes);
+app.use('/api/relay', relayRoutes);
 app.use('/api/stats', statsRoutes);
 
 // Route de santé (Health check pour cPanel / monitoring)

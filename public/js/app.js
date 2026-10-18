@@ -12,6 +12,7 @@ export * from './modules/directory.js';
 export * from './modules/push-ui.js';
 export * from './modules/pact-form.js';
 export * from './modules/stats.js';
+export * from './modules/relay-chat.js';
 
 // 2. Imports internes pour l'initialisation de l'application
 import { state, t, setupLanguage, applyTranslations, showToast } from './modules/state.js';
@@ -48,7 +49,29 @@ function setupEventListeners() {
     });
   }
 
-  // Puces de réseaux Big Tech à remplacer (Étape 1)
+  // Puces rapides de RTA (Quartiers québécois / canadiens)
+  document.querySelectorAll('.fsa-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.fsa-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      if (postalInput) {
+        postalInput.value = pill.dataset.fsa;
+        updatePostalCodeFeedback();
+      }
+    });
+  });
+
+  // Cartes de départ d'une plateforme commerciale (Étape 1 - Choix unique)
+  document.querySelectorAll('.origin-platform-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.origin-platform-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const net = card.dataset.network;
+      state.selectedNetworks = new Set([net]);
+    });
+  });
+
+  // Puces de réseaux (rétrocompatibilité)
   document.querySelectorAll('.network-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       const net = chip.dataset.network;

@@ -51,3 +51,15 @@ CREATE TABLE IF NOT EXISTS territory_stats (
 
 CREATE INDEX IF NOT EXISTS idx_territory_signers ON territory_stats (signers_count);
 CREATE INDEX IF NOT EXISTS idx_territory_province ON territory_stats (province);
+
+-- 5. Boîte morte chiffrée (Zero-Knowledge Relay Blobs)
+CREATE TABLE IF NOT EXISTS relay_blobs (
+    id SERIAL PRIMARY KEY,
+    circle_hash VARCHAR(64) NOT NULL,
+    iv VARCHAR(64) NOT NULL,
+    ciphertext TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_relay_circle_hash ON relay_blobs (circle_hash);
+CREATE INDEX IF NOT EXISTS idx_relay_created_at ON relay_blobs (created_at);

@@ -14,7 +14,8 @@ const memoryDb = {
   commitments: [],
   blindCircles: new Map(),
   circlePushListeners: [],
-  territoryStats: new Map()
+  territoryStats: new Map(),
+  relayBlobs: []
 };
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../../.data');
@@ -27,13 +28,14 @@ function loadMemoryStore() {
       const data = JSON.parse(raw);
       if (Array.isArray(data.commitments)) memoryDb.commitments = data.commitments;
       if (Array.isArray(data.circlePushListeners)) memoryDb.circlePushListeners = data.circlePushListeners;
+      if (Array.isArray(data.relayBlobs)) memoryDb.relayBlobs = data.relayBlobs;
       if (data.blindCircles && typeof data.blindCircles === 'object') {
         memoryDb.blindCircles = new Map(Object.entries(data.blindCircles));
       }
       if (data.territoryStats && typeof data.territoryStats === 'object') {
         memoryDb.territoryStats = new Map(Object.entries(data.territoryStats));
       }
-      console.log(`[DB] Données locales restaurées depuis ${STORE_FILE} (${memoryDb.blindCircles.size} cercle(s), ${memoryDb.commitments.length} engagement(s)).`);
+      console.log(`[DB] Données locales restaurées depuis ${STORE_FILE} (${memoryDb.blindCircles.size} cercle(s), ${memoryDb.commitments.length} engagement(s), ${memoryDb.relayBlobs.length} paquet(s) relais).`);
     }
   } catch (err) {
     console.warn('[DB] Erreur chargement store local:', err.message);
@@ -50,6 +52,7 @@ function persistMemoryStore() {
       blindCircles: Object.fromEntries(memoryDb.blindCircles),
       circlePushListeners: memoryDb.circlePushListeners,
       territoryStats: Object.fromEntries(memoryDb.territoryStats),
+      relayBlobs: memoryDb.relayBlobs,
       updated_at: new Date().toISOString()
     };
     fs.writeFileSync(STORE_FILE, JSON.stringify(data, null, 2), 'utf-8');
@@ -383,3 +386,71 @@ export async function getTerritoryStats() {
     };
   }
 }
+
+/**
+ * Enregistre un paquet chiffré dans la boîte morte du cercle (Relais aveugle)
+ * Limite de taille : 4 Ko (4096 octets)
+ */
+export async function saveRelayBlob({ circleHash, iv, ciphertext }) {
+  if (!circleHash || !iv || !ciphertext) {
+    throw new Error('Données de paquet relais incomplètes');
+  }
+
+  const payloadSize = Buffer.byteLength(iv, 'utf8') + Buffer.byteLength(ciphertext, 'utf8');
+  if (payloadSize > 4096) {
+    throw new Error('Taille du paquet relais supérieure à 4 Ko');
+  }
+
+  const p = await getDb();
+  if (p) {
+    const res = await p.query(
+      `INSERT INTO relay_blobs (circle_hash, iv, ciphertext, created_at)
+       VALUES ($1, $2, $3, NOW())
+       RETURNING id, circle_hash, iv, ciphertext, created_at`,
+      [circleHash, iv, ciphertext]
+    );
+    return res.rows[0];
+  } else {
+    const blob = {
+      id: memoryDb.relayBlobs.length + 1,
+      circle_hash: circleHash,
+      iv,
+      ciphertext,
+      created_at: new Date().toISOString()
+    };
+    memoryDb.relayBlobs.push(blob);
+    persistMemoryStore();
+    return blob;
+  }
+}
+
+/**
+ * Récupère les paquets chiffrés d'un cercle avec expiration automatique (TTL 30 jours)
+ */
+export async function getRelayBlobs(circleHash) {
+  if (!circleHash) return [];
+
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  const p = await getDb();
+  if (p) {
+    // Nettoyage en tâche de fond des vieux paquets expirés
+    p.query(`DELETE FROM relay_blobs WHERE created_at < NOW() - INTERVAL '30 days'`).catch(() => {});
+
+    const res = await p.query(
+      `SELECT id, circle_hash, iv, ciphertext, created_at
+       FROM relay_blobs
+       WHERE circle_hash = $1 AND created_at >= NOW() - INTERVAL '30 days'
+       ORDER BY created_at ASC`,
+      [circleHash]
+    );
+    return res.rows;
+  } else {
+    // Filtrage et élagage en mémoire
+    memoryDb.relayBlobs = memoryDb.relayBlobs.filter(b => new Date(b.created_at) >= thirtyDaysAgo);
+    return memoryDb.relayBlobs
+      .filter(b => b.circle_hash === circleHash)
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  }
+}
+

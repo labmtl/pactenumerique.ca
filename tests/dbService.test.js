@@ -110,17 +110,18 @@ describe('Service de Persistance & Logique de Masse Critique', () => {
       .map(s => s.trim())
       .filter(s => s.length > 0);
 
-    // Vérifie la présence des 4 CREATE TABLE
+    // Vérifie la présence des 5 CREATE TABLE
     const createTables = statements.filter(s => s.toUpperCase().startsWith('CREATE TABLE'));
-    assert.strictEqual(createTables.length, 4);
+    assert.strictEqual(createTables.length, 5);
 
     assert.ok(createTables.some(s => s.includes('pact_commitments')));
     assert.ok(createTables.some(s => s.includes('blind_circles')));
     assert.ok(createTables.some(s => s.includes('circle_push_listeners')));
     assert.ok(createTables.some(s => s.includes('territory_stats')));
+    assert.ok(createTables.some(s => s.includes('relay_blobs')));
 
-    // Vérifie la présence des 7 CREATE INDEX
+    // Vérifie la présence des 9 CREATE INDEX
     const createIndexes = statements.filter(s => s.toUpperCase().startsWith('CREATE INDEX'));
-    assert.strictEqual(createIndexes.length, 7);
+    assert.strictEqual(createIndexes.length, 9);
   });
 });

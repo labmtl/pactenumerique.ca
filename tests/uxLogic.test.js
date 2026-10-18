@@ -32,6 +32,16 @@ describe('Logique UX & Simplification Citoyenne (app.js)', () => {
     );
   });
 
+  it('génère le message préformaté de preuve sociale pour publication sur X / Facebook', async () => {
+    const { getSocialShareMessage } = await import('../public/js/app.js');
+    const inviteUrl = 'https://pactenumerique.ca/#cercle=123&k=abc';
+    const msg = getSocialShareMessage(inviteUrl, 5, ['X / Twitter']);
+    assert.strictEqual(
+      msg,
+      'J’ai signé le pacte pour basculer vers un réseau libre dès qu’on est 5 dans mon cercle. Rejoignez mon départ ici : https://pactenumerique.ca/#cercle=123&k=abc'
+    );
+  });
+
   it('génère la jauge de masse critique visuelle avec avatars', () => {
     const html1 = renderCriticalMassGauge(1, 5, false);
     assert.ok(html1.includes('critical-gauge-container'));

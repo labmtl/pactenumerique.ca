@@ -83,4 +83,38 @@ describe('Service Cryptographique & Zero-Knowledge', () => {
     const customSalt = generateSalt(16);
     assert.strictEqual(customSalt.length, 32); // 16 octets = 32 caractères hex
   });
+
+  it('chiffre et déchiffre de bout en bout avec AES-GCM (public/js/crypto.js)', async () => {
+    const { generateRandomKeyBytes, deriveBlindId, encryptMessage, decryptMessage, solveProofOfWork } = await import('../public/js/crypto.js');
+
+    const keyBytes = generateRandomKeyBytes();
+    assert.strictEqual(keyBytes.length, 32);
+
+    const blindId = await deriveBlindId(keyBytes);
+    assert.strictEqual(blindId.length, 64);
+    assert.match(blindId, /^[0-9a-f]{64}$/);
+
+    const originalText = JSON.stringify({
+      author: 'Membre 1',
+      text: 'Tout le monde a créé son profil ? On ferme samedi ?',
+      timestamp: Date.now()
+    });
+
+    const encrypted = await encryptMessage(originalText, keyBytes);
+    assert.ok(encrypted.iv);
+    assert.ok(encrypted.ciphertext);
+    assert.notStrictEqual(encrypted.ciphertext, originalText);
+
+    const decrypted = await decryptMessage(encrypted, keyBytes);
+    assert.strictEqual(decrypted, originalText);
+
+    const parsed = JSON.parse(decrypted);
+    assert.strictEqual(parsed.author, 'Membre 1');
+
+    // Test de résolution de la preuve de travail côté client
+    const nonce = await solveProofOfWork(blindId, '00');
+    assert.strictEqual(typeof nonce, 'number');
+    assert.strictEqual(verifyProofOfWork(blindId, nonce), true);
+  });
 });
+

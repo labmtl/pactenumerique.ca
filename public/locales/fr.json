@@ -86,17 +86,36 @@
     "test_push_success": "Notification de test envoyée !",
     "test_push_tip": "Si rien n'apparaît, vérifiez les réglages de votre système d'exploitation.",
     "celebration_toast": "🎉 Masse critique atteinte ! Votre cercle de {count} personnes est complet. Vous pouvez faire le saut ensemble !",
+    "gauge_title": "Progression vers le départ collectif",
+    "avatar_me": "Moi",
+    "avatar_friend": "Ami",
     "gauge_status_1": "Déjà 1 personne sur {target} prête à faire le saut (plus que {needed} !)",
     "gauge_status_n": "Déjà {current} personnes sur {target} prêtes à faire le saut (plus que {needed} !)",
     "gauge_status_complete": "🎉 {target} personnes sur {target} : Masse critique atteinte ! C'est le moment de faire le saut ensemble !",
     "share_ready_title": "Message tout prêt à envoyer par SMS ou WhatsApp :",
     "share_ready_template": "Salut ! Dès qu'on est {target} à s'inscrire, on quitte {networks} ensemble. Rejoins mon groupe ici : {link}",
+    "btn_share_x": "Publier mon pacte sur X",
+    "btn_share_fb": "Partager sur Facebook",
+    "btn_share_li": "Partager sur LinkedIn",
     "btn_share_whatsapp": "💬 Envoyer par WhatsApp",
     "btn_share_sms": "📱 Envoyer par SMS",
     "btn_copy_message": "📋 Copier le message complet",
     "btn_copy_link": "🔗 Copier seulement le lien",
     "message_copied": "Message d'invitation copié ! Prêt à coller dans vos discussions.",
     "link_copied": "Lien copié dans le presse-papier !"
+  },
+  "relay_chat": {
+    "title": "Boîte morte chiffrée (Zero-Knowledge)",
+    "subtitle": "Coordination confidentielle de bout en bout (AES-GCM). Aucun compte requis.",
+    "placeholder": "Écrire un message chiffré à vos proches...",
+    "empty": "Aucun message pour le moment. Déposez le premier mot pour coordonner le grand départ !"
+  },
+  "migration": {
+    "title": "Guide de bascule coordonnée",
+    "subtitle": "Félicitations, votre cercle a atteint sa masse critique ! Voici le plan en 3 étapes pour faire le saut ensemble sans laisser personne derrière.",
+    "step1_title": "Sauvegardez vos archives personnelles",
+    "step2_title": "Créez votre compte sur un réseau souverain local",
+    "step3_title": "Partagez votre nouvelle adresse avec vos proches"
   },
   "directory": {
     "title": "Répertoire des réseaux sociaux souverains",

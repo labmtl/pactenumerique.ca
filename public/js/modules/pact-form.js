@@ -21,26 +21,155 @@ import {
 } from '../crypto.js';
 import { checkOrRestorePushSubscription } from '../push.js';
 import { loadTerritoryStats } from './stats.js';
+import { renderRelayChat, renderMigrationGuide, postEncryptedRelayMessage } from './relay-chat.js';
 
 /**
  * Détection du parrainage aveugle dans le fragment d'URL (#cercle=...&k=...)
  */
-export function detectInviteHash() {
+export async function detectInviteHash() {
   if (typeof window === 'undefined') return;
 
   const hash = window.location.hash.substring(1);
   if (!hash) return;
 
   const params = new URLSearchParams(hash);
-  const cercle = params.get('cercle');
+  const cercle = params.get('cercle') || params.get('c');
+  const k = params.get('k') || params.get('cle');
 
   if (cercle && /^[a-f0-9]{64}$/i.test(cercle)) {
     state.inviterCircleId = cercle;
+    if (k) {
+      try {
+        state.circleKeyBytes = base64UrlToBuf(k);
+      } catch (err) {
+        console.warn('[Crypto] Erreur décodage clé d\'URL:', err);
+      }
+    }
+
     const banner = document.getElementById('inviteBanner');
     if (banner) {
       banner.style.display = 'flex';
       banner.scrollIntoView({ behavior: 'smooth' });
     }
+
+    // Si l'utilisateur n'a pas encore de cercle enregistré localement, afficher l'invitation avec boîte morte
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('pacte_my_circle') : null;
+    if (!saved && state.circleKeyBytes) {
+      await renderGuestInviteWidget(cercle, state.circleKeyBytes);
+    }
+  }
+}
+
+/**
+ * Affiche le tableau de bord pour un invité arrivant par lien avec fragment chiffré
+ */
+export async function renderGuestInviteWidget(circleHash, keyBytes) {
+  if (typeof document === 'undefined') return;
+  const widget = document.getElementById('myCircleWidget');
+  if (!widget) return;
+
+  let currentCount = 1;
+  let targetCount = 5;
+  let unlocked = false;
+
+  try {
+    const res = await fetch(`/api/circle/${circleHash}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.circle) {
+        currentCount = data.circle.current_count;
+        targetCount = data.circle.target_count;
+        unlocked = data.circle.unlocked;
+      }
+    }
+  } catch (err) {
+    console.warn('[Invité] Erreur lecture cercle:', err);
+  }
+
+  const percent = Math.min(100, Math.round((currentCount / targetCount) * 100));
+
+  widget.style.display = 'block';
+  widget.innerHTML = `
+    <div class="guest-invite-card">
+      <div class="guest-invite-header">
+        <span class="guest-badge">💌 Vous avez été invité(e) dans ce cercle privé</span>
+        <h3 class="guest-title">Faisons le saut ensemble vers un réseau libre</h3>
+        <p class="guest-desc">Votre proche a initié ce départ collectif. Aucun courriel requis : rejoignez le départ en un clic et échangez dans la boîte morte chiffrée.</p>
+      </div>
+
+      <!-- Jauge de progression du cercle d'amis -->
+      ${renderCriticalMassGauge(currentCount, targetCount, unlocked)}
+
+      <div class="guest-join-action" style="text-align:center; margin: 1.25rem 0;">
+        <button type="button" class="btn-submit" id="btnGuestJoinCircle" style="max-width: 420px; margin: 0 auto;">
+          <span>🤝</span> <span>Rejoindre ce départ (sans inscription)</span>
+        </button>
+      </div>
+
+      <!-- Boîte morte chiffrée -->
+      <div id="guestRelayChat"></div>
+      
+      <!-- Guide de migration si déjà débloqué -->
+      <div id="guestMigrationGuide"></div>
+    </div>
+  `;
+
+  const chatContainer = widget.querySelector('#guestRelayChat');
+  if (chatContainer) {
+    renderRelayChat(chatContainer, circleHash, keyBytes);
+  }
+
+  if (unlocked || currentCount >= targetCount) {
+    const guideContainer = widget.querySelector('#guestMigrationGuide');
+    if (guideContainer) {
+      renderMigrationGuide(guideContainer, 'X / Twitter', circleHash, keyBytes);
+    }
+  }
+
+  const joinBtn = widget.querySelector('#btnGuestJoinCircle');
+  if (joinBtn) {
+    joinBtn.addEventListener('click', async () => {
+      joinBtn.disabled = true;
+      joinBtn.textContent = 'Connexion...';
+      try {
+        await fetch('/api/circle/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ blind_circle_id: circleHash })
+        });
+
+        // Déposer un message chiffré dans la boîte morte
+        try {
+          await postEncryptedRelayMessage(circleHash, keyBytes, {
+            type: 'chat',
+            author: state.lang === 'fr' ? 'Un ami' : 'A friend',
+            text: state.lang === 'fr' ? 'Je viens de rejoindre le départ collectif ! 🚀' : 'I just joined the departure! 🚀',
+            timestamp: Date.now()
+          });
+        } catch (e) {
+          console.warn('[Relais] Erreur dépôt join:', e);
+        }
+
+        const circleData = {
+          blindId: circleHash,
+          keyB64: bufToBase64Url(keyBytes),
+          targetCount,
+          fsa: 'H2T',
+          createdAt: new Date().toISOString(),
+          leavingNetworks: ['X / Twitter']
+        };
+        localStorage.setItem('pacte_my_circle', JSON.stringify(circleData));
+        state.myBlindCircleId = circleHash;
+        state.savedCircleData = circleData;
+
+        showToast(state.lang === 'fr' ? 'Vous avez rejoint le cercle !' : 'You joined the circle!');
+        await renderMyCircleWidget();
+      } catch (err) {
+        alert(err.message || 'Erreur');
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Rejoindre ce départ';
+      }
+    });
   }
 }
 
@@ -162,10 +291,16 @@ export async function renderMyCircleWidget() {
     <!-- Jauge de masse critique visuelle et intuitive -->
     ${renderCriticalMassGauge(currentCount, targetCount, unlocked)}
 
-    <!-- Boîte de message tout prêt pour SMS ou WhatsApp -->
+    <!-- Boîte de message tout prêt pour X, Facebook, LinkedIn, SMS ou WhatsApp -->
     ${renderReadyShareBox(inviteUrl, targetCount, saved.leavingNetworks, 'myCircle')}
 
-    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem; margin-top:0.6rem;">
+    <!-- Boîte morte chiffrée (Mini-clavardage asynchrone Zero-Knowledge) -->
+    <div id="myCircleRelayChatContainer" style="margin-top: 1.25rem;"></div>
+
+    <!-- Guide de migration coordonnée (déverrouillé au seuil) -->
+    <div id="myCircleMigrationGuideContainer" style="margin-top: 1.25rem;"></div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem; margin-top:1rem;">
       <div id="myCirclePushStatus" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
         ${state.isPushActive 
           ? `<span style="color:var(--accent-emerald); font-weight:600;">${t('circle_widget.push_active') || '🔔 Notifications actives pour ce cercle'}</span>`
@@ -184,8 +319,25 @@ export async function renderMyCircleWidget() {
     </div>
   `;
 
-  // Attache les écouteurs pour la boîte de partage SMS/WhatsApp
+  // Attache les écouteurs pour la boîte de partage (X, Facebook, LinkedIn, SMS, WhatsApp)
   attachShareBoxListeners('myCircle', inviteUrl, getReadyInviteMessage(inviteUrl, targetCount, saved.leavingNetworks));
+
+  // Rendu de la boîte morte chiffrée
+  if (state.circleKeyBytes) {
+    const chatContainer = widget.querySelector('#myCircleRelayChatContainer');
+    if (chatContainer) {
+      renderRelayChat(chatContainer, saved.blindId, state.circleKeyBytes);
+    }
+  }
+
+  // Rendu du guide de migration coordonnée si seuil atteint
+  if (unlocked || currentCount >= targetCount) {
+    const guideContainer = widget.querySelector('#myCircleMigrationGuideContainer');
+    if (guideContainer) {
+      const leavingNet = (saved.leavingNetworks && saved.leavingNetworks[0]) || 'X / Twitter';
+      renderMigrationGuide(guideContainer, leavingNet, saved.blindId, state.circleKeyBytes);
+    }
+  }
 
   // Écouteur pour activer push en un clic
   const quickPushBtn = document.getElementById('btnQuickEnablePush');
@@ -339,6 +491,21 @@ export async function handlePactSubmit(e) {
       localStorage.setItem('pacte_my_circle', JSON.stringify(myCircleData));
     }
     state.savedCircleData = myCircleData;
+
+    // Déposer le message initial sur la boîte morte chiffrée
+    try {
+      const leavingName = Array.from(state.selectedNetworks)[0] || 'la Big Tech';
+      await postEncryptedRelayMessage(state.myBlindCircleId, state.circleKeyBytes, {
+        type: 'chat',
+        author: state.lang === 'fr' ? 'Initiateur' : 'Initiator',
+        text: state.lang === 'fr'
+          ? `Pacte signé pour quitter ${leavingName} ! Bienvenue dans notre cercle confidentiel.`
+          : `Pledge signed to leave ${leavingName}! Welcome to our private circle.`,
+        timestamp: Date.now()
+      });
+    } catch (relayErr) {
+      console.warn('[Relais] Message initial non déposé:', relayErr);
+    }
 
     // Afficher le widget de progression en direct
     await renderMyCircleWidget();

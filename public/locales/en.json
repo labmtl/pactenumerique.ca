@@ -86,17 +86,36 @@
     "test_push_success": "Test notification sent!",
     "test_push_tip": "If nothing appears, check your OS notification settings.",
     "celebration_toast": "🎉 Critical mass reached! Your circle of {count} people is complete. You can make the jump together!",
+    "gauge_title": "Progress toward collective departure",
+    "avatar_me": "Me",
+    "avatar_friend": "Friend",
     "gauge_status_1": "Already 1 of {target} ready to make the leap ({needed} more to go!)",
     "gauge_status_n": "Already {current} of {target} ready to make the leap ({needed} more to go!)",
     "gauge_status_complete": "🎉 {target} of {target}: Critical mass reached! It's time to make the leap together!",
     "share_ready_title": "Ready-to-send message for SMS or WhatsApp:",
     "share_ready_template": "Hey! As soon as {target} of us sign up, we're leaving {networks} together. Join my group here: {link}",
+    "btn_share_x": "Post my pledge on X",
+    "btn_share_fb": "Share on Facebook",
+    "btn_share_li": "Share on LinkedIn",
     "btn_share_whatsapp": "💬 Share via WhatsApp",
     "btn_share_sms": "📱 Share via SMS",
     "btn_copy_message": "📋 Copy full message",
     "btn_copy_link": "🔗 Copy link only",
     "message_copied": "Invitation message copied! Ready to paste into your chats.",
     "link_copied": "Link copied to clipboard!"
+  },
+  "relay_chat": {
+    "title": "Encrypted Dead-Drop (Zero-Knowledge Relay)",
+    "subtitle": "End-to-end confidential coordination (AES-GCM). No account required.",
+    "placeholder": "Write an encrypted note to your circle...",
+    "empty": "No messages yet. Post the first encrypted message to coordinate your departure!"
+  },
+  "migration": {
+    "title": "Coordinated Migration Guide",
+    "subtitle": "Congratulations, your circle reached critical mass! Follow these 3 simple steps to switch together without leaving anyone behind.",
+    "step1_title": "Back up your personal archives",
+    "step2_title": "Create your account on a local sovereign network",
+    "step3_title": "Share your new handle with your friends"
   },
   "directory": {
     "title": "Directory of Sovereign Social Networks",

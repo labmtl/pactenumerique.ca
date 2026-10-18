@@ -98,19 +98,63 @@ export function getReadyInviteMessage(inviteUrl, targetCount = 5, networks = nul
 }
 
 /**
- * Rendu de la boîte de partage SMS / WhatsApp tout prêt
+ * Génère le message ciblé pour publication sociale sur la plateforme d'origine
+ * (Format officiel requis pour le recrutement et la validation sociale)
+ */
+export function getSocialShareMessage(inviteUrl, targetCount = 5, networks = null) {
+  if (state.lang === 'en') {
+    return `I signed the pledge to switch to an open network as soon as there are ${targetCount} of us in my circle. Join my departure here: ${inviteUrl}`;
+  }
+  return `J’ai signé le pacte pour basculer vers un réseau libre dès qu’on est ${targetCount} dans mon cercle. Rejoignez mon départ ici : ${inviteUrl}`;
+}
+
+/**
+ * Rendu de la boîte de partage avec boutons ciblés vers la plateforme d'origine et messageries privées
  */
 export function renderReadyShareBox(inviteUrl, targetCount, leavingNetworks, prefix = 'widget') {
   const message = getReadyInviteMessage(inviteUrl, targetCount, leavingNetworks);
+  const socialMessage = getSocialShareMessage(inviteUrl, targetCount, leavingNetworks);
+
+  const netList = Array.isArray(leavingNetworks) ? leavingNetworks : (leavingNetworks ? Array.from(leavingNetworks) : []);
+  const isLeavingFb = netList.some(n => /Facebook/i.test(n));
+  const isLeavingLi = netList.some(n => /LinkedIn/i.test(n));
+  const isLeavingX = netList.some(n => /X|Twitter/i.test(n)) || (!isLeavingFb && !isLeavingLi);
+
+  let originPlatformBtn = '';
+  if (isLeavingX) {
+    originPlatformBtn = `
+      <button type="button" class="btn-share-social twitter" id="${prefix}BtnTwitter">
+        <span>🐦</span> <span>${t('circle_widget.btn_share_x') || 'Publier mon pacte sur X'}</span>
+      </button>
+    `;
+  }
+  if (isLeavingFb) {
+    originPlatformBtn += `
+      <button type="button" class="btn-share-social facebook" id="${prefix}BtnFacebook">
+        <span>👥</span> <span>${t('circle_widget.btn_share_fb') || 'Partager sur Facebook'}</span>
+      </button>
+    `;
+  }
+  if (isLeavingLi) {
+    originPlatformBtn += `
+      <button type="button" class="btn-share-social linkedin" id="${prefix}BtnLinkedIn">
+        <span>💼</span> <span>${t('circle_widget.btn_share_li') || 'Partager sur LinkedIn'}</span>
+      </button>
+    `;
+  }
+
   return `
     <div class="ready-share-box">
       <div class="ready-share-header">
-        <strong>💬 ${t('circle_widget.share_ready_title') || 'Message tout prêt à envoyer par SMS ou WhatsApp :'}</strong>
+        <strong>📣 ${t('circle_widget.share_ready_title') || 'Publiez votre appel de départ ou envoyez-le directement :'}</strong>
       </div>
       <div class="ready-share-bubble">
-        <p id="${prefix}ShareBubbleText">${message}</p>
+        <p id="${prefix}ShareBubbleText">${socialMessage}</p>
       </div>
+
+      <!-- Actions de diffusion sociale ciblée & messageries -->
       <div class="ready-share-actions">
+        ${originPlatformBtn}
         <button type="button" class="btn-share-social whatsapp" id="${prefix}BtnWhatsApp">
           <span>💬</span> <span>WhatsApp</span>
         </button>
@@ -129,22 +173,51 @@ export function renderReadyShareBox(inviteUrl, targetCount, leavingNetworks, pre
 }
 
 /**
- * Attache les écouteurs pour la boîte de partage SMS/WhatsApp
+ * Attache les écouteurs pour la boîte de partage (X, Facebook, LinkedIn, SMS, WhatsApp)
  */
-export function attachShareBoxListeners(prefix, inviteUrl, message) {
+export function attachShareBoxListeners(prefix, inviteUrl, message, customSocialMsg = null) {
   if (typeof document === 'undefined') return;
+
+  const socialMsg = customSocialMsg || message;
+
+  // Bouton Twitter / X
+  const btnTwitter = document.getElementById(`${prefix}BtnTwitter`);
+  if (btnTwitter) {
+    btnTwitter.onclick = () => {
+      const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(socialMsg)}`;
+      window.open(intentUrl, '_blank', 'noopener,noreferrer');
+    };
+  }
+
+  // Bouton Facebook
+  const btnFb = document.getElementById(`${prefix}BtnFacebook`);
+  if (btnFb) {
+    btnFb.onclick = () => {
+      const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteUrl)}&quote=${encodeURIComponent(socialMsg)}`;
+      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    };
+  }
+
+  // Bouton LinkedIn
+  const btnLi = document.getElementById(`${prefix}BtnLinkedIn`);
+  if (btnLi) {
+    btnLi.onclick = () => {
+      const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(inviteUrl)}`;
+      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    };
+  }
 
   const btnWa = document.getElementById(`${prefix}BtnWhatsApp`);
   if (btnWa) {
     btnWa.onclick = () => {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(socialMsg)}`, '_blank');
     };
   }
 
   const btnSms = document.getElementById(`${prefix}BtnSMS`);
   if (btnSms) {
     btnSms.onclick = () => {
-      window.location.href = `sms:?&body=${encodeURIComponent(message)}`;
+      window.location.href = `sms:?&body=${encodeURIComponent(socialMsg)}`;
     };
   }
 
@@ -152,7 +225,7 @@ export function attachShareBoxListeners(prefix, inviteUrl, message) {
   if (btnCopyMsg) {
     btnCopyMsg.onclick = async () => {
       try {
-        await navigator.clipboard.writeText(message);
+        await navigator.clipboard.writeText(socialMsg);
         showToast(t('circle_widget.message_copied') || 'Message complet copié ! Prêt à coller.');
       } catch {
         showToast('Erreur copie presse-papier');

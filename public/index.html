@@ -85,73 +85,40 @@
         <!-- Formulaire d'engagement en 2 étapes simples -->
         <form id="pactForm">
           
-          <!-- ÉTAPE 1 : Qui voulez-vous remplacer ? -->
+          <!-- ÉTAPE 1 : Quelle plateforme voulez-vous quitter ? -->
           <div class="form-group-block">
-            <h3 class="block-title" data-i18n="form.step1_title">1. Qui voulez-vous remplacer ?</h3>
-            <p class="input-help" data-i18n="form.step_networks_desc">Sélectionnez les plateformes que vous souhaitez remplacer par des solutions souveraines :</p>
+            <h3 class="block-title" data-i18n="form.step1_title">1. Quelle plateforme voulez-vous quitter ?</h3>
+            <p class="input-help" data-i18n="form.step_networks_desc">Sélectionnez la plateforme commerciale dont vous voulez vous libérer :</p>
             
-            <div class="networks-grid" id="networksGrid">
-              <div class="network-chip active" data-network="Facebook">
-                <span class="network-chip-icon">👥</span>
-                <span>Facebook / Meta</span>
-              </div>
-              <div class="network-chip active" data-network="X / Twitter">
-                <span class="network-chip-icon">🐦</span>
-                <span>X / Twitter</span>
-              </div>
-              <div class="network-chip active" data-network="Instagram">
-                <span class="network-chip-icon">📸</span>
-                <span>Instagram</span>
-              </div>
-              <div class="network-chip" data-network="WhatsApp">
-                <span class="network-chip-icon">💬</span>
-                <span>WhatsApp / Discord</span>
-              </div>
-              <div class="network-chip" data-network="YouTube">
-                <span class="network-chip-icon">🎬</span>
-                <span>YouTube / TikTok</span>
-              </div>
-              <div class="network-chip" data-network="LinkedIn">
-                <span class="network-chip-icon">💼</span>
-                <span>LinkedIn</span>
-              </div>
-              <div class="network-chip" data-network="Reddit">
-                <span class="network-chip-icon">🗨️</span>
-                <span>Reddit / Forums</span>
-              </div>
+            <div class="origin-platform-grid" id="originPlatformGrid">
+              <button type="button" class="origin-platform-card active" data-network="X / Twitter">
+                <span class="platform-icon">🐦</span>
+                <span class="platform-label">Je veux quitter X / Twitter</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="Facebook">
+                <span class="platform-icon">👥</span>
+                <span class="platform-label">Je veux quitter Facebook</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="Instagram">
+                <span class="platform-icon">📸</span>
+                <span class="platform-label">Je veux quitter Instagram</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="LinkedIn">
+                <span class="platform-icon">💼</span>
+                <span class="platform-label">Je veux quitter LinkedIn</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="YouTube">
+                <span class="platform-icon">🎬</span>
+                <span class="platform-label">Je veux quitter YouTube / TikTok</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="WhatsApp">
+                <span class="platform-icon">💬</span>
+                <span class="platform-label">Je veux quitter WhatsApp / Discord</span>
+              </button>
             </div>
-
-            <!-- Attribution automatique du serveur local (Évite la paralysie du choix) -->
-            <div class="auto-server-card" id="autoServerCard">
-              <div class="auto-server-main">
-                <div class="auto-server-icon" aria-hidden="true">✨</div>
-                <div class="auto-server-info">
-                  <h4 class="auto-server-title" data-i18n="form.auto_server_title">Attribution automatique de votre serveur local</h4>
-                  <p class="auto-server-desc" id="autoServerSummary" data-i18n="form.auto_server_desc">Nous vous associons automatiquement au meilleur serveur local selon votre ville (sans publicité, données hébergées au pays).</p>
-                  <div id="autoServerPickedBadge" class="auto-server-picked"></div>
-                </div>
-              </div>
-              <div class="auto-server-toggle">
-                <label class="custom-checkbox-label">
-                  <input type="checkbox" id="chkManualServer">
-                  <span data-i18n="form.manual_server_checkbox">Je choisis moi-même mon instance (avancé)</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Boîte de sélection manuelle (affichée uniquement si case cochée) -->
-            <div id="recommendationsBox" class="recommendations-box" style="display: none;">
-              <div class="recom-header">
-                <div class="recom-title-row">
-                  <h4 data-i18n="form.recom_title">Choix manuel de votre serveur local :</h4>
-                  <span id="recomQcBadge" class="recom-qc-badge" style="display:none;" data-i18n="directory.recom_qc_priority">⚜️ Solutions hébergées au Québec priorisées</span>
-                </div>
-                <p class="input-help" data-i18n="form.recom_pick">Sélectionnez le serveur de votre choix pour votre pacte :</p>
-              </div>
-              <div id="recomCards" class="recom-cards">
-                <!-- Rempli dynamiquement par app.js avec des notions d'usage -->
-              </div>
-            </div>
+            <p class="input-help" style="margin-top: 0.65rem; font-size: 0.85rem; color: var(--text-muted);">
+              ✨ <em>L'instance d'accueil souveraine vous sera suggérée lors du déclenchement final de la bascule.</em>
+            </p>
           </div>
 
           <!-- ÉTAPE 2 : Avec combien d'amis voulez-vous partir ? -->
@@ -174,35 +141,35 @@
               </button>
             </div>
 
+            <!-- Région allégée (3 caractères de la RTA ou ville) - Aucun courriel requis -->
             <div style="margin-top: 1.5rem;">
-              <label for="emailInput" class="input-help" style="font-weight:600; color:var(--text-main);" data-i18n="form.email_label">Adresse courriel pour recevoir l'alerte de départ</label>
-              <input 
-                type="email" 
-                id="emailInput" 
-                class="input-field" 
-                placeholder="nom@exemple.ca" 
-                data-i18n-placeholder="form.email_placeholder"
-                autocomplete="email"
-              >
-              <p class="input-help" data-i18n="form.email_help">Strictement confidentielle. Jamais partagée, ni vendue, ni conservée en clair.</p>
-            </div>
-
-            <div style="margin-top: 1.25rem;">
-              <label for="postalCodeInput" class="input-help" style="font-weight:600; color:var(--text-main);" data-i18n="form.postal_label">Votre ville (ou code postal)</label>
+              <label for="postalCodeInput" class="input-help" style="font-weight:600; color:var(--text-main);" data-i18n="form.postal_label">Votre quartier (3 caractères de la RTA) ou ville</label>
               <input 
                 type="text" 
                 id="postalCodeInput" 
                 class="input-field" 
-                placeholder="ex: Montréal, Québec, Gatineau, H2T..." 
+                placeholder="ex: H2T, G1K, Montréal, Québec..." 
                 data-i18n-placeholder="form.postal_placeholder"
                 maxlength="30"
                 autocomplete="address-level2"
+                value="H2T"
               >
               <div id="geoBadge" class="geo-badge" style="display: none;"></div>
-              <p class="input-help" data-i18n="form.postal_help">Permet de regrouper les engagements citoyens de votre région.</p>
+              
+              <!-- Puces de sélection rapide de la RTA -->
+              <div class="fsa-quick-pills" id="fsaQuickPills">
+                <span style="font-size:0.75rem; color:var(--text-muted); align-self:center;">RTA rapides :</span>
+                <button type="button" class="fsa-pill active" data-fsa="H2T">H2T (Plateau)</button>
+                <button type="button" class="fsa-pill" data-fsa="G1K">G1K (Québec)</button>
+                <button type="button" class="fsa-pill" data-fsa="H1W">H1W (Hochelaga)</button>
+                <button type="button" class="fsa-pill" data-fsa="J4H">J4H (Longueuil)</button>
+                <button type="button" class="fsa-pill" data-fsa="K1P">K1P (Gatineau/Ottawa)</button>
+              </div>
+
+              <p class="input-help" data-i18n="form.postal_help">Aucune adresse exacte requise. Permet uniquement de regrouper les engagements citoyens de votre secteur.</p>
             </div>
 
-            <!-- Option notification appareil -->
+            <!-- Option notification appareil (optionnelle, sans compte ni courriel) -->
             <div class="push-toggle-box" style="margin-top: 1.25rem;">
               <div class="push-info">
                 <h5 data-i18n="form.push_title">Alerte discrète sur cet appareil</h5>

@@ -1,7 +1,18 @@
 /**
  * Cryptographie côté client - Web Crypto API
  * Garantit l'absence d'accès au graphe social par le serveur (Zero-Knowledge)
+ * Supporte le chiffrement de bout en bout AES-GCM pour le relais boîte morte
  */
+
+function getCrypto() {
+  if (typeof window !== 'undefined' && window.crypto) {
+    return window.crypto;
+  }
+  if (typeof globalThis !== 'undefined' && globalThis.crypto) {
+    return globalThis.crypto;
+  }
+  throw new Error('Web Crypto API non disponible dans cet environnement');
+}
 
 /**
  * Encode un Uint8Array en chaîne hexadécimale
@@ -22,7 +33,8 @@ export function bufToBase64Url(buffer) {
   for (let i = 0; i < len; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary)
+  const btoaFn = typeof btoa === 'function' ? btoa : (s) => Buffer.from(s, 'binary').toString('base64');
+  return btoaFn(binary)
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
@@ -36,7 +48,8 @@ export function base64UrlToBuf(base64Url) {
   while (base64.length % 4) {
     base64 += '=';
   }
-  const binary = atob(base64);
+  const atobFn = typeof atob === 'function' ? atob : (s) => Buffer.from(s, 'base64').toString('binary');
+  const binary = atobFn(base64);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
     bytes[i] = binary.charCodeAt(i);
@@ -49,7 +62,7 @@ export function base64UrlToBuf(base64Url) {
  */
 export function generateRandomKeyBytes() {
   const bytes = new Uint8Array(32);
-  window.crypto.getRandomValues(bytes);
+  getCrypto().getRandomValues(bytes);
   return bytes;
 }
 
@@ -63,7 +76,7 @@ export async function deriveBlindId(keyBytes) {
   combined.set(keyBytes, 0);
   combined.set(tag, keyBytes.length);
 
-  const hashBuffer = await window.crypto.subtle.digest('SHA-256', combined);
+  const hashBuffer = await getCrypto().subtle.digest('SHA-256', combined);
   return bufToHex(hashBuffer);
 }
 
@@ -76,7 +89,7 @@ export async function solveProofOfWork(payload, leadingZeros = '00') {
   const encoder = new TextEncoder();
   while (true) {
     const data = encoder.encode(`${payload}:${nonce}`);
-    const hashBuf = await window.crypto.subtle.digest('SHA-256', data);
+    const hashBuf = await getCrypto().subtle.digest('SHA-256', data);
     const hashHex = bufToHex(hashBuf);
     if (hashHex.startsWith(leadingZeros)) {
       return nonce;
@@ -87,4 +100,67 @@ export async function solveProofOfWork(payload, leadingZeros = '00') {
       await new Promise(r => setTimeout(r, 0));
     }
   }
+}
+
+/**
+ * Chiffre une chaîne ou objet JSON avec AES-GCM (256-bit) via la clé du cercle
+ * Retourne { iv: string, ciphertext: string } encodé en Base64URL
+ */
+export async function encryptMessage(plaintext, keyBytes) {
+  const cryptoObj = getCrypto();
+  const rawKey = keyBytes instanceof Uint8Array ? keyBytes : new Uint8Array(keyBytes);
+
+  const key = await cryptoObj.subtle.importKey(
+    'raw',
+    rawKey,
+    { name: 'AES-GCM' },
+    false,
+    ['encrypt']
+  );
+
+  const iv = new Uint8Array(12);
+  cryptoObj.getRandomValues(iv);
+
+  const encoded = new TextEncoder().encode(plaintext);
+  const ciphertextBuf = await cryptoObj.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    encoded
+  );
+
+  return {
+    iv: bufToBase64Url(iv),
+    ciphertext: bufToBase64Url(ciphertextBuf)
+  };
+}
+
+/**
+ * Déchiffre un message AES-GCM via { iv, ciphertext } et la clé du cercle
+ */
+export async function decryptMessage(encryptedObj, keyBytes) {
+  if (!encryptedObj || !encryptedObj.iv || !encryptedObj.ciphertext) {
+    throw new Error('Objet chiffré invalide');
+  }
+
+  const cryptoObj = getCrypto();
+  const rawKey = keyBytes instanceof Uint8Array ? keyBytes : new Uint8Array(keyBytes);
+
+  const key = await cryptoObj.subtle.importKey(
+    'raw',
+    rawKey,
+    { name: 'AES-GCM' },
+    false,
+    ['decrypt']
+  );
+
+  const iv = base64UrlToBuf(encryptedObj.iv);
+  const ciphertext = base64UrlToBuf(encryptedObj.ciphertext);
+
+  const decryptedBuf = await cryptoObj.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    ciphertext
+  );
+
+  return new TextDecoder().decode(decryptedBuf);
 }
