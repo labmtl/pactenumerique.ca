@@ -49,6 +49,11 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Fallback 404 pour l'API
+app.all('/api/*', (req, res) => {
+  res.status(404).json({ error: 'Endpoint API introuvable' });
+});
+
 // Fallback SPA pour les liens directs (ex: /join#...)
 app.get('*', (req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));

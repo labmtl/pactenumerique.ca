@@ -115,4 +115,52 @@ describe('Intégration API HTTP REST', () => {
     assert.strictEqual(data.success, true);
     assert.ok(data.current_count >= 2);
   });
+
+  it('GET /api/circle/:id retourne les détails d\'un cercle aveugle ou 404', async () => {
+    const blindId = '11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff';
+    const res = await fetch(`${baseUrl}/api/circle/${blindId}`);
+    assert.strictEqual(res.status, 200);
+    const data = await res.json();
+    assert.strictEqual(data.success, true);
+    assert.ok(data.circle);
+    assert.strictEqual(data.circle.blind_id, blindId);
+    assert.ok(data.circle.current_count >= 2);
+
+    // Cercle inconnu -> 404
+    const res404 = await fetch(`${baseUrl}/api/circle/0000000000000000000000000000000000000000000000000000000000000000`);
+    assert.strictEqual(res404.status, 404);
+
+    // ID invalide -> 400
+    const res400 = await fetch(`${baseUrl}/api/circle/invalid-id`);
+    assert.strictEqual(res400.status, 400);
+  });
+
+  it('POST /api/circle/subscribe associe un abonnement push ou renvoie 400', async () => {
+    const blindId = '11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff';
+    
+    // Succès
+    const resOk = await fetch(`${baseUrl}/api/circle/subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        blind_circle_id: blindId,
+        push_subscription: { endpoint: 'https://example.com/push/sub1' }
+      })
+    });
+    assert.strictEqual(resOk.status, 200);
+    const dataOk = await resOk.json();
+    assert.strictEqual(dataOk.success, true);
+
+    // Paramètres manquants
+    const resBad = await fetch(`${baseUrl}/api/circle/subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        blind_circle_id: 'invalid-id',
+        push_subscription: null
+      })
+    });
+    assert.strictEqual(resBad.status, 400);
+  });
 });
+

@@ -5,6 +5,7 @@ import {
   saveCommitment,
   createBlindCircle,
   incrementBlindCircle,
+  getBlindCircle,
   addCirclePushListener,
   getCirclePushListeners,
   markCircleTriggered,
@@ -98,9 +99,12 @@ router.post('/commit', async (req, res) => {
       // Si le seuil du cercle vient d'être atteint, envoyer la notification Web Push !
       if (circleUpdate.is_newly_unlocked) {
         const listeners = await getCirclePushListeners(inviter_circle_id);
+        console.log(`[API /commit] Cercle parrain ${inviter_circle_id} déverrouillé ! ${listeners.length} abonné(s) push.`);
         if (listeners.length > 0) {
           await notifyCircleMembers(listeners, { targetCount: circleUpdate.target_count });
           await markCircleTriggered(inviter_circle_id);
+        } else {
+          console.warn(`[API /commit] Cercle parrain ${inviter_circle_id} déverrouillé mais aucun abonné push inscrit.`);
         }
       }
     }
@@ -146,9 +150,12 @@ router.post('/join', async (req, res) => {
 
     if (circleUpdate.is_newly_unlocked) {
       const listeners = await getCirclePushListeners(blind_circle_id);
+      console.log(`[API /circle/join] Cercle ${blind_circle_id} déverrouillé ! ${listeners.length} abonné(s) push.`);
       if (listeners.length > 0) {
         await notifyCircleMembers(listeners, { targetCount: circleUpdate.target_count });
         await markCircleTriggered(blind_circle_id);
+      } else {
+        console.warn(`[API /circle/join] Cercle ${blind_circle_id} déverrouillé mais aucun abonné push inscrit.`);
       }
     }
 
@@ -160,6 +167,65 @@ router.post('/join', async (req, res) => {
     });
   } catch (err) {
     console.error('[API /join] Erreur:', err);
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+/**
+ * POST /api/circle/subscribe
+ * Enregistre ou associe un abonnement Web Push à un cercle aveugle
+ */
+router.post('/subscribe', async (req, res) => {
+  try {
+    const { blind_circle_id, push_subscription } = req.body;
+
+    if (!isValidBlindId(blind_circle_id)) {
+      return res.status(400).json({ error: 'Identifiant de cercle invalide' });
+    }
+
+    if (!push_subscription || !push_subscription.endpoint) {
+      return res.status(400).json({ error: 'Abonnement Web Push manquant ou invalide' });
+    }
+
+    await addCirclePushListener({
+      id: generateUUID(),
+      blindId: blind_circle_id,
+      pushSubscription: push_subscription
+    });
+
+    return res.json({
+      success: true,
+      message: 'Abonnement Web Push associé au cercle'
+    });
+  } catch (err) {
+    console.error('[API /circle/subscribe] Erreur:', err);
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+/**
+ * GET /api/circle/:blind_circle_id
+ * Consulte l'état actuel d'un cercle aveugle
+ */
+router.get('/:blind_circle_id', async (req, res) => {
+  try {
+    const { blind_circle_id } = req.params;
+
+    if (!isValidBlindId(blind_circle_id)) {
+      return res.status(400).json({ error: 'Identifiant de cercle invalide' });
+    }
+
+    const circle = await getBlindCircle(blind_circle_id);
+    if (!circle) {
+      return res.status(404).json({ error: 'Cercle introuvable' });
+    }
+
+    return res.json({
+      success: true,
+      circle
+    });
+  } catch (err) {
+    console.error('[API /circle/:id] Erreur:', err);
     return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });

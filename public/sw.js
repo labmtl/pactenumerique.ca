@@ -39,19 +39,31 @@ self.addEventListener('push', (event) => {
     ]
   };
 
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
+  const notifyPromise = self.registration.showNotification(data.title, options);
+
+  // Diffusion aux onglets ouverts pour mise à jour immédiate de l'interface
+  const broadcastPromise = self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+    for (const client of windowClients) {
+      client.postMessage({
+        type: 'PUSH_NOTIFICATION_RECEIVED',
+        title: data.title,
+        body: data.body,
+        data: data.data
+      });
+    }
+  });
+
+  event.waitUntil(Promise.all([notifyPromise, broadcastPromise]));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data?.url || '/';
+  const targetUrl = event.notification.data?.url || '/#souverainete-active';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {
-        if (client.url.includes('pactenumerique.ca') && 'focus' in client) {
+        if ((client.url.includes('pactenumerique.ca') || client.url.includes('localhost') || client.url.includes('127.0.0.1')) && 'focus' in client) {
           return client.focus();
         }
       }

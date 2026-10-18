@@ -6,9 +6,10 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
-    "test": "node --test tests/**/*.test.js",
+    "dev": "node --watch-path=src --watch-path=public src/server.js",
+    "test": "NODE_ENV=test node --test tests/**/*.test.js",
     "test:urls": "node scripts/check-urls.js",
+    "circle:simulate": "node scripts/simulate-circle.js",
     "db:init": "node src/db/init.js",
     "vapid:generate": "node src/utils/generateVapid.js",
     "salt:generate": "node src/utils/generateSalt.js"

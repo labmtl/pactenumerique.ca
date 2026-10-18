@@ -121,6 +121,83 @@ Faites défiler la page jusqu'au **Répertoire des réseaux sociaux souverains**
 
 ---
 
+---
+
+### Étape E : Vérification de la persistance des notifications du fureteur
+1. **Activation initiale :**
+   - Dans le formulaire (Étape 4 : Notification de bascule), cliquez sur le bouton **`Activer la notification du fureteur`**.
+   - Autorisez les notifications dans la boîte de dialogue de votre navigateur.
+   - Le bouton devient vert : **`✓ Activé`** (ou `✓ Enabled` en anglais) avec un message toast de confirmation.
+2. **Rechargement de la page (F5 / Cmd+R) :**
+   - Rechargez la page : le script interroge automatiquement l'état auprès du Service Worker (`checkPushStatus()`).
+   - **Résultat attendu :** Le bouton **ne se réinitialise plus** au libellé initial; il affiche immédiatement **`✓ Activé`** en vert dès le chargement.
+3. **Bascule de langue :**
+   - Cliquez sur `EN` en haut à droite : le bouton passe à **`✓ Enabled`** tout en conservant son style actif.
+   - Cliquez sur `FR` : le bouton repasse à **`✓ Activé`**.
+4. **Désactivation (Bascule) :**
+   - Cliquez à nouveau sur le bouton **`✓ Activé`** : les notifications sont désactivées auprès du Service Worker, et le bouton redevient **`Activer la notification du fureteur`**.
+
+---
+
+### Étape F : Test de la notification de cercle avec le simulateur CLI
+Cette procédure permet de tester en direct la réception de la notification Web Push lors du déblocage d'un cercle :
+
+1. **Préparation dans le navigateur :**
+   - Activez les notifications (bouton `✓ Activé`).
+   - Saisissez un code postal (ex: `H2T 2N5`).
+   - Choisissez un seuil de **3 amis proches** (ou 5 amis).
+   - Cliquez sur **`Signer le pacte numérique`**.
+   - Dans le modal de succès, cliquez sur **`Copier`** pour copier votre URL d'invitation privée :
+     *(ex: `http://localhost:3000/#cercle=a1b2c3...&k=d4e5f6...`)*.
+2. **Exécution du simulateur dans votre terminal :**
+   - Lancez le script en lui passant l'URL d'invitation copiée :
+     ```bash
+     npm run circle:simulate -- "http://localhost:3000/#cercle=VOTRE_ID_HEX&k=VOTRE_CLE"
+     ```
+     *(ou directement : `node scripts/simulate-circle.js "VOTRE_URL_OU_ID"`)*
+3. **Observation en temps réel :**
+   - Le terminal affiche l'état actuel du cercle (`1 / 3` ou `1 / 5`).
+   - Le script calcule automatiquement le nombre d'amis requis (ex: 2 amis manquants).
+   - Chaque ami rejoint avec une barre de progression en temps réel :
+     ```text
+     [1/2] 👤 Ami rejoint ! Progression : [███████░░░] 2/3 (67%)
+     [2/2] 👤 Ami rejoint ! Progression : [██████████] 3/3 (100%) — 🔓 SEUIL ATTEINT !
+     🎉 SUCCÈS : MASSE CRITIQUE ATTEINTE !
+     🔔 Le serveur a déclenché l'envoi de la notification Web Push...
+     ```
+4. **Réception de la notification :**
+   - Une notification de votre système d'exploitation / fureteur s'affiche instantanément :
+     `🎉 Pacte Numérique : Masse critique atteinte !`
+     `Votre cercle de 3 amis a rejoint le pacte ! Il est temps de faire le saut ensemble vers les réseaux souverains.`
+   - De plus, si l'onglet du pacte est ouvert au premier plan, un message toast de célébration apparaît immédiatement dans la page et la barre de progression passe à 100% en temps réel !
+
+---
+
+### Étape G : Persistance locale du cercle et tableau de bord en direct
+1. **Persistance au rechargement :**
+   - Dès que vous signez le pacte, votre cercle est sauvegardé localement (`localStorage`).
+   - Même si vous rechargez la page ou fermez votre fureteur, le panneau **`Mon cercle d'action souverain`** s'affiche au-dessus du formulaire.
+   - Il affiche :
+     - Votre jauge de progression en direct (`X / 5 amis`).
+     - Votre lien d'invitation avec bouton de copie en 1 clic.
+     - L'état de vos notifications (avec bouton d'activation rapide).
+     - Le bouton **`🔔 Tester mes notifications`** pour déclencher immédiatement une notification système et un carillon audio.
+     - La commande CLI prête à être copiée.
+2. **Synchronisation en direct (Polling & Push) :**
+   - Lorsque des amis rejoignent votre cercle (ou lors d'un test avec `npm run circle:simulate`), le panneau se met à jour automatiquement toutes les 15 secondes sans recharger la page.
+3. **Célébration à l'atteinte du seuil (100%) :**
+   - Dès que le seuil de 5/5 est atteint :
+     - Un carillon harmonique civique (Do-Mi-Sol-Do) retentit via la Web Audio API.
+     - Une notification système est envoyée.
+     - Une bannière de célébration persistante apparaît avec animation émeraude sur le widget.
+4. **Diagnostic des notifications bureau sur macOS :**
+   - Sur macOS (Sonoma, Sequoia, etc.), Google Chrome peut avoir l'autorisation Web accordée tout en étant bloqué au niveau du système d'exploitation :
+     - **Vérification 1 :** *Réglages Système macOS > Notifications > Google Chrome* -> Activez "Autoriser les notifications" et les bannières.
+     - **Vérification 2 :** Désactivez le mode "Ne pas déranger" ou "Concentration" dans la barre des menus de macOS.
+     - **Vérification 3 :** Cliquez sur le bouton `🔔 Tester mes notifications` dans le widget de votre cercle pour tester la chaîne complète.
+5. **Réinitialisation volontaire :**
+   - Un bouton discret `Nouveau cercle / Réinitialiser` vous permet à tout moment d'effacer la progression locale pour créer un nouveau pacte.
+
 ## 3. Validation rapide via cURL
 
 Pour tester les réponses du backend sans interface graphique :
@@ -135,10 +212,18 @@ curl -s http://localhost:3000/api/stats/alternatives | jq '.[0]'
 # 3. Tester la validation d'un code postal invalide (doit renvoyer HTTP 400)
 curl -s -X POST http://localhost:3000/api/pact/commit \
   -H "Content-Type: application/json" \
-  -d '{"postalCode":"12345"}' | jq .
+  -d '{"postal_code":"12345"}' | jq .
 
-# 4. Tester l'engagement avec un code postal québécois
+# 4. Tester l'engagement et la création d'un cercle aveugle
 curl -s -X POST http://localhost:3000/api/pact/commit \
   -H "Content-Type: application/json" \
-  -d '{"postalCode":"H2T 2N5","blindCircleId":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","targetCount":5}' | jq .
+  -d '{"postal_code":"H2T 2N5","blind_circle_id":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","target_count":3}' | jq .
+
+# 5. Consulter l'état d'un cercle aveugle
+curl -s http://localhost:3000/api/circle/0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef | jq .
+
+# 6. Rejoindre directement un cercle aveugle (incrémentation)
+curl -s -X POST http://localhost:3000/api/circle/join \
+  -H "Content-Type: application/json" \
+  -d '{"blind_circle_id":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}' | jq .
 ```

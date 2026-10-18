@@ -528,6 +528,19 @@ button {
 
 .btn-toggle-push.active {
   background: var(--accent-emerald);
+  color: #fff;
+}
+
+.btn-toggle-push.active:hover {
+  background: #047857;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+}
+
+.btn-toggle-push.blocked,
+.btn-toggle-push:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Bouton principal de soumission */
@@ -1476,6 +1489,155 @@ button {
 @keyframes slide-toast {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* Widget de progression du cercle sauvegardé localement */
+.my-circle-widget {
+  background: var(--bg-card);
+  border: 2px solid var(--accent-emerald);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.12);
+  animation: slide-toast 0.4s ease;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.my-circle-widget.celebrate {
+  border-color: #059669;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+  animation: pulse-celebrate 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-celebrate {
+  0% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+  100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.45); }
+}
+
+.my-circle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.my-circle-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.my-circle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-emerald);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.my-circle-badge.unlocked {
+  background: var(--accent-emerald);
+  color: #fff;
+}
+
+.my-circle-subtitle {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.my-circle-progress-box {
+  margin: 1.25rem 0;
+}
+
+.my-circle-progress-track {
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.my-circle-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: var(--radius-full);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.my-circle-invite-box {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.my-circle-invite-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.my-circle-invite-input {
+  flex: 1;
+  font-size: 0.85rem;
+  font-family: monospace;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+.my-circle-btn-copy {
+  background: var(--accent-indigo);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.my-circle-btn-copy:hover {
+  background: var(--accent-indigo-hover);
+}
+
+.my-circle-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.my-circle-btn-text {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.my-circle-btn-text:hover {
+  color: var(--text-main);
 }
 
 /* Responsive */

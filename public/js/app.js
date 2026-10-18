@@ -5,7 +5,13 @@ import {
   base64UrlToBuf,
   solveProofOfWork
 } from './crypto.js';
-import { subscribeToPushNotifications, registerServiceWorker } from './push.js';
+import {
+  subscribeToPushNotifications,
+  registerServiceWorker,
+  getExistingPushSubscription,
+  checkOrRestorePushSubscription,
+  unsubscribeFromPush
+} from './push.js';
 
 // État global de l'application
 const state = {
@@ -25,7 +31,9 @@ const state = {
   currentDirectoryCat: 'all',
   currentDirectoryRegion: 'all',
   currentDirectoryLang: 'all',
-  directorySearchQuery: ''
+  directorySearchQuery: '',
+  savedCircleData: null,
+  isFormManuallyShown: false
 };
 
 /**
@@ -108,10 +116,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
   loadTerritoryStats();
   await loadAlternatives();
-  registerServiceWorker();
+  await registerServiceWorker();
+  await restoreSavedCircle();
+  await checkPushStatus();
 
-  // Polling doux des statistiques toutes les 30 secondes
+  // Écoute des messages du Service Worker (notification Web Push reçue)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data?.type === 'PUSH_NOTIFICATION_RECEIVED') {
+        playCelebrationChime();
+        const title = event.data.title || '🎉 Masse critique atteinte !';
+        const body = event.data.body || '';
+        showToast(`${title}\n${body}`, 8000);
+        renderMyCircleWidget();
+      }
+    });
+  }
+
+  // Polling doux des statistiques territoriales toutes les 30 secondes
   setInterval(loadTerritoryStats, 30000);
+
+  // Polling doux du cercle personnel toutes les 15 secondes
+  setInterval(() => {
+    if (state.myBlindCircleId) {
+      renderMyCircleWidget();
+    }
+  }, 15000);
 });
 
 /**
@@ -161,6 +191,8 @@ function t(keyPath) {
 
 function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
+    // Le bouton push est géré dynamiquement par updatePushButtonUI()
+    if (el.id === 'btnTogglePush') return;
     const key = el.getAttribute('data-i18n');
     el.textContent = t(key);
   });
@@ -175,10 +207,85 @@ function applyTranslations() {
     langBtn.textContent = state.lang === 'fr' ? 'EN' : 'FR';
   }
 
+  updatePushButtonUI();
+
+  if (state.savedCircleData || localStorage.getItem('pacte_my_circle')) {
+    renderMyCircleWidget();
+  }
+
   if (state.alternatives && state.alternatives.length > 0) {
     renderRecommendations();
     renderDirectory();
   }
+}
+
+/**
+ * Met à jour l'apparence et le texte du bouton d'activation Push selon l'état actuel
+ */
+export function updatePushButtonUI() {
+  const pushBtn = document.getElementById('btnTogglePush');
+  if (!pushBtn) return;
+
+  if (state.isPushActive) {
+    pushBtn.classList.add('active');
+    pushBtn.classList.remove('blocked');
+    pushBtn.disabled = false;
+    pushBtn.textContent = '✓ ' + (state.lang === 'fr' ? 'Activé' : 'Enabled');
+    pushBtn.title = state.lang === 'fr'
+      ? 'Notifications fureteur activées (cliquez pour désactiver)'
+      : 'Browser notifications active (click to disable)';
+  } else if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+    pushBtn.classList.remove('active');
+    pushBtn.classList.add('blocked');
+    pushBtn.disabled = true;
+    pushBtn.textContent = t('form.push_blocked') || (state.lang === 'fr' ? 'Notifications bloquées' : 'Notifications blocked');
+    pushBtn.title = state.lang === 'fr'
+      ? 'Notifications bloquées dans les réglages de votre fureteur'
+      : 'Notifications blocked in browser settings';
+  } else {
+    pushBtn.classList.remove('active');
+    pushBtn.classList.remove('blocked');
+    pushBtn.disabled = false;
+    pushBtn.textContent = t('form.enable_push') || (state.lang === 'fr' ? 'Activer la notification du fureteur' : 'Enable browser notification');
+    pushBtn.title = '';
+  }
+}
+
+/**
+ * Vérifie le statut actuel des notifications et restaure l'état au rechargement de la page
+ */
+export async function checkPushStatus() {
+  const pushBtn = document.getElementById('btnTogglePush');
+  if (!pushBtn) return;
+
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    pushBtn.disabled = true;
+    pushBtn.classList.add('blocked');
+    pushBtn.textContent = t('form.push_unsupported') || (state.lang === 'fr' ? 'Non supporté' : 'Not supported');
+    return;
+  }
+
+  if (Notification.permission === 'denied') {
+    updatePushButtonUI();
+    return;
+  }
+
+  if (Notification.permission === 'granted') {
+    try {
+      const sub = await checkOrRestorePushSubscription();
+      if (sub) {
+        state.pushSubscription = sub;
+        state.isPushActive = true;
+        if (state.myBlindCircleId) {
+          syncPushSubscriptionWithCircle(state.myBlindCircleId, sub);
+        }
+      }
+    } catch (err) {
+      console.warn('[Push] Impossible de restaurer le statut push:', err);
+    }
+  }
+
+  updatePushButtonUI();
 }
 
 /**
@@ -256,10 +363,29 @@ function setupEventListeners() {
     });
   });
 
-  // Bouton d'activation des notifications push
+  // Bouton d'activation et de bascule des notifications push
   const pushBtn = document.getElementById('btnTogglePush');
   if (pushBtn) {
     pushBtn.addEventListener('click', async () => {
+      if (state.isPushActive) {
+        // Désactivation de la notification
+        try {
+          pushBtn.disabled = true;
+          pushBtn.textContent = '...';
+          await unsubscribeFromPush();
+          state.pushSubscription = null;
+          state.isPushActive = false;
+          updatePushButtonUI();
+          showToast(t('form.push_toast_disabled') || (state.lang === 'fr' ? 'Notifications du fureteur désactivées' : 'Browser notifications disabled'));
+        } catch (err) {
+          console.warn('[Push] Erreur désactivation push:', err);
+        } finally {
+          pushBtn.disabled = false;
+        }
+        return;
+      }
+
+      // Activation de la notification
       try {
         pushBtn.disabled = true;
         pushBtn.textContent = '...';
@@ -267,17 +393,24 @@ function setupEventListeners() {
         if (sub) {
           state.pushSubscription = sub;
           state.isPushActive = true;
-          pushBtn.classList.add('active');
-          pushBtn.textContent = '✓ ' + (state.lang === 'fr' ? 'Activé' : 'Enabled');
-          showToast(state.lang === 'fr' ? 'Notifications du fureteur activées !' : 'Browser notifications enabled!');
+          updatePushButtonUI();
+          showToast(t('form.push_toast_enabled') || (state.lang === 'fr' ? 'Notifications du fureteur activées !' : 'Browser notifications enabled!'));
+          if (state.myBlindCircleId) {
+            syncPushSubscriptionWithCircle(state.myBlindCircleId, sub);
+            renderMyCircleWidget();
+          }
         } else {
-          pushBtn.disabled = false;
-          pushBtn.textContent = t('form.enable_push');
+          updatePushButtonUI();
         }
       } catch (err) {
-        alert(err.message);
+        if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+          updatePushButtonUI();
+        } else {
+          alert(err.message);
+          updatePushButtonUI();
+        }
+      } finally {
         pushBtn.disabled = false;
-        pushBtn.textContent = t('form.enable_push');
       }
     });
   }
@@ -736,6 +869,398 @@ function renderDirectory() {
 }
 
 /**
+ * Joue un carillon harmonique de célébration civique via la Web Audio API (Do-Mi-Sol-Do)
+ */
+export function playCelebrationChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+      gain.gain.setValueAtTime(0.2, now + idx * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 0.45);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + idx * 0.12);
+      osc.stop(now + idx * 0.12 + 0.5);
+    });
+  } catch (err) {
+    console.warn('[Audio] Carillon audio non disponible:', err);
+  }
+}
+
+/**
+ * Déclenche la célébration de déblocage du seuil : carillon audio, notification locale et toast persistant
+ */
+export async function triggerThresholdCelebration(savedCircle, currentCount, targetCount) {
+  playCelebrationChime();
+
+  const title = t('circle_widget.unlocked_title') || '🎉 Masse critique atteinte !';
+  const body = (t('circle_widget.celebration_toast') || '🎉 Masse critique atteinte ! Votre cercle de {count} personnes est complet. Vous pouvez faire le saut ensemble !').replace('{count}', targetCount);
+
+  // Notification bureau native si autorisée
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    try {
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        if (reg && reg.showNotification) {
+          reg.showNotification(title, {
+            body,
+            icon: '/favicon.ico',
+            badge: '/favicon.ico',
+            vibrate: [200, 100, 200],
+            data: { url: '/#souverainete-active' }
+          });
+        } else {
+          new Notification(title, { body, icon: '/favicon.ico' });
+        }
+      } else {
+        new Notification(title, { body, icon: '/favicon.ico' });
+      }
+    } catch (e) {
+      console.warn('[Push] Erreur affichage notification locale:', e);
+    }
+  }
+
+  showToast(`${title}\n${body}`, 10000);
+
+  // Mémoriser la célébration pour ne pas rejouer le carillon à chaque cycle de 15s
+  savedCircle.celebrated = true;
+  localStorage.setItem('pacte_my_circle', JSON.stringify(savedCircle));
+  state.savedCircleData = savedCircle;
+}
+
+/**
+ * Teste la capacité du fureteur à afficher des notifications système
+ */
+export async function testLocalNotification() {
+  if (!('Notification' in window)) {
+    alert(state.lang === 'fr' 
+      ? 'Les notifications ne sont pas supportées par votre fureteur.'
+      : 'Notifications are not supported by your browser.');
+    return;
+  }
+
+  if (Notification.permission === 'denied') {
+    alert(state.lang === 'fr'
+      ? '⚠️ Les notifications sont bloquées dans les réglages de votre fureteur.\n\nPour les activer :\n1. Cliquez sur l\'icône de cadenas ou de réglages à gauche de l\'adresse URL.\n2. Modifiez "Notifications" vers "Autoriser".\n3. Rechargez la page.'
+      : '⚠️ Notifications are blocked in your browser settings.\n\nTo enable:\n1. Click the lock/settings icon to the left of the URL bar.\n2. Change "Notifications" to "Allow".\n3. Reload the page.');
+    return;
+  }
+
+  let perm = Notification.permission;
+  if (perm === 'default') {
+    perm = await Notification.requestPermission();
+    await checkPushStatus();
+  }
+
+  if (perm !== 'granted') {
+    alert(state.lang === 'fr' ? 'Permission de notification non accordée.' : 'Notification permission not granted.');
+    return;
+  }
+
+  playCelebrationChime();
+
+  const title = '🍁 Pacte Numérique Canada — Test de notification ⚜️';
+  const body = state.lang === 'fr'
+    ? 'Vos notifications fureteur fonctionnent parfaitement !'
+    : 'Your browser notifications are working properly!';
+
+  let displayed = false;
+  try {
+    if ('serviceWorker' in navigator) {
+      const reg = await navigator.serviceWorker.ready;
+      if (reg && reg.showNotification) {
+        await reg.showNotification(title, {
+          body,
+          icon: '/favicon.ico',
+          badge: '/favicon.ico',
+          vibrate: [200, 100, 200],
+          data: { url: '/#souverainete-active' }
+        });
+        displayed = true;
+      }
+    }
+    if (!displayed) {
+      new Notification(title, { body, icon: '/favicon.ico' });
+    }
+    const tip = t('circle_widget.test_push_tip') || (state.lang === 'fr'
+      ? "Si rien n'apparaît en haut à droite : vérifiez les Réglages Système macOS > Notifications > Google Chrome et désactivez le mode Ne pas déranger."
+      : "If nothing appears in top right: check macOS System Settings > Notifications > Google Chrome and turn off Do Not Disturb.");
+    showToast(`🔔 ${t('circle_widget.test_push_success') || 'Notification de test envoyée !'}\n${tip}`, 8000);
+  } catch (err) {
+    console.warn('[Notification Test] Erreur:', err);
+    alert(state.lang === 'fr' 
+      ? `Erreur lors de l'envoi de la notification : ${err.message}` 
+      : `Error sending notification: ${err.message}`);
+  }
+}
+
+/**
+ * Restaure le cercle personnel sauvegardé localement dans localStorage
+ */
+async function restoreSavedCircle() {
+  const saved = localStorage.getItem('pacte_my_circle');
+  if (!saved) return;
+
+  try {
+    const data = JSON.parse(saved);
+    if (data && data.blindId && /^[a-f0-9]{64}$/i.test(data.blindId)) {
+      state.myBlindCircleId = data.blindId;
+      state.savedCircleData = data;
+      if (data.keyB64) {
+        state.circleKeyBytes = base64UrlToBuf(data.keyB64);
+      }
+      if (data.targetCount) {
+        state.targetCount = Number(data.targetCount) || 5;
+      }
+      if (data.chosenAlternativeId) {
+        state.chosenAlternativeId = data.chosenAlternativeId;
+      }
+
+      await renderMyCircleWidget();
+
+      // Si l'utilisateur a un abonnement Web Push actif, assurer sa liaison avec le cercle
+      if (state.pushSubscription) {
+        syncPushSubscriptionWithCircle(data.blindId, state.pushSubscription);
+      }
+    }
+  } catch (err) {
+    console.warn('[Cercle] Erreur chargement cercle local:', err);
+  }
+}
+
+/**
+ * Associe l'abonnement push courant au cercle sur le serveur
+ */
+export async function syncPushSubscriptionWithCircle(blindId, pushSubscription) {
+  if (!blindId || !pushSubscription) return;
+  try {
+    const rawSub = typeof pushSubscription.toJSON === 'function' ? pushSubscription.toJSON() : pushSubscription;
+    await fetch('/api/circle/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        blind_circle_id: blindId,
+        push_subscription: rawSub
+      })
+    });
+  } catch (err) {
+    console.warn('[Push] Erreur liaison abonnement au cercle:', err);
+  }
+}
+
+/**
+ * Affiche ou met à jour le widget de progression du cercle sauvegardé
+ */
+async function renderMyCircleWidget() {
+  const widget = document.getElementById('myCircleWidget');
+  if (!widget) return;
+
+  const saved = state.savedCircleData || (localStorage.getItem('pacte_my_circle') ? JSON.parse(localStorage.getItem('pacte_my_circle')) : null);
+  if (!saved || !saved.blindId) {
+    widget.style.display = 'none';
+    const form = document.getElementById('pactForm');
+    if (form) form.style.display = 'block';
+    return;
+  }
+
+  // Interroger le statut en direct depuis l'API
+  let currentCount = 1;
+  let targetCount = Number(saved.targetCount) || 5;
+  let unlocked = false;
+
+  try {
+    const res = await fetch(`/api/circle/${saved.blindId}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.circle) {
+        currentCount = data.circle.current_count;
+        targetCount = data.circle.target_count;
+        unlocked = data.circle.unlocked;
+      }
+    }
+  } catch (err) {
+    console.warn('[Cercle] Erreur récupération statut serveur:', err);
+  }
+
+  // Déclencher la célébration si le seuil est débloqué pour la 1re fois
+  if (unlocked) {
+    widget.classList.add('celebrate');
+    if (!saved.celebrated) {
+      triggerThresholdCelebration(saved, currentCount, targetCount);
+    }
+  } else {
+    widget.classList.remove('celebrate');
+  }
+
+  // S'assurer que le push subscription est associé au cercle sur le serveur
+  if (state.pushSubscription) {
+    syncPushSubscriptionWithCircle(saved.blindId, state.pushSubscription);
+  }
+
+  const percent = Math.min(100, Math.round((currentCount / targetCount) * 100));
+  const needed = Math.max(0, targetCount - currentCount);
+  const inviteUrl = `${window.location.origin}/#cercle=${saved.blindId}${saved.keyB64 ? `&k=${saved.keyB64}` : ''}`;
+
+  let statusBadge = '';
+  if (unlocked) {
+    statusBadge = `<span class="my-circle-badge unlocked">🎉 ${t('circle_widget.unlocked_title') || 'Masse critique atteinte !'}</span>`;
+  } else {
+    statusBadge = `<span class="my-circle-badge">⏳ ${currentCount} / ${targetCount} ${state.lang === 'fr' ? 'amis' : 'friends'} (${percent}%)</span>`;
+  }
+
+  const chosenAlt = state.alternatives?.find(a => a.id === saved.chosenAlternativeId);
+  const chosenText = chosenAlt ? `&bull; Destination : <strong>${chosenAlt.name}</strong> (${chosenAlt.protocol})` : '';
+
+  widget.style.display = 'block';
+  widget.innerHTML = `
+    <div class="my-circle-header">
+      <div>
+        <h3 class="my-circle-title">
+          <span>⚜️ 🍁</span>
+          <span>${t('circle_widget.title') || 'Mon cercle d\'action souverain'}</span>
+        </h3>
+        <p class="my-circle-subtitle">
+          ${t('circle_widget.subtitle') || 'Votre engagement est sauvegardé dans ce fureteur.'} ${chosenText}
+        </p>
+      </div>
+      <div>${statusBadge}</div>
+    </div>
+
+    <div class="my-circle-progress-box">
+      <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.95rem;">
+        <span>${t('circle_widget.status_label') || 'Progression de votre cercle :'} ${currentCount} / ${targetCount}</span>
+        <span>${percent}%</span>
+      </div>
+      <div class="my-circle-progress-track">
+        <div class="my-circle-progress-fill" style="width: ${percent}%;"></div>
+      </div>
+      <p style="font-size:0.85rem; color:${unlocked ? 'var(--accent-emerald)' : 'var(--text-muted)'}; margin-top:0.35rem;">
+        ${unlocked 
+          ? (t('circle_widget.unlocked_desc') || '🎉 Votre cercle est complet ! Vous pouvez maintenant migrer ensemble vers les réseaux souverains.')
+          : (t('circle_widget.waiting_text')?.replace('{needed}', needed) || `En attente de ${needed} ami(s) pour déclencher votre départ`)}
+      </p>
+    </div>
+
+    <div class="my-circle-invite-box">
+      <label style="font-size:0.85rem; font-weight:600;">🔗 ${state.lang === 'fr' ? 'Votre lien d\'invitation privée (à partager à vos amis)' : 'Your private invite link (share with friends)'}</label>
+      <div class="my-circle-invite-row">
+        <input type="text" readonly value="${inviteUrl}" id="myCircleInviteInput" class="my-circle-invite-input">
+        <button type="button" id="btnCopyMyCircleInvite" class="my-circle-btn-copy">${t('circle_widget.copy_btn') || 'Copier'}</button>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem; margin-top:0.5rem;">
+      <div id="myCirclePushStatus" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+        ${state.isPushActive 
+          ? `<span style="color:var(--accent-emerald); font-weight:600;">${t('circle_widget.push_active') || '🔔 Notifications actives pour ce cercle'}</span>`
+          : `<span style="color:var(--text-muted);">${t('circle_widget.push_inactive') || '🔕 Notifications inactives'}</span> <button type="button" id="btnQuickEnablePush" class="btn-toggle-push" style="padding:0.25rem 0.65rem; font-size:0.75rem;">${t('circle_widget.enable_push_btn') || 'Activer'}</button>`}
+        <button type="button" id="btnTestMyCirclePush" class="my-circle-btn-text" style="color:var(--accent-teal, #0d9488); font-size:0.8rem; margin-left:0.25rem;">🔔 ${t('circle_widget.test_push_btn') || 'Tester mes notifications'}</button>
+      </div>
+      <div>
+        <code style="font-size:0.75rem; background:rgba(0,0,0,0.05); padding:0.2rem 0.4rem; border-radius:4px;">npm run circle:simulate -- "${inviteUrl}"</code>
+      </div>
+    </div>
+
+    <div class="my-circle-actions">
+      <button type="button" id="btnTogglePactForm" class="my-circle-btn-text">
+        ${state.isFormManuallyShown ? (t('circle_widget.toggle_form_hide') || 'Masquer le formulaire') : (t('circle_widget.toggle_form_show') || 'Afficher le formulaire d\'engagement')}
+      </button>
+      <button type="button" id="btnResetMyCircle" class="my-circle-btn-text" style="color:var(--accent-rose, #e11d48);">
+        ${t('circle_widget.reset_btn') || 'Nouveau cercle / Réinitialiser'}
+      </button>
+    </div>
+  `;
+
+  // Écouteur pour copier le lien
+  const copyBtn = document.getElementById('btnCopyMyCircleInvite');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(inviteUrl);
+        copyBtn.textContent = t('circle_widget.copied_btn') || '✓ Copié !';
+        showToast(state.lang === 'fr' ? 'Lien d\'invitation copié dans le presse-papier !' : 'Invite link copied to clipboard!');
+        setTimeout(() => {
+          copyBtn.textContent = t('circle_widget.copy_btn') || 'Copier';
+        }, 2500);
+      } catch {
+        const input = document.getElementById('myCircleInviteInput');
+        if (input) {
+          input.select();
+          document.execCommand('copy');
+          copyBtn.textContent = t('circle_widget.copied_btn') || '✓ Copié !';
+        }
+      }
+    });
+  }
+
+  // Écouteur pour activer push en un clic
+  const quickPushBtn = document.getElementById('btnQuickEnablePush');
+  if (quickPushBtn) {
+    quickPushBtn.addEventListener('click', async () => {
+      const toggleBtn = document.getElementById('btnTogglePush');
+      if (toggleBtn) toggleBtn.click();
+      setTimeout(renderMyCircleWidget, 800);
+    });
+  }
+
+  // Écouteur pour tester les notifications bureau
+  const testPushBtn = document.getElementById('btnTestMyCirclePush');
+  if (testPushBtn) {
+    testPushBtn.addEventListener('click', () => {
+      testLocalNotification();
+    });
+  }
+
+  // Écouteur pour afficher / masquer le formulaire
+  const toggleFormBtn = document.getElementById('btnTogglePactForm');
+  const form = document.getElementById('pactForm');
+  if (toggleFormBtn && form) {
+    if (!state.isFormManuallyShown) {
+      form.style.display = 'none';
+    } else {
+      form.style.display = 'block';
+    }
+
+    toggleFormBtn.addEventListener('click', () => {
+      state.isFormManuallyShown = !state.isFormManuallyShown;
+      if (state.isFormManuallyShown) {
+        form.style.display = 'block';
+        toggleFormBtn.textContent = t('circle_widget.toggle_form_hide') || 'Masquer le formulaire';
+        form.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        form.style.display = 'none';
+        toggleFormBtn.textContent = t('circle_widget.toggle_form_show') || 'Afficher le formulaire d\'engagement';
+      }
+    });
+  }
+
+  // Écouteur pour réinitialiser
+  const resetBtn = document.getElementById('btnResetMyCircle');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      const confirmMsg = t('circle_widget.confirm_reset') || 'Voulez-vous réinitialiser votre progression locale et créer un nouveau pacte ?';
+      if (confirm(confirmMsg)) {
+        localStorage.removeItem('pacte_my_circle');
+        state.myBlindCircleId = null;
+        state.savedCircleData = null;
+        state.isFormManuallyShown = true;
+        widget.style.display = 'none';
+        if (form) form.style.display = 'block';
+        showToast(state.lang === 'fr' ? 'Progression locale réinitialisée.' : 'Local progress reset.');
+      }
+    });
+  }
+}
+
+/**
  * Soumission du pacte avec Zero-Knowledge & Web Crypto
  */
 async function handlePactSubmit(e) {
@@ -762,6 +1287,19 @@ async function handlePactSubmit(e) {
     const fsa = rawPostal.substring(0, 3);
     const powNonce = await solveProofOfWork(fsa);
 
+    // S'assurer que pushSubscription est récupéré si la permission est déjà accordée
+    if (!state.pushSubscription && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        state.pushSubscription = await checkOrRestorePushSubscription();
+      } catch (e) {
+        console.warn('[Push] Vérification souscription avant commit:', e);
+      }
+    }
+
+    const rawPush = state.pushSubscription
+      ? (typeof state.pushSubscription.toJSON === 'function' ? state.pushSubscription.toJSON() : state.pushSubscription)
+      : null;
+
     // 3. Payload d'engagement avec réseaux ciblés
     const payload = {
       postal_code: rawPostal,
@@ -769,7 +1307,7 @@ async function handlePactSubmit(e) {
       blind_circle_id: state.myBlindCircleId,
       inviter_circle_id: state.inviterCircleId || null,
       target_count: state.targetCount,
-      push_subscription: state.pushSubscription,
+      push_subscription: rawPush,
       pow_nonce: powNonce,
       target_networks: {
         leaving: Array.from(state.selectedNetworks),
@@ -788,9 +1326,29 @@ async function handlePactSubmit(e) {
       throw new Error(data.error || 'Erreur lors de la signature');
     }
 
+    if (state.pushSubscription) {
+      syncPushSubscriptionWithCircle(state.myBlindCircleId, state.pushSubscription);
+    }
+
     // 4. Générer le lien d'invitation avec clé dans le fragment (#k=...)
     const keyB64 = bufToBase64Url(state.circleKeyBytes);
     const inviteUrl = `${window.location.origin}/#cercle=${state.myBlindCircleId}&k=${keyB64}`;
+
+    // Sauvegarder dans localStorage pour conserver la progression au rechargement
+    const myCircleData = {
+      blindId: state.myBlindCircleId,
+      keyB64: keyB64,
+      targetCount: state.targetCount,
+      fsa: fsa,
+      createdAt: new Date().toISOString(),
+      chosenAlternativeId: state.chosenAlternativeId,
+      leavingNetworks: Array.from(state.selectedNetworks)
+    };
+    localStorage.setItem('pacte_my_circle', JSON.stringify(myCircleData));
+    state.savedCircleData = myCircleData;
+
+    // Afficher le widget de progression en direct
+    await renderMyCircleWidget();
 
     document.getElementById('inviteLinkInput').value = inviteUrl;
     document.getElementById('circleTargetDisplay').textContent = `${state.targetCount} ${state.lang === 'fr' ? 'amis' : 'friends'}`;

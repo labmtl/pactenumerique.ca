@@ -74,3 +74,87 @@ export async function subscribeToPushNotifications() {
 
   return subscription;
 }
+
+/**
+ * Récupère une souscription Push déjà enregistrée auprès du Service Worker
+ */
+export async function getExistingPushSubscription() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    return null;
+  }
+
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    if (!reg || !reg.pushManager) return null;
+    return await reg.pushManager.getSubscription();
+  } catch (err) {
+    console.warn('[Push] Erreur vérification souscription active:', err);
+    return null;
+  }
+}
+
+/**
+ * Vérifie et restaure automatiquement la souscription push si la permission
+ * est déjà accordée dans le fureteur (évite de réinitialiser le bouton au rechargement)
+ */
+export async function checkOrRestorePushSubscription() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    return null;
+  }
+
+  if (Notification.permission !== 'granted') {
+    return null;
+  }
+
+  try {
+    const reg = await registerServiceWorker();
+    if (!reg || !reg.pushManager) return null;
+
+    let sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      return sub;
+    }
+
+    // Si permission accordée mais pas d'objet subscription, tenter une inscription transparente
+    const res = await fetch('/api/stats/vapid');
+    if (!res.ok) return null;
+
+    const { vapid_public_key } = await res.json();
+    if (!vapid_public_key) return null;
+
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlB64ToUint8Array(vapid_public_key)
+    });
+
+    return sub;
+  } catch (err) {
+    console.warn('[Push] Erreur restauration transparente:', err);
+    return null;
+  }
+}
+
+/**
+ * Désactive la notification Push auprès du fureteur
+ */
+export async function unsubscribeFromPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    return false;
+  }
+
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    if (!reg || !reg.pushManager) return false;
+
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      const unsubscribed = await sub.unsubscribe();
+      return unsubscribed;
+    }
+    return false;
+  } catch (err) {
+    console.warn('[Push] Erreur désinscription:', err);
+    return false;
+  }
+}
+

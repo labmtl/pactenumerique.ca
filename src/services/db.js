@@ -17,6 +17,50 @@ const memoryDb = {
   territoryStats: new Map()
 };
 
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../../.data');
+const STORE_FILE = process.env.STORE_FILE || path.join(DATA_DIR, process.env.NODE_ENV === 'test' ? 'test_store.json' : 'dev_store.json');
+
+function loadMemoryStore() {
+  try {
+    if (fs.existsSync(STORE_FILE)) {
+      const raw = fs.readFileSync(STORE_FILE, 'utf-8');
+      const data = JSON.parse(raw);
+      if (Array.isArray(data.commitments)) memoryDb.commitments = data.commitments;
+      if (Array.isArray(data.circlePushListeners)) memoryDb.circlePushListeners = data.circlePushListeners;
+      if (data.blindCircles && typeof data.blindCircles === 'object') {
+        memoryDb.blindCircles = new Map(Object.entries(data.blindCircles));
+      }
+      if (data.territoryStats && typeof data.territoryStats === 'object') {
+        memoryDb.territoryStats = new Map(Object.entries(data.territoryStats));
+      }
+      console.log(`[DB] Données locales restaurées depuis ${STORE_FILE} (${memoryDb.blindCircles.size} cercle(s), ${memoryDb.commitments.length} engagement(s)).`);
+    }
+  } catch (err) {
+    console.warn('[DB] Erreur chargement store local:', err.message);
+  }
+}
+
+function persistMemoryStore() {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    const data = {
+      commitments: memoryDb.commitments,
+      blindCircles: Object.fromEntries(memoryDb.blindCircles),
+      circlePushListeners: memoryDb.circlePushListeners,
+      territoryStats: Object.fromEntries(memoryDb.territoryStats),
+      updated_at: new Date().toISOString()
+    };
+    fs.writeFileSync(STORE_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('[DB] Erreur sauvegarde store local:', err.message);
+  }
+}
+
+// Initialisation dès le chargement du module
+loadMemoryStore();
+
 /**
  * Initialise le pool PostgreSQL ou bascule en mode simulation
  */
@@ -128,6 +172,7 @@ export async function saveCommitment({ id, fsa, province, emailHash, encryptedEm
     const current = memoryDb.territoryStats.get(fsa) || { fsa, province, signers_count: 0, target_threshold: 100 };
     current.signers_count += 1;
     memoryDb.territoryStats.set(fsa, current);
+    persistMemoryStore();
   }
 }
 
@@ -150,6 +195,39 @@ export async function createBlindCircle({ blindId, targetCount = 5 }) {
       current_count: 1,
       is_triggered: false
     });
+    persistMemoryStore();
+  }
+}
+
+/**
+ * Récupère les données d'un cercle aveugle
+ */
+export async function getBlindCircle(blindId) {
+  const p = await getDb();
+  if (p) {
+    const res = await p.query(
+      `SELECT blind_id, target_count, current_count, is_triggered FROM blind_circles WHERE blind_id = $1`,
+      [blindId]
+    );
+    if (res.rows.length === 0) return null;
+    const circle = res.rows[0];
+    return {
+      blind_id: circle.blind_id,
+      target_count: circle.target_count,
+      current_count: circle.current_count,
+      unlocked: circle.current_count >= circle.target_count,
+      is_triggered: circle.is_triggered
+    };
+  } else {
+    const circle = memoryDb.blindCircles.get(blindId);
+    if (!circle) return null;
+    return {
+      blind_id: circle.blind_id,
+      target_count: circle.target_count,
+      current_count: circle.current_count,
+      unlocked: circle.current_count >= circle.target_count,
+      is_triggered: circle.is_triggered
+    };
   }
 }
 
@@ -193,11 +271,13 @@ export async function incrementBlindCircle(blindId) {
     if (!circle) {
       circle = { blind_id: blindId, target_count: 5, current_count: 1, is_triggered: false };
       memoryDb.blindCircles.set(blindId, circle);
+      persistMemoryStore();
       return { current_count: 1, target_count: 5, unlocked: false, is_newly_unlocked: false };
     }
     circle.current_count += 1;
     const isUnlocked = circle.current_count >= circle.target_count;
     const isNewlyUnlocked = isUnlocked && !circle.is_triggered;
+    persistMemoryStore();
     return {
       current_count: circle.current_count,
       target_count: circle.target_count,
@@ -217,6 +297,7 @@ export async function markCircleTriggered(blindId) {
   } else {
     const c = memoryDb.blindCircles.get(blindId);
     if (c) c.is_triggered = true;
+    persistMemoryStore();
   }
 }
 
@@ -233,7 +314,13 @@ export async function addCirclePushListener({ id, blindId, pushSubscription }) {
       [id, blindId, pushJson]
     );
   } else {
-    memoryDb.circlePushListeners.push({ id, blindId, push_subscription: pushJson });
+    const exists = memoryDb.circlePushListeners.some(
+      l => l.blindId === blindId && l.push_subscription === pushJson
+    );
+    if (!exists) {
+      memoryDb.circlePushListeners.push({ id, blindId, push_subscription: pushJson });
+      persistMemoryStore();
+    }
   }
 }
 

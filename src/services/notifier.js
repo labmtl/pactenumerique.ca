@@ -22,6 +22,13 @@ if (publicKey && privateKey) {
  * Envoie une notification de déverrouillage de cercle à tous ses membres
  */
 export async function notifyCircleMembers(subscriptions, { targetCount }) {
+  console.log(`[Notifier] notifyCircleMembers déclenché pour ${subscriptions ? subscriptions.length : 0} abonné(s) (seuil: ${targetCount})`);
+
+  if (!subscriptions || subscriptions.length === 0) {
+    console.warn('[Notifier] Aucun abonné Web Push enregistré pour ce cercle.');
+    return { sent: 0, total: 0 };
+  }
+
   if (!vapidConfigured) {
     console.log(`[Notifier] Simulation d'envoi de notification (VAPID non actif): Le cercle de ${targetCount} amis est complet !`);
     return { sent: 0, simulated: subscriptions.length };
@@ -30,8 +37,8 @@ export async function notifyCircleMembers(subscriptions, { targetCount }) {
   const payload = JSON.stringify({
     title: '🎉 Pacte Numérique : Masse critique atteinte !',
     body: `Votre cercle de ${targetCount} amis a rejoint le pacte ! Il est temps de faire le saut ensemble vers les réseaux souverains.`,
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
     data: {
       url: '/#souverainete-active'
     }
@@ -40,10 +47,13 @@ export async function notifyCircleMembers(subscriptions, { targetCount }) {
   let sent = 0;
   for (const sub of subscriptions) {
     try {
+      const endpointShort = sub.endpoint ? sub.endpoint.substring(0, 45) + '...' : 'endpoint inconnu';
+      console.log(`[Notifier] Envoi de la notification Web Push vers ${endpointShort}`);
       await webpush.sendNotification(sub, payload);
       sent++;
+      console.log(`[Notifier] Notification Web Push livrée avec succès !`);
     } catch (err) {
-      console.warn(`[Notifier] Échec d'envoi Web Push (${err.statusCode || err.message})`);
+      console.warn(`[Notifier] Échec d'envoi Web Push (code: ${err.statusCode || 'N/A'}, err: ${err.message})`);
     }
   }
 

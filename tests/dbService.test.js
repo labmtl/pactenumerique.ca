@@ -4,6 +4,7 @@ import {
   saveCommitment,
   createBlindCircle,
   incrementBlindCircle,
+  getBlindCircle,
   markCircleTriggered,
   addCirclePushListener,
   getCirclePushListeners,
@@ -77,6 +78,17 @@ describe('Service de Persistance & Logique de Masse Critique', () => {
     assert.strictEqual(step3.current_count, 4);
     assert.strictEqual(step3.unlocked, true);
     assert.strictEqual(step3.is_newly_unlocked, false);
+
+    // Test de getBlindCircle
+    const circleData = await getBlindCircle(testBlindId);
+    assert.ok(circleData);
+    assert.strictEqual(circleData.blind_id, testBlindId);
+    assert.strictEqual(circleData.current_count, 4);
+    assert.strictEqual(circleData.target_count, 3);
+    assert.strictEqual(circleData.unlocked, true);
+
+    const nonExistent = await getBlindCircle('0000000000000000000000000000000000000000000000000000000000000000');
+    assert.strictEqual(nonExistent, null);
   });
 
   it('exécute initDatabase sans erreur en mode mémoire', async () => {
