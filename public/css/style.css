@@ -2422,6 +2422,31 @@ button {
   background: rgba(0, 0, 0, 0.05);
 }
 
+.relay-source-profile-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-indigo);
+  background: var(--accent-indigo-bg);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.relay-source-profile-tag:hover {
+  background: #ffffff;
+  color: var(--accent-indigo-hover);
+  text-decoration: underline;
+}
+
+.relay-msg-bubble.is-me .relay-source-profile-tag {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
 .relay-quick-prompts {
   display: flex;
   flex-wrap: wrap;

@@ -68,6 +68,30 @@ function setupEventListeners() {
       card.classList.add('active');
       const net = card.dataset.network;
       state.selectedNetworks = new Set([net]);
+
+      const iconEl = document.getElementById('sourceProfilePrefixIcon');
+      const inputEl = document.getElementById('sourceProfileInput');
+      if (iconEl && inputEl) {
+        if (/Facebook/i.test(net)) {
+          iconEl.textContent = '👥';
+          inputEl.placeholder = 'ex: https://www.facebook.com/rngadam';
+        } else if (/Instagram/i.test(net)) {
+          iconEl.textContent = '📸';
+          inputEl.placeholder = 'ex: https://www.instagram.com/rngadam/';
+        } else if (/LinkedIn/i.test(net)) {
+          iconEl.textContent = '💼';
+          inputEl.placeholder = 'ex: https://www.linkedin.com/in/rngadam';
+        } else if (/YouTube/i.test(net)) {
+          iconEl.textContent = '🎬';
+          inputEl.placeholder = 'ex: https://youtube.com/@rngadam';
+        } else if (/WhatsApp/i.test(net)) {
+          iconEl.textContent = '💬';
+          inputEl.placeholder = 'ex: rngadam ou pseudo';
+        } else {
+          iconEl.textContent = '🐦';
+          inputEl.placeholder = 'ex: https://x.com/rngadam ou @rngadam';
+        }
+      }
     });
   });
 

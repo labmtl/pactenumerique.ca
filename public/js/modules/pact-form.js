@@ -477,6 +477,9 @@ export async function handlePactSubmit(e) {
     const keyB64 = bufToBase64Url(state.circleKeyBytes);
     const inviteUrl = `${window.location.origin}/#cercle=${state.myBlindCircleId}&k=${keyB64}`;
 
+    const sourceProfileInput = document.getElementById('sourceProfileInput');
+    const sourceProfile = sourceProfileInput ? sourceProfileInput.value.trim() : '';
+
     // Sauvegarder dans localStorage pour conserver la progression au rechargement
     const myCircleData = {
       blindId: state.myBlindCircleId,
@@ -485,7 +488,8 @@ export async function handlePactSubmit(e) {
       fsa: fsa,
       createdAt: new Date().toISOString(),
       chosenAlternativeId: state.chosenAlternativeId,
-      leavingNetworks: Array.from(state.selectedNetworks)
+      leavingNetworks: Array.from(state.selectedNetworks),
+      sourceProfile: sourceProfile || null
     };
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('pacte_my_circle', JSON.stringify(myCircleData));
@@ -497,7 +501,8 @@ export async function handlePactSubmit(e) {
       const leavingName = Array.from(state.selectedNetworks)[0] || 'la Big Tech';
       await postEncryptedRelayMessage(state.myBlindCircleId, state.circleKeyBytes, {
         type: 'chat',
-        author: state.lang === 'fr' ? 'Initiateur' : 'Initiator',
+        author: sourceProfile || (state.lang === 'fr' ? 'Initiateur' : 'Initiator'),
+        sourceProfile: sourceProfile || null,
         text: state.lang === 'fr'
           ? `Pacte signé pour quitter ${leavingName} ! Bienvenue dans notre cercle confidentiel.`
           : `Pledge signed to leave ${leavingName}! Welcome to our private circle.`,

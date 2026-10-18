@@ -119,6 +119,28 @@
             <p class="input-help" style="margin-top: 0.65rem; font-size: 0.85rem; color: var(--text-muted);">
               ✨ <em>L'instance d'accueil souveraine vous sera suggérée lors du déclenchement final de la bascule.</em>
             </p>
+
+            <!-- Identifiant ou profil public sur la plateforme source (Zero-Knowledge, chiffré de bout en bout) -->
+            <div class="source-profile-box" style="margin-top: 1.15rem; background: var(--bg-card-subtle); padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <label for="sourceProfileInput" class="input-help" style="font-weight: 600; color: var(--text-main); display: block; margin-bottom: 0.35rem;" id="sourceProfileLabel">
+                Lien de votre profil sur la plateforme à quitter <span style="font-weight: 400; color: var(--text-muted);">(optionnel)</span>
+              </label>
+              <div class="source-profile-input-wrapper" style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.3rem 0.6rem;">
+                <span class="source-profile-prefix-icon" id="sourceProfilePrefixIcon" style="font-size: 1.1rem;">🐦</span>
+                <input 
+                  type="text" 
+                  id="sourceProfileInput" 
+                  class="source-profile-field" 
+                  placeholder="ex: https://x.com/rngadam ou @rngadam"
+                  autocomplete="username"
+                  maxlength="120"
+                  style="border: none; outline: none; width: 100%; font-family: inherit; font-size: 0.9rem; color: var(--text-main); background: transparent;"
+                >
+              </div>
+              <p class="input-help" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.45rem; line-height: 1.4;">
+                🔒 <strong>Preuve sociale chiffrée de bout en bout :</strong> Seuls vos proches détenant la clé du cercle pourront voir ce lien pour valider votre départ. Notre serveur ne reçoit aucun profil en clair.
+              </p>
+            </div>
           </div>
 
           <!-- ÉTAPE 2 : Avec combien d'amis voulez-vous partir ? -->

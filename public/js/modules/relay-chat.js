@@ -139,7 +139,7 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
         <button type="button" class="btn-quick-prompt" data-prompt="J'ai exporté mes photos et archives.">📦 Archives exportées</button>
       </div>
 
-      <!-- Formulaire d'envoi chiffré -->
+      <!-- Formulaire d'envoi chiffré avec profil source pour transférer l'identité -->
       <form class="relay-input-form" id="relayInputForm">
         <input 
           type="text" 
@@ -147,7 +147,7 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
           class="relay-pseudo-field" 
           placeholder="${state.lang === 'fr' ? 'Pseudo' : 'Name'}" 
           value="${defaultPseudo}"
-          maxlength="20"
+          maxlength="25"
           title="Votre pseudo visible uniquement par vos proches"
         />
         <input 
@@ -194,10 +194,21 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
         const text = (msg.text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const handle = msg.handle ? `<div class="relay-handle-tag">🏷️ <strong>${msg.handle}</strong></div>` : '';
 
+        // Badge du profil source vérifié (ex: facebook.com/rngadam, instagram.com/rngadam, etc.)
+        let sourceBadge = '';
+        if (msg.sourceProfile) {
+          const raw = String(msg.sourceProfile).trim();
+          const cleanDisplay = raw.replace(/^https?:\/\/(www\.)?/, '');
+          const isUrl = /^https?:\/\//i.test(raw);
+          const href = isUrl ? raw : `https://${raw}`;
+          sourceBadge = `<a href="${href}" target="_blank" rel="noopener noreferrer" class="relay-source-profile-tag" title="Profil vérifié sur la plateforme source">🔗 ${cleanDisplay}</a>`;
+        }
+
         return `
           <div class="relay-msg-bubble ${isMe ? 'is-me' : 'is-friend'}">
             <div class="relay-msg-header">
               <span class="relay-msg-author">${author}</span>
+              ${sourceBadge}
               <span class="relay-msg-time">${dateStr}</span>
             </div>
             <div class="relay-msg-body">${text}</div>
@@ -256,9 +267,12 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
           localStorage.setItem('pacte_my_pseudo', author);
         }
 
+        const savedSourceProfile = state.savedCircleData?.sourceProfile || (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_source_profile')) || null;
+
         const payload = {
           type: 'chat',
           author: author || 'Ami',
+          sourceProfile: savedSourceProfile,
           text,
           timestamp: Date.now()
         };
@@ -400,13 +414,111 @@ export function renderMigrationGuide(containerEl, leavingNetwork, circleHash, ke
         <div class="migration-step-item">
           <div class="step-number">3</div>
           <div class="step-content">
-            <h4>${t('migration.step3_title') || 'Partagez votre nouvelle adresse avec vos proches'}</h4>
+            <h4>${t('migration.step3_title') || 'Transférez votre réputation & échangez vos nouveaux identifiants'}</h4>
             <p>
-              Indiquez votre nouvel identifiant (ex: <code>@monpseudo@qlub.ca</code>) dans la boîte morte chiffrée ci-dessous. Vos proches pourront vous retrouver et vous suivre instantanément !
+              Pour faire suivre votre audience et votre réputation, annoncez votre nouveau compte souverain à votre cercle. Vos proches pourront s'abonner et vous suivre instantanément !
             </p>
+
+            <form class="migration-handle-form" id="migrationHandleForm" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin:0.85rem 0;">
+              <input 
+                type="text" 
+                id="migrationNewHandleInput" 
+                class="input-field" 
+                placeholder="Votre nouvelle adresse (ex: @monpseudo@qlub.ca)" 
+                required 
+                style="flex:1; min-width:240px; padding:0.5rem 0.75rem;"
+              />
+              <button type="submit" class="btn-create-account" id="btnPublishMigrationHandle" style="border:none; cursor:pointer; padding:0.55rem 1rem; font-size:0.85rem;">
+                📢 Annoncer mon profil
+              </button>
+            </form>
+
+            <div class="migration-identity-bridge" id="migrationIdentityBridge"></div>
           </div>
         </div>
       </div>
     </div>
   `;
+
+  const handleForm = containerEl.querySelector('#migrationHandleForm');
+  const handleInput = containerEl.querySelector('#migrationNewHandleInput');
+  const bridgeContainer = containerEl.querySelector('#migrationIdentityBridge');
+
+  async function updateIdentityBridge() {
+    if (!bridgeContainer || !circleHash || !keyBytes) return;
+    try {
+      const messages = await fetchAndDecryptRelayBlobs(circleHash, keyBytes);
+      const mappings = [];
+      const seen = new Set();
+      for (const msg of messages) {
+        if (msg.handle && !seen.has(msg.handle)) {
+          seen.add(msg.handle);
+          mappings.push({
+            author: msg.author,
+            sourceProfile: msg.sourceProfile,
+            handle: msg.handle
+          });
+        }
+      }
+
+      if (mappings.length > 0) {
+        bridgeContainer.innerHTML = `
+          <div class="identity-bridge-box" style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.75rem; margin-top:0.75rem;">
+            <strong style="font-size:0.85rem; color:var(--text-main); display:block; margin-bottom:0.5rem;">
+              👥 Passerelle des membres prêts à basculer :
+            </strong>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+              ${mappings.map(m => {
+                const source = m.sourceProfile ? `<span class="source-tag" style="color:var(--text-muted); font-size:0.78rem;">🔗 ${m.sourceProfile.replace(/^https?:\/\/(www\.)?/, '')}</span> ➡️` : '';
+                return `
+                  <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; flex-wrap:wrap;">
+                    <strong>${m.author}</strong>
+                    ${source}
+                    <code style="background:var(--accent-emerald-bg); color:var(--accent-emerald); padding:0.15rem 0.4rem; border-radius:4px; font-weight:700;">${m.handle}</code>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+    } catch (e) {
+      console.warn('[Bridge] Erreur chargement pont d\'identités:', e);
+    }
+  }
+
+  updateIdentityBridge();
+
+  if (handleForm && handleInput) {
+    handleForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newHandle = handleInput.value.trim();
+      if (!newHandle) return;
+
+      const btn = containerEl.querySelector('#btnPublishMigrationHandle');
+      if (btn) btn.disabled = true;
+
+      try {
+        const savedSourceProfile = state.savedCircleData?.sourceProfile || (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_source_profile')) || null;
+        const savedPseudo = (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_pseudo')) || 'Un ami';
+
+        await postEncryptedRelayMessage(circleHash, keyBytes, {
+          type: 'handle_exchange',
+          author: savedPseudo,
+          sourceProfile: savedSourceProfile,
+          handle: newHandle,
+          text: `Mon nouveau profil souverain est créé : ${newHandle} ! Vous pouvez me suivre dès maintenant.`,
+          timestamp: Date.now()
+        });
+
+        handleInput.value = '';
+        showToast(state.lang === 'fr' ? 'Profil souverain partagé dans le cercle !' : 'Sovereign handle shared with circle!');
+        await updateIdentityBridge();
+      } catch (err) {
+        alert(err.message || 'Erreur lors de la publication');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+  }
 }
