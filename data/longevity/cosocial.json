@@ -1,0 +1,46 @@
+{
+  "id": "cosocial",
+  "name": "CoSocial",
+  "url": "https://cosocial.ca",
+  "apex_domain": "cosocial.ca",
+  "audited_at": "2026-10-18T15:06:34.788Z",
+  "established": "2022-11",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2022-11",
+  "first_web_archive": "2022-11",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "cosocial.ca",
+      "registration_date": "2022-11-18T13:47:52Z",
+      "registration_ym": "2022-11",
+      "registrar": "Webnames.ca Inc.",
+      "events": [
+        {
+          "eventAction": "registration",
+          "eventDate": "2022-11-18T13:47:52Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2030-11-18T13:47:52Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2026-10-11T15:01:18Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:05:04Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20221118222022",
+      "first_snapshot_ym": "2022-11",
+      "first_snapshot_date": "2022-11-18",
+      "snapshot_url": "https://web.archive.org/web/20221118222022/http://cosocial.ca/"
+    }
+  }
+}

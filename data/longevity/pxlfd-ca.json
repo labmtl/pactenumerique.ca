@@ -1,0 +1,46 @@
+{
+  "id": "pxlfd-ca",
+  "name": "pxlfd.ca",
+  "url": "https://pxlfd.ca",
+  "apex_domain": "pxlfd.ca",
+  "audited_at": "2026-10-18T15:06:37.414Z",
+  "established": "2025-01",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2025-01",
+  "first_web_archive": "2025-01",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "pxlfd.ca",
+      "registration_date": "2025-01-15T19:01:43Z",
+      "registration_ym": "2025-01",
+      "registrar": "OVHcloud (Hébergement OVH inc)",
+      "events": [
+        {
+          "eventAction": "registration",
+          "eventDate": "2025-01-15T19:01:43Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2027-01-15T19:01:43Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2026-01-01T11:00:51Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:05:06Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20250116145850",
+      "first_snapshot_ym": "2025-01",
+      "first_snapshot_date": "2025-01-16",
+      "snapshot_url": "https://web.archive.org/web/20250116145850/https://pxlfd.ca/"
+    }
+  }
+}

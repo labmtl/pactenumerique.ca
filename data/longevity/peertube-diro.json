@@ -1,0 +1,46 @@
+{
+  "id": "peertube-diro",
+  "name": "PeerTube DIRO (UdeM)",
+  "url": "https://classe.iro.umontreal.ca",
+  "apex_domain": "umontreal.ca",
+  "audited_at": "2026-10-18T15:07:21.172Z",
+  "established": "2020-11",
+  "established_reason": "Premier instantané web documenté sur le sous-domaine spécifique",
+  "domain_registration": "2000-10",
+  "first_web_archive": "2020-11",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "umontreal.ca",
+      "registration_date": "2000-10-30T19:29:57Z",
+      "registration_ym": "2000-10",
+      "registrar": "RIQ, a division of Bell Canada",
+      "events": [
+        {
+          "eventAction": "registration",
+          "eventDate": "2000-10-30T19:29:57Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2027-03-21T05:00:00Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2023-04-05T13:19:29Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:05:11Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20201124010656",
+      "first_snapshot_ym": "2020-11",
+      "first_snapshot_date": "2020-11-24",
+      "snapshot_url": "https://web.archive.org/web/20201124010656/https://classe.iro.umontreal.ca/"
+    }
+  }
+}

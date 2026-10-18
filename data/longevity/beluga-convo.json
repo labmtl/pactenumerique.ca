@@ -1,0 +1,46 @@
+{
+  "id": "beluga-convo",
+  "name": "Béluga Convo",
+  "url": "https://beluga.quebec",
+  "apex_domain": "beluga.quebec",
+  "audited_at": "2026-10-18T15:06:50.896Z",
+  "established": "2026-03",
+  "established_reason": "Date d’enregistrement du nom de domaine via RDAP/WHOIS",
+  "domain_registration": "2026-03",
+  "first_web_archive": null,
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "beluga.quebec",
+      "registration_date": "2026-03-17T00:12:34.7Z",
+      "registration_ym": "2026-03",
+      "registrar": null,
+      "events": [
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:06:14.780Z"
+        },
+        {
+          "eventAction": "registration",
+          "eventActor": "REG-00938",
+          "eventDate": "2026-03-17T00:12:34.7Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventActor": "REG-00938",
+          "eventDate": "2026-04-29T19:31:00.322Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2027-03-17T00:12:34.7Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "first_snapshot_ym": null,
+      "message": "Aucun instantané archivé trouvé sur Wayback Machine"
+    }
+  }
+}

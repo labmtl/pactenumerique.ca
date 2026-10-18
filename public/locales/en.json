@@ -128,7 +128,12 @@
     "tech_details_summary": "🔧 Learn more: infrastructure details & source code",
     "tech_details_intro": "Technical details for everyday web users and open-source enthusiasts:",
     "protocol_label": "Open protocol",
-    "host_datacenter": "Physical hosting"
+    "host_datacenter": "Physical hosting",
+    "established_label": "History",
+    "established_since": "Active since",
+    "activity_period_label": "Activity period",
+    "track_record": "Documented track record",
+    "domain_registered": "Domain held since"
   },
   "usages": {
     "microblogging": "Ad-free open alternative",

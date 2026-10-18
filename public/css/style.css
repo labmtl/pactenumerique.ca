@@ -1296,6 +1296,15 @@ button {
   border: 1px solid var(--border-color);
 }
 
+.badge-tag.longevity {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .badge-lang {
   display: inline-flex;
   align-items: center;

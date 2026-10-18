@@ -24,7 +24,9 @@
 | **Logique Client** | `public/js/app.js` | Modèle de données client, i18n, gestion du formulaire, résolution de ville, Web Push, jauge. |
 | **Feuille de Styles** | `public/css/style.css` | Styles CSS modernes, variables HSL, cartes, jauge, bulles de partage. |
 | **Traductions** | `public/locales/fr.json` & `en.json` | Textes et libellés bilingues (FR/EN). |
-| **Catalogue Données** | `public/data/alternatives.json` | Données normalisées des plateformes et instances québécoises/canadiennes. |
+| **Catalogue Données** | `public/data/alternatives.json` | Données normalisées des plateformes et instances québécoises/canadiennes (`established` YYYY-MM). |
+| **Archives de Longévité** | `data/longevity/*.json` | Audits originaux archivés (RDAP/WHOIS + Wayback CDX) pour éviter les requêtes réseau répétitives. |
+| **Script Audit Longévité** | `scripts/audit-longevity.js` | Commande d'audit automatique (`npm run audit:longevity`) avec cache prioritaire. |
 | **Serveur & API** | `src/server.js` | Routes Express (`/api/pact/commit`, `/api/circle/join`, `/repertoire`, `/statistiques`). |
 | **Persistance & Masse Critique** | `src/services/dbService.js` | Logique d'agrégation territoriale, gestion des cercles et déclenchement au seuil. |
 | **Cryptographie** | `src/services/cryptoService.js` | Hachage HMAC-SHA256 avec sel serveur, génération de jetons aveugles. |
@@ -44,7 +46,7 @@ Pour éviter de saturer le contexte et ralentir l'analyse :
 
 - **Tests unitaires rapides (sans réseau / < 50ms) :**
   ```bash
-  node --test tests/uxLogic.test.js tests/alternatives.test.js tests/db.test.js
+  node --test tests/longevity.test.js tests/uxLogic.test.js tests/alternatives.test.js tests/db.test.js
   ```
 - **Suite de tests complète :**
   ```bash

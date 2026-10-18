@@ -1,0 +1,46 @@
+{
+  "id": "qlub",
+  "name": "Qlub",
+  "url": "https://qlub.social",
+  "apex_domain": "qlub.social",
+  "audited_at": "2026-10-18T15:06:11.362Z",
+  "established": "2025-02",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2025-02",
+  "first_web_archive": "2025-02",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "qlub.social",
+      "registration_date": "2025-02-02T18:54:00.756Z",
+      "registration_ym": "2025-02",
+      "registrar": "Webnames.ca Inc.",
+      "events": [
+        {
+          "eventAction": "expiration",
+          "eventDate": "2027-02-02T18:54:00.756Z"
+        },
+        {
+          "eventAction": "registration",
+          "eventDate": "2025-02-02T18:54:00.756Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2026-08-12T02:31:36.097Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:06:11.311Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20250213170359",
+      "first_snapshot_ym": "2025-02",
+      "first_snapshot_date": "2025-02-13",
+      "snapshot_url": "https://web.archive.org/web/20250213170359/http://qlub.social/"
+    }
+  }
+}

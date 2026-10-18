@@ -1,0 +1,29 @@
+{
+  "id": "passerelles",
+  "name": "Passerelles",
+  "url": "https://passerelles.encommun.io/",
+  "apex_domain": "encommun.io",
+  "audited_at": "2026-10-18T15:06:52.992Z",
+  "established": "2024-01",
+  "established_reason": "Premier instantané web documenté sur le sous-domaine spécifique",
+  "domain_registration": "2022-08",
+  "first_web_archive": "2024-01",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "whois",
+      "domain": "encommun.io",
+      "registration_date": "2022-08-18T15:06:20",
+      "registration_ym": "2022-08",
+      "registrar": null,
+      "raw_output_snippet": "% IANA WHOIS server\n% for more information on IANA, visit http://www.iana.org\n% This query returned 1 object\n\nrefer:        whois.nic.io\n\ndomain:       IO\n\norganisation: Internet Computer Bureau Limited\naddress:      c/o Sure (Diego Garcia) Limited\naddress:      Diego Garcia\naddress:      British Indian Ocean Territories, PSC 466 Box 59\naddress:      FPO-AP 96595-0059\naddress:      British Indian Ocean Territory (the)\n\ncontact:      administrative\nname:         Internet Administrator\norganisatio"
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20240102050640",
+      "first_snapshot_ym": "2024-01",
+      "first_snapshot_date": "2024-01-02",
+      "snapshot_url": "https://web.archive.org/web/20240102050640/http://passerelles.encommun.io/"
+    }
+  }
+}

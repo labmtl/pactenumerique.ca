@@ -1,0 +1,46 @@
+{
+  "id": "lemmy-ca",
+  "name": "Lemmy Canada",
+  "url": "https://lemmy.ca",
+  "apex_domain": "lemmy.ca",
+  "audited_at": "2026-10-18T15:06:39.783Z",
+  "established": "2020-12",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2020-12",
+  "first_web_archive": "2021-01",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "lemmy.ca",
+      "registration_date": "2020-12-10T16:41:10Z",
+      "registration_ym": "2020-12",
+      "registrar": "CanSpace Solutions Inc.",
+      "events": [
+        {
+          "eventAction": "registration",
+          "eventDate": "2020-12-10T16:41:10Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2026-12-10T16:41:10Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2026-07-05T04:50:59Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:05:09Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20210125195609",
+      "first_snapshot_ym": "2021-01",
+      "first_snapshot_date": "2021-01-25",
+      "snapshot_url": "https://web.archive.org/web/20210125195609/https://lemmy.ca/"
+    }
+  }
+}

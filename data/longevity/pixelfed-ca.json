@@ -1,0 +1,46 @@
+{
+  "id": "pixelfed-ca",
+  "name": "Pixelfed Canada",
+  "url": "https://pixelfed.ca",
+  "apex_domain": "pixelfed.ca",
+  "audited_at": "2026-10-18T15:06:36.397Z",
+  "established": "2018-05",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2018-05",
+  "first_web_archive": "2025-02",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "pixelfed.ca",
+      "registration_date": "2018-05-09T19:08:33Z",
+      "registration_ym": "2018-05",
+      "registrar": "CanSpace Solutions Inc.",
+      "events": [
+        {
+          "eventAction": "registration",
+          "eventDate": "2018-05-09T19:08:33Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2027-05-09T19:08:33Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2026-07-05T04:49:19Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:05:06Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20250222195350",
+      "first_snapshot_ym": "2025-02",
+      "first_snapshot_date": "2025-02-22",
+      "snapshot_url": "https://web.archive.org/web/20250222195350/https://pixelfed.ca/"
+    }
+  }
+}

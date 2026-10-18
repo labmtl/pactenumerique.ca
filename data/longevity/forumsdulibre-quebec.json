@@ -1,0 +1,52 @@
+{
+  "id": "forumsdulibre-quebec",
+  "name": "Forums du libre du Québec",
+  "url": "https://forumsdulibre.quebec",
+  "apex_domain": "forumsdulibre.quebec",
+  "audited_at": "2026-10-18T15:06:38.872Z",
+  "established": "2016-11",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2016-11",
+  "first_web_archive": "2018-08",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "forumsdulibre.quebec",
+      "registration_date": "2016-11-19T22:03:50.466Z",
+      "registration_ym": "2016-11",
+      "registrar": null,
+      "events": [
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:06:14.780Z"
+        },
+        {
+          "eventAction": "registration",
+          "eventActor": "REG-00146",
+          "eventDate": "2016-11-19T22:03:50.466Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventActor": "REG-00433",
+          "eventDate": "2025-10-20T01:13:18.351Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2026-11-19T22:03:50.466Z"
+        },
+        {
+          "eventAction": "transfer",
+          "eventDate": "2025-10-20T00:30:45.687Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20180809233835",
+      "first_snapshot_ym": "2018-08",
+      "first_snapshot_date": "2018-08-09",
+      "snapshot_url": "https://web.archive.org/web/20180809233835/http://forumsdulibre.quebec/"
+    }
+  }
+}

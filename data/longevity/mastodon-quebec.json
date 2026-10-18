@@ -1,0 +1,29 @@
+{
+  "id": "mastodon-quebec",
+  "name": "Mastodon Québec",
+  "url": "https://mastodon.quebec",
+  "apex_domain": "mastodon.quebec",
+  "audited_at": "2026-10-18T15:06:29.636Z",
+  "established": "2021-04",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2021-04",
+  "first_web_archive": "2021-12",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "whois",
+      "domain": "mastodon.quebec",
+      "registration_date": "2021-04-19T05:54:02",
+      "registration_ym": "2021-04",
+      "registrar": null,
+      "raw_output_snippet": "% IANA WHOIS server\n% for more information on IANA, visit http://www.iana.org\n% This query returned 1 object\n\nrefer:        whois.nic.quebec\n\ndomain:       QUEBEC\n\norganisation: PointQuébec Inc\naddress:      101-82, Sherbrooke Ouest\naddress:      Montréal QC H2X 1X3\naddress:      Canada\n\ncontact:      administrative\nname:         Normand Fortier\norganisation: PointQuébec\naddress:      101-82, Sherbrooke Ouest\naddress:      Montréal QC H2X 1X3\naddress:      Canada\nphone:        +1.514-700-0018\nfa"
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20211217082115",
+      "first_snapshot_ym": "2021-12",
+      "first_snapshot_date": "2021-12-17",
+      "snapshot_url": "https://web.archive.org/web/20211217082115/http://mastodon.quebec/"
+    }
+  }
+}

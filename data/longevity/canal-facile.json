@@ -1,0 +1,50 @@
+{
+  "id": "canal-facile",
+  "name": "Canal FACiLe",
+  "url": "https://canal.facil.services",
+  "apex_domain": "facil.services",
+  "audited_at": "2026-10-18T15:06:40.478Z",
+  "established": "2021-10",
+  "established_reason": "Premier instantané web documenté sur le sous-domaine spécifique",
+  "domain_registration": "2016-06",
+  "first_web_archive": "2021-10",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "facil.services",
+      "registration_date": "2016-06-17T01:12:51.457Z",
+      "registration_ym": "2016-06",
+      "registrar": "OVH SAS",
+      "events": [
+        {
+          "eventAction": "transfer",
+          "eventDate": "2026-04-22T23:14:02.389Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2027-06-17T01:12:51.457Z"
+        },
+        {
+          "eventAction": "registration",
+          "eventDate": "2016-06-17T01:12:51.457Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2026-08-12T07:05:16.994Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:06:40.198Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20211024030104",
+      "first_snapshot_ym": "2021-10",
+      "first_snapshot_date": "2021-10-24",
+      "snapshot_url": "https://web.archive.org/web/20211024030104/https://canal.facil.services/"
+    }
+  }
+}

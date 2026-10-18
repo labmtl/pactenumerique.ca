@@ -1,0 +1,46 @@
+{
+  "id": "mstdn-ca",
+  "name": "mstdn.ca",
+  "url": "https://mstdn.ca",
+  "apex_domain": "mstdn.ca",
+  "audited_at": "2026-10-18T15:06:35.723Z",
+  "established": "2022-04",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2022-04",
+  "first_web_archive": "2022-04",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "mstdn.ca",
+      "registration_date": "2022-04-26T04:31:44Z",
+      "registration_ym": "2022-04",
+      "registrar": "Tucows.com Co.",
+      "events": [
+        {
+          "eventAction": "registration",
+          "eventDate": "2022-04-26T04:31:44Z"
+        },
+        {
+          "eventAction": "expiration",
+          "eventDate": "2027-04-26T04:31:44Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2026-04-25T09:18:58Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:05:05Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20220427165143",
+      "first_snapshot_ym": "2022-04",
+      "first_snapshot_date": "2022-04-27",
+      "snapshot_url": "https://web.archive.org/web/20220427165143/https://mstdn.ca/"
+    }
+  }
+}

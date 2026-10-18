@@ -128,7 +128,12 @@
     "tech_details_summary": "🔧 En savoir plus : infrastructure technique et code source",
     "tech_details_intro": "Détails techniques pour les profanes du web et passionnés d'informatique libre :",
     "protocol_label": "Protocole ouvert",
-    "host_datacenter": "Hébergement physique"
+    "host_datacenter": "Hébergement physique",
+    "established_label": "Historique",
+    "established_since": "Actif depuis",
+    "activity_period_label": "Période d'activité",
+    "track_record": "Pérennité et historique documenté",
+    "domain_registered": "Nom de domaine détenu depuis"
   },
   "usages": {
     "microblogging": "Alternative libre et sans pub",

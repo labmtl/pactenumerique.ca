@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   getUsageLabel,
+  formatLongevity,
   getReadyInviteMessage,
   renderCriticalMassGauge,
   resolveLocationInput
@@ -68,5 +69,27 @@ describe('Logique UX & Simplification Citoyenne (app.js)', () => {
     // Valeur vide ou nulle (déduction automatique)
     const empty = resolveLocationInput('');
     assert.strictEqual(empty.fsa, 'H2T');
+  });
+
+  it('formate la date d\'établissement et calcule l\'ancienneté en français et anglais', () => {
+    // Test FR
+    const resFr = formatLongevity('2021-04', 'fr');
+    assert.strictEqual(resFr.monthYear, 'avril 2021');
+    assert.strictEqual(resFr.year, 2021);
+    assert.strictEqual(resFr.month, 4);
+    assert.ok(resFr.ageStr.includes('an'));
+    assert.ok(resFr.fullDisplay.startsWith('avril 2021 ('));
+
+    // Test EN
+    const resEn = formatLongevity('2024-04', 'en');
+    assert.strictEqual(resEn.monthYear, 'April 2024');
+    assert.strictEqual(resEn.year, 2024);
+    assert.strictEqual(resEn.month, 4);
+    assert.ok(resEn.ageStr.includes('yr') || resEn.ageStr.includes('mo'));
+
+    // Test format invalide
+    assert.strictEqual(formatLongevity('invalid'), null);
+    assert.strictEqual(formatLongevity(null), null);
+    assert.strictEqual(formatLongevity('2024'), null);
   });
 });

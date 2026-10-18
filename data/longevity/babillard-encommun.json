@@ -1,0 +1,27 @@
+{
+  "id": "babillard-encommun",
+  "name": "Babillard (En commun)",
+  "url": "https://encommun.io/initiatives/babillard",
+  "apex_domain": "encommun.io",
+  "audited_at": "2026-10-18T15:06:53.911Z",
+  "established": "2022-08",
+  "established_reason": "Date d’enregistrement du nom de domaine via RDAP/WHOIS",
+  "domain_registration": "2022-08",
+  "first_web_archive": null,
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "whois",
+      "domain": "encommun.io",
+      "registration_date": "2022-08-18T15:06:20",
+      "registration_ym": "2022-08",
+      "registrar": null,
+      "raw_output_snippet": "% IANA WHOIS server\n% for more information on IANA, visit http://www.iana.org\n% This query returned 1 object\n\nrefer:        whois.nic.io\n\ndomain:       IO\n\norganisation: Internet Computer Bureau Limited\naddress:      c/o Sure (Diego Garcia) Limited\naddress:      Diego Garcia\naddress:      British Indian Ocean Territories, PSC 466 Box 59\naddress:      FPO-AP 96595-0059\naddress:      British Indian Ocean Territory (the)\n\ncontact:      administrative\nname:         Internet Administrator\norganisatio"
+    },
+    "wayback_machine": {
+      "success": true,
+      "first_snapshot_ym": null,
+      "message": "Aucun instantané archivé trouvé sur Wayback Machine"
+    }
+  }
+}

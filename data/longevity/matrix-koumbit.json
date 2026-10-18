@@ -1,0 +1,46 @@
+{
+  "id": "matrix-koumbit",
+  "name": "Infrastructure Matrix Koumbit",
+  "url": "https://koumbit.org",
+  "apex_domain": "koumbit.org",
+  "audited_at": "2026-10-18T15:06:51.887Z",
+  "established": "2004-02",
+  "established_reason": "Date d’enregistrement du domaine ou plus ancienne trace web",
+  "domain_registration": "2004-02",
+  "first_web_archive": "2004-08",
+  "sources": {
+    "rdap_whois": {
+      "success": true,
+      "source": "rdap",
+      "domain": "koumbit.org",
+      "registration_date": "2004-02-06T04:52:38.695Z",
+      "registration_ym": "2004-02",
+      "registrar": "Gandi SAS",
+      "events": [
+        {
+          "eventAction": "expiration",
+          "eventDate": "2027-02-06T04:52:38.695Z"
+        },
+        {
+          "eventAction": "registration",
+          "eventDate": "2004-02-06T04:52:38.695Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "2026-08-12T06:37:47.224Z"
+        },
+        {
+          "eventAction": "last update of RDAP database",
+          "eventDate": "2026-10-18T15:06:51.831Z"
+        }
+      ]
+    },
+    "wayback_machine": {
+      "success": true,
+      "timestamp": "20040825180426",
+      "first_snapshot_ym": "2004-08",
+      "first_snapshot_date": "2004-08-25",
+      "snapshot_url": "https://web.archive.org/web/20040825180426/http://www.koumbit.org:80/"
+    }
+  }
+}

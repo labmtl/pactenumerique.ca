@@ -72,6 +72,60 @@ export function getUsageLabel(alt) {
 }
 
 /**
+ * Formate la date d'établissement (YYYY-MM) en texte lisible avec calcul d'ancienneté
+ */
+export function formatLongevity(establishedYm, lang = null) {
+  if (!establishedYm || !/^\d{4}-\d{2}$/.test(establishedYm)) return null;
+  const currentLang = lang || state.lang || 'fr';
+  const [yearStr, monthStr] = establishedYm.split('-');
+  const year = parseInt(yearStr, 10);
+  const month = parseInt(monthStr, 10);
+
+  const monthNamesFr = [
+    'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+    'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+  ];
+  const monthNamesEn = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const mName = currentLang === 'fr' ? monthNamesFr[month - 1] : monthNamesEn[month - 1];
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const totalMonths = (currentYear - year) * 12 + (currentMonth - month);
+  const years = Math.floor(totalMonths / 12);
+  const remMonths = totalMonths % 12;
+
+  let ageStr = '';
+  if (years >= 1) {
+    if (remMonths > 0 && years < 5) {
+      ageStr = currentLang === 'fr'
+        ? `${years} an${years > 1 ? 's' : ''} et ${remMonths} mois`
+        : `${years} yr${years > 1 ? 's' : ''} ${remMonths} mo`;
+    } else {
+      ageStr = currentLang === 'fr'
+        ? `${years} an${years > 1 ? 's' : ''}`
+        : `${years} yr${years > 1 ? 's' : ''}`;
+    }
+  } else {
+    ageStr = currentLang === 'fr'
+      ? `${totalMonths} mois`
+      : `${totalMonths} mo${totalMonths > 1 ? 's' : ''}`;
+  }
+
+  return {
+    year,
+    month,
+    monthYear: `${mName} ${year}`,
+    ageStr,
+    fullDisplay: `${mName} ${year} (${ageStr})`
+  };
+}
+
+/**
  * Rendu visuel et intuitif de la jauge de masse critique
  */
 export function renderCriticalMassGauge(currentCount, targetCount, isUnlocked) {
@@ -1113,6 +1167,15 @@ function renderDirectory() {
       locationStr = hier.countryName || 'Canada';
     }
 
+    const longevityInfo = formatLongevity(alt.established, state.lang);
+    const longevityBadge = longevityInfo
+      ? `<span class="badge-tag longevity" title="${t('directory.track_record') || 'Pérennité et historique documenté'}">⏳ ${t('directory.established_since') || (state.lang === 'fr' ? 'Actif depuis' : 'Active since')} ${longevityInfo.monthYear}</span>`
+      : '';
+
+    const longevityMeta = longevityInfo
+      ? `<div>⏳ <strong>${t('directory.established_label') || (state.lang === 'fr' ? 'Historique :' : 'History:')}</strong> ${t('directory.established_since') || (state.lang === 'fr' ? 'Actif depuis' : 'Active since')} ${longevityInfo.fullDisplay}</div>`
+      : '';
+
     return `
       <div class="instance-card ${cardClass}">
         <div>
@@ -1122,6 +1185,7 @@ function renderDirectory() {
               ${flagBadges}
               ${hostBadge}
               ${langBadges}
+              ${longevityBadge}
               <span class="badge-tag proto">${getUsageLabel(alt)}</span>
             </div>
           </div>
@@ -1135,6 +1199,7 @@ function renderDirectory() {
           <div class="instance-meta">
             <div>📍 <strong>${state.lang === 'fr' ? 'Territoire :' : 'Location:'}</strong> ${locationStr} &bull; <small>${alt.host}</small></div>
             <div>🏛️ <strong>${state.lang === 'fr' ? 'Organisation :' : 'Organization:'}</strong> ${alt.org}</div>
+            ${longevityMeta}
             <div>💬 <strong>${state.lang === 'fr' ? 'Support :' : 'Support:'}</strong> ${alt.support_fr ? '<span class="lang-check" title="Support français validé">✔ FR</span>' : ''} ${alt.support_en ? '<span class="lang-check" title="Support anglais validé">✔ EN</span>' : ''}</div>
           </div>
           
@@ -1148,6 +1213,7 @@ function renderDirectory() {
                 <div>🛠️ <strong>${t('directory.stack_label') || 'Pile logicielle'} :</strong> ${stackBadge}</div>
                 <div>📂 <strong>${t('directory.project_source_label') || 'Code source du projet'} :</strong> ${sourceBadge}</div>
                 <div>🏢 <strong>${t('directory.host_datacenter') || 'Hébergement physique'} :</strong> ${alt.host}</div>
+                <div>⏳ <strong>${t('directory.activity_period_label') || 'Période d\'activité'} :</strong> ${longevityInfo ? `${longevityInfo.fullDisplay} [${alt.established}]` : (alt.established || 'N/D')}</div>
               </div>
             </div>
           </details>
