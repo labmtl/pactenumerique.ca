@@ -21,7 +21,8 @@
 | **Accueil (Action Citoyenne)** | `public/index.html` | Page principale : engagement en 2 étapes, jauge visuelle, partage SMS/WhatsApp. |
 | **Répertoire Dédié** | `public/repertoire.html` | Catalogue complet des instances avec recherche, filtres et détails d'infrastructure repliables. |
 | **Statistiques Dédiées** | `public/statistiques.html` | Compteur national, progression provinciale et palmarès des RTA/quartiers. |
-| **Logique Client** | `public/js/app.js` | Modèle de données client, i18n, gestion du formulaire, résolution de ville, Web Push, jauge. |
+| **Logique Client (Entrée)** | `public/js/app.js` | Point d'entrée léger (< 250 lignes), orchestrateur et ré-exportation de l'API. |
+| **Modules Client Thématiques** | `public/js/modules/*.js` | Modules ciblés : `state.js`, `geo.js`, `longevity.js`, `gauge.js`, `directory.js`, `push-ui.js`, `pact-form.js`, `stats.js`. |
 | **Feuille de Styles** | `public/css/style.css` | Styles CSS modernes, variables HSL, cartes, jauge, bulles de partage. |
 | **Traductions** | `public/locales/fr.json` & `en.json` | Textes et libellés bilingues (FR/EN). |
 | **Catalogue Données** | `public/data/alternatives.json` | Données normalisées des plateformes et instances québécoises/canadiennes (`established` YYYY-MM). |
