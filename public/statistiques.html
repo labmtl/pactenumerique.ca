@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobilisation & Statistiques territoriales | PacteNumérique.ca</title>
+  <meta name="description" content="Visualisez en direct la progression des engagements citoyens par province et par quartier au Québec et au Canada vers la masse critique souveraine.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.82em%22 font-size=%2246%22>⚜️🍁</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo" id="brandLogo">
+        <span class="brand-emblems" aria-label="Québec et Canada">
+          <span class="emblem-qc">⚜️</span><span class="emblem-ca">🍁</span>
+        </span>
+        <span>PacteNumérique<span class="brand-suffix">.ca</span></span>
+      </a>
+      <div class="nav-actions">
+        <ul class="nav-links">
+          <li><a href="/" data-i18n="nav.mission">Le Pacte</a></li>
+          <li><a href="/#comment-ca-marche" data-i18n="nav.how_it_works">Comment ça marche</a></li>
+          <li><a href="/repertoire" data-i18n="nav.directory">Répertoire souverain</a></li>
+          <li><a href="/statistiques" style="color:var(--accent-red); font-weight:700;" data-i18n="nav.territories">Mobilisation & Stats</a></li>
+        </ul>
+        <button id="btnLangToggle" class="btn-lang" aria-label="Changer de langue">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- En-tête de la page -->
+    <section class="subpage-hero">
+      <h1 class="subpage-hero-title" data-i18n="dashboard.title">Mobilisation territoriale au Québec et au Canada</h1>
+      <p class="subpage-hero-sub" data-i18n="dashboard.subtitle">La masse critique par province et par quartier (Région de tri d'acheminement - RTA).</p>
+
+      <div class="hero-counters" style="margin-top: 2rem;">
+        <div class="counter-card">
+          <div class="counter-num" id="counterNational">0</div>
+          <div class="counter-label" data-i18n="stats.national_signers">Québécois et Canadiens engagés</div>
+        </div>
+        <div class="counter-card">
+          <div class="counter-num" id="counterCircles">100%</div>
+          <div class="counter-label" data-i18n="stats.zero_knowledge">Anonyme & Confidentiel</div>
+        </div>
+        <div class="counter-card">
+          <div class="counter-num" id="counterHost">⚜️ 🍁 WHC</div>
+          <div class="counter-label" data-i18n="stats.sovereign_hosting">Hébergement souverain (QC & CA)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Territorial -->
+    <section class="dashboard-section" style="padding-top: 1rem;">
+      <div class="dashboard-grid">
+        <div class="dash-panel">
+          <h3 data-i18n="dashboard.provinces_title">Engagement par province</h3>
+          <div id="provinceStatsList" class="province-list">
+            <p style="color:var(--text-dim);font-size:0.9rem;">Chargement des données provinciales...</p>
+          </div>
+        </div>
+
+        <div class="dash-panel">
+          <h3 data-i18n="dashboard.top_fsa_title">Quartiers en tête vers la masse critique</h3>
+          <div id="fsaStatsList" class="fsa-list">
+            <p style="color:var(--text-dim);font-size:0.9rem;">Chargement des données de quartiers...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appel à la mobilisation locale -->
+      <div class="discovery-card" style="margin-top: 2.5rem; text-align: center; align-items: center;">
+        <h3>Mobilisez votre région !</h3>
+        <p style="max-width: 650px; margin: 0.5rem auto 1.5rem;">
+          Votre quartier n'est pas encore dans le classement ? Créez votre cercle citoyen en 30 secondes et invitez 5 amis proches pour déclencher le signal de départ ensemble.
+        </p>
+        <a href="/#engagement" class="btn-subpage-cta">
+          <span>✍️</span> <span>Signer le pacte dans ma région</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pied de page -->
+  <footer class="footer">
+    <p data-i18n="footer.hosted_in_canada">⚜️ 🍁 Fièrement hébergé au Québec et au Canada chez Web Hosting Canada (WHC.ca)</p>
+    <p data-i18n="footer.open_source">Projet civique à code ouvert sous licence MIT.</p>
+    <p data-i18n="footer.rights">© 2026 Pacte numérique Québec & Canada. Tous droits réservés.</p>
+  </footer>
+
+  <!-- Conteneur pour toasts -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Répertoire des réseaux sociaux souverains | PacteNumérique.ca</title>
+  <meta name="description" content="Catalogue complet des alternatives libres, sans publicité et hébergées au Québec et au Canada (Mastodon, Bluesky, Pixelfed, Matrix, PeerTube).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.82em%22 font-size=%2246%22>⚜️🍁</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo" id="brandLogo">
+        <span class="brand-emblems" aria-label="Québec et Canada">
+          <span class="emblem-qc">⚜️</span><span class="emblem-ca">🍁</span>
+        </span>
+        <span>PacteNumérique<span class="brand-suffix">.ca</span></span>
+      </a>
+      <div class="nav-actions">
+        <ul class="nav-links">
+          <li><a href="/" data-i18n="nav.mission">Le Pacte</a></li>
+          <li><a href="/#comment-ca-marche" data-i18n="nav.how_it_works">Comment ça marche</a></li>
+          <li><a href="/repertoire" style="color:var(--accent-red); font-weight:700;" data-i18n="nav.directory">Répertoire souverain</a></li>
+          <li><a href="/statistiques" data-i18n="nav.territories">Mobilisation & Stats</a></li>
+        </ul>
+        <button id="btnLangToggle" class="btn-lang" aria-label="Changer de langue">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- En-tête de la page -->
+    <section class="subpage-hero">
+      <h1 class="subpage-hero-title" data-i18n="directory.title">Répertoire des réseaux sociaux souverains</h1>
+      <p class="subpage-hero-sub" data-i18n="directory.subtitle">Infrastructures numériques québécoises et canadiennes opérées par des coopératives, OBNL et collectifs citoyens (2024-2026). Données hébergées en sol québécois et canadien.</p>
+      <div class="subpage-cta-box">
+        <a href="/#engagement" class="btn-subpage-cta">
+          <span>✍️</span> <span>Signer le pacte citoyen</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Contrôles et Grille interactive -->
+    <section class="directory-section" style="padding-top: 1rem;">
+      <div class="directory-controls">
+        <div class="search-bar-wrap">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            id="directorySearchInput" 
+            class="search-input" 
+            placeholder="Rechercher une instance, une plateforme ou un besoin..."
+            data-i18n-placeholder="directory.search_placeholder"
+          >
+        </div>
+
+        <!-- Filtres par besoin -->
+        <div class="filter-pills-bar">
+          <button type="button" class="filter-pill active" data-cat="all" data-i18n="directory.filter_all_cats">Tous les besoins</button>
+          <button type="button" class="filter-pill" data-cat="microblogging">🐦 Microblogging (X)</button>
+          <button type="button" class="filter-pill" data-cat="photos">📸 Photographie (Instagram)</button>
+          <button type="button" class="filter-pill" data-cat="forums">💬 Forums (Reddit)</button>
+          <button type="button" class="filter-pill" data-cat="messaging">🛡️ Messagerie (WhatsApp)</button>
+          <button type="button" class="filter-pill" data-cat="video">🎬 Vidéo (YouTube)</button>
+          <button type="button" class="filter-pill" data-cat="professional">💼 Professionnel (LinkedIn)</button>
+          <button type="button" class="filter-pill" data-cat="events">📅 Événements (Facebook, Meetup)</button>
+        </div>
+
+        <!-- Filtres géographiques -->
+        <div class="filter-pills-bar">
+          <button type="button" class="filter-pill active" data-region="all" data-i18n="directory.filter_all_regions">⚜️ 🍁 Toutes les régions</button>
+          <button type="button" class="filter-pill" data-region="MTL"><span class="mtl-rosette-icon" aria-hidden="true"><svg viewBox="0 0 100 100" class="svg-mtl-rosette"><path d="M 50,50 C 42,38 24,24 24,14 C 24,5 37,2 50,15 C 63,2 76,5 76,14 C 76,24 58,38 50,50 Z" /><path d="M 50,50 C 42,38 24,24 24,14 C 24,5 37,2 50,15 C 63,2 76,5 76,14 C 76,24 58,38 50,50 Z" transform="rotate(90 50 50)" /><path d="M 50,50 C 42,38 24,24 24,14 C 24,5 37,2 50,15 C 63,2 76,5 76,14 C 76,24 58,38 50,50 Z" transform="rotate(180 50 50)" /><path d="M 50,50 C 42,38 24,24 24,14 C 24,5 37,2 50,15 C 63,2 76,5 76,14 C 76,24 58,38 50,50 Z" transform="rotate(270 50 50)" /></svg></span> <span data-i18n="directory.filter_mtl">Montréal</span></button>
+          <button type="button" class="filter-pill" data-region="QC" data-i18n="directory.filter_qc">⚜️ Québec</button>
+          <button type="button" class="filter-pill" data-region="CA" data-i18n="directory.filter_ca">🍁 Canada</button>
+        </div>
+
+        <!-- Filtres linguistiques -->
+        <div class="filter-pills-bar filter-pills-lang">
+          <button type="button" class="filter-pill active" data-lang-filter="all" data-i18n="directory.filter_lang_all">Toutes les langues</button>
+          <button type="button" class="filter-pill" data-lang-filter="fr" data-i18n="directory.filter_lang_fr">⚜️ Support français</button>
+          <button type="button" class="filter-pill" data-lang-filter="en" data-i18n="directory.filter_lang_en">🍁 Support anglais</button>
+          <button type="button" class="filter-pill" data-lang-filter="bilingual" data-i18n="directory.filter_lang_bilingual">⚜️ 🍁 Bilingue (FR/EN)</button>
+        </div>
+      </div>
+
+      <div id="instancesGrid" class="instances-grid">
+        <!-- Rempli dynamiquement par app.js avec volet repliable pour infrastructure -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Pied de page -->
+  <footer class="footer">
+    <p data-i18n="footer.hosted_in_canada">⚜️ 🍁 Fièrement hébergé au Québec et au Canada chez Web Hosting Canada (WHC.ca)</p>
+    <p data-i18n="footer.open_source">Projet civique à code ouvert sous licence MIT.</p>
+    <p data-i18n="footer.rights">© 2026 Pacte numérique Québec & Canada. Tous droits réservés.</p>
+  </footer>
+
+  <!-- Conteneur pour toasts -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

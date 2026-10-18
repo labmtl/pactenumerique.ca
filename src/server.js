@@ -54,6 +54,15 @@ app.all('/api/*', (req, res) => {
   res.status(404).json({ error: 'Endpoint API introuvable' });
 });
 
+// Routes de pages dédiées
+app.get('/repertoire', (req, res) => {
+  res.sendFile(path.join(publicDir, 'repertoire.html'));
+});
+
+app.get('/statistiques', (req, res) => {
+  res.sendFile(path.join(publicDir, 'statistiques.html'));
+});
+
 // Fallback SPA pour les liens directs (ex: /join#...)
 app.get('*', (req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));

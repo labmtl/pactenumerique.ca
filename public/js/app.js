@@ -28,6 +28,7 @@ const state = {
   alternatives: [],
   selectedNetworks: new Set(['X / Twitter', 'Instagram']),
   chosenAlternativeId: null,
+  isManualServerChoice: false,
   currentDirectoryCat: 'all',
   currentDirectoryRegion: 'all',
   currentDirectoryLang: 'all',
@@ -35,6 +36,267 @@ const state = {
   savedCircleData: null,
   isFormManuallyShown: false
 };
+
+/**
+ * Retourne une notion d'usage intuitive et non-technique pour une alternative
+ */
+export function getUsageLabel(alt) {
+  if (!alt) return state.lang === 'fr' ? 'Alternative libre et sans pub' : 'Ad-free open alternative';
+  const cat = alt.category;
+  const usageKey = `usages.${cat}`;
+  const translated = t(usageKey);
+  if (translated && translated !== usageKey) {
+    return translated;
+  }
+  const fallbacks = {
+    fr: {
+      microblogging: 'Alternative libre et sans pub',
+      photos: 'Partage photo sans algorithme toxique',
+      forums: 'Espace d\'échange communautaire libre',
+      messaging: 'Messagerie privée chiffrée',
+      video: 'Vidéos indépendantes et éthiques',
+      professional: 'Réseau d\'entraide professionnelle citoyenne',
+      events: 'Babillard et événements locaux'
+    },
+    en: {
+      microblogging: 'Ad-free open alternative',
+      photos: 'Photo sharing with no toxic algorithm',
+      forums: 'Open community discussions',
+      messaging: 'Private encrypted messaging',
+      video: 'Independent & ethical videos',
+      professional: 'Civic professional network',
+      events: 'Local events and bulletin board'
+    }
+  };
+  return fallbacks[state.lang]?.[cat] || (state.lang === 'fr' ? 'Alternative libre et éthique' : 'Open ethical alternative');
+}
+
+/**
+ * Rendu visuel et intuitif de la jauge de masse critique
+ */
+export function renderCriticalMassGauge(currentCount, targetCount, isUnlocked) {
+  const percent = Math.min(100, Math.round((currentCount / targetCount) * 100));
+  const needed = Math.max(0, targetCount - currentCount);
+
+  let statusText = '';
+  const status1 = t('circle_widget.gauge_status_1');
+  const template1 = (status1 && status1 !== 'circle_widget.gauge_status_1') 
+    ? status1 
+    : `Déjà 1 personne sur {target} prête à faire le saut (plus que {needed} !)`;
+
+  const statusN = t('circle_widget.gauge_status_n');
+  const templateN = (statusN && statusN !== 'circle_widget.gauge_status_n') 
+    ? statusN 
+    : `Déjà {current} personnes sur {target} prêtes à faire le saut (plus que {needed} !)`;
+
+  const statusComp = t('circle_widget.gauge_status_complete');
+  const templateComp = (statusComp && statusComp !== 'circle_widget.gauge_status_complete') 
+    ? statusComp 
+    : `🎉 {target} personnes sur {target} : Masse critique atteinte ! C'est le moment de faire le saut ensemble !`;
+
+  if (isUnlocked) {
+    statusText = templateComp.replace('{target}', targetCount);
+  } else if (currentCount === 1) {
+    statusText = template1.replace('{target}', targetCount).replace('{needed}', needed);
+  } else {
+    statusText = templateN.replace('{current}', currentCount).replace('{target}', targetCount).replace('{needed}', needed);
+  }
+
+  const avatars = [];
+  for (let i = 0; i < targetCount; i++) {
+    if (i < currentCount) {
+      const isMe = i === 0;
+      avatars.push(`
+        <div class="gauge-avatar joined ${isMe ? 'is-me' : ''}" title="${isMe ? (state.lang === 'fr' ? 'Vous (prêt·e)' : 'You (ready)') : (state.lang === 'fr' ? `Ami ${i + 1} (a rejoint)` : `Friend ${i + 1} (joined)`)}">
+          <span class="gauge-avatar-icon">👤</span>
+          <span class="gauge-avatar-num">${isMe ? (state.lang === 'fr' ? 'Vous' : 'You') : `#${i + 1}`}</span>
+        </div>
+      `);
+    } else {
+      avatars.push(`
+        <div class="gauge-avatar pending" title="${state.lang === 'fr' ? `En attente d'un ami (${i + 1}/${targetCount})` : `Waiting for friend (${i + 1}/${targetCount})`}">
+          <span class="gauge-avatar-icon">⚪</span>
+          <span class="gauge-avatar-num">#${i + 1}</span>
+        </div>
+      `);
+    }
+  }
+
+  return `
+    <div class="critical-gauge-container ${isUnlocked ? 'unlocked' : ''}">
+      <div class="critical-gauge-headline">
+        <span class="critical-gauge-icon">${isUnlocked ? '🚀' : '👥'}</span>
+        <span class="critical-gauge-text">${statusText}</span>
+      </div>
+
+      <div class="critical-gauge-avatars">
+        ${avatars.join('')}
+      </div>
+
+      <div class="critical-gauge-track">
+        <div class="critical-gauge-fill" style="width: ${percent}%;"></div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Message d'invitation concret tout prêt à envoyer par SMS / WhatsApp
+ */
+export function getReadyInviteMessage(inviteUrl, targetCount = 5, networks = null) {
+  let netText = 'la Big Tech';
+  if (networks && networks.length > 0) {
+    const netList = Array.isArray(networks) ? networks : Array.from(networks);
+    if (netList.includes('X / Twitter')) {
+      netText = 'X';
+    } else if (netList.includes('Facebook')) {
+      netText = 'Facebook';
+    } else if (netList.includes('Instagram')) {
+      netText = 'Instagram';
+    } else {
+      netText = netList[0];
+    }
+  }
+
+  if (state.lang === 'en') {
+    return `Hey! As soon as ${targetCount} of us sign up, we're leaving ${netText} together. Join my group here: ${inviteUrl}`;
+  }
+  return `Salut ! Dès qu'on est ${targetCount} à s'inscrire, on quitte ${netText} ensemble. Rejoins mon groupe ici : ${inviteUrl}`;
+}
+
+/**
+ * Rendu de la boîte de partage SMS / WhatsApp tout prêt
+ */
+export function renderReadyShareBox(inviteUrl, targetCount, leavingNetworks, prefix = 'widget') {
+  const message = getReadyInviteMessage(inviteUrl, targetCount, leavingNetworks);
+  return `
+    <div class="ready-share-box">
+      <div class="ready-share-header">
+        <strong>💬 ${t('circle_widget.share_ready_title') || 'Message tout prêt à envoyer par SMS ou WhatsApp :'}</strong>
+      </div>
+      <div class="ready-share-bubble">
+        <p id="${prefix}ShareBubbleText">${message}</p>
+      </div>
+      <div class="ready-share-actions">
+        <button type="button" class="btn-share-social whatsapp" id="${prefix}BtnWhatsApp">
+          <span>💬</span> <span>WhatsApp</span>
+        </button>
+        <button type="button" class="btn-share-social sms" id="${prefix}BtnSMS">
+          <span>📱</span> <span>SMS</span>
+        </button>
+        <button type="button" class="btn-share-social copy" id="${prefix}BtnCopyMessage">
+          <span>📋</span> <span>${t('circle_widget.btn_copy_message') || 'Copier le message'}</span>
+        </button>
+        <button type="button" class="btn-share-social link-only" id="${prefix}BtnCopyLink">
+          <span>🔗</span> <span>${t('circle_widget.btn_copy_link') || 'Copier le lien'}</span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Attache les écouteurs pour la boîte de partage SMS/WhatsApp
+ */
+export function attachShareBoxListeners(prefix, inviteUrl, message) {
+  const btnWa = document.getElementById(`${prefix}BtnWhatsApp`);
+  if (btnWa) {
+    btnWa.onclick = () => {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+    };
+  }
+
+  const btnSms = document.getElementById(`${prefix}BtnSMS`);
+  if (btnSms) {
+    btnSms.onclick = () => {
+      window.location.href = `sms:?&body=${encodeURIComponent(message)}`;
+    };
+  }
+
+  const btnCopyMsg = document.getElementById(`${prefix}BtnCopyMessage`);
+  if (btnCopyMsg) {
+    btnCopyMsg.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(message);
+        showToast(t('circle_widget.message_copied') || 'Message complet copié ! Prêt à coller.');
+      } catch {
+        showToast('Erreur copie presse-papier');
+      }
+    };
+  }
+
+  const btnCopyLnk = document.getElementById(`${prefix}BtnCopyLink`);
+  if (btnCopyLnk) {
+    btnCopyLnk.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(inviteUrl);
+        showToast(t('circle_widget.link_copied') || 'Lien copié dans le presse-papier !');
+      } catch {
+        showToast('Erreur copie presse-papier');
+      }
+    };
+  }
+}
+
+/**
+ * Résout une entrée de ville ou code postal sans forcer l'utilisateur à connaître la RTA
+ */
+export function resolveLocationInput(input) {
+  if (!input || !input.trim()) {
+    return { fsa: 'H2T', city: 'Montréal', province: 'QC', region: 'MTL' };
+  }
+  const clean = input.trim();
+  const cleanPostal = clean.replace(/\s+/g, '').toUpperCase();
+  if (/^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z]/i.test(cleanPostal)) {
+    const fsa = cleanPostal.substring(0, 3);
+    const prov = PROVINCE_MAP[fsa[0]];
+    return {
+      fsa,
+      city: prov ? (state.lang === 'fr' ? prov.fr : prov.en) : clean,
+      province: prov?.code || 'QC',
+      region: prov?.region || prov?.code || 'QC'
+    };
+  }
+
+  const normCity = clean.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
+  const cityMap = {
+    montreal: { fsa: 'H2T', city: 'Montréal', province: 'QC', region: 'MTL' },
+    quebec: { fsa: 'G1K', city: 'Québec', province: 'QC', region: 'QC' },
+    laval: { fsa: 'H7N', city: 'Laval', province: 'QC', region: 'MTL' },
+    gatineau: { fsa: 'J8X', city: 'Gatineau', province: 'QC', region: 'QC' },
+    longueuil: { fsa: 'J4H', city: 'Longueuil', province: 'QC', region: 'QC' },
+    sherbrooke: { fsa: 'J1H', city: 'Sherbrooke', province: 'QC', region: 'QC' },
+    saguenay: { fsa: 'G7H', city: 'Saguenay', province: 'QC', region: 'QC' },
+    levis: { fsa: 'G6V', city: 'Lévis', province: 'QC', region: 'QC' },
+    troisrivieres: { fsa: 'G9A', city: 'Trois-Rivières', province: 'QC', region: 'QC' },
+    drummondville: { fsa: 'J2B', city: 'Drummondville', province: 'QC', region: 'QC' },
+    granby: { fsa: 'J2G', city: 'Granby', province: 'QC', region: 'QC' },
+    saintjean: { fsa: 'J3B', city: 'Saint-Jean-sur-Richelieu', province: 'QC', region: 'QC' },
+    ottawa: { fsa: 'K1P', city: 'Ottawa', province: 'ON', region: 'CA' },
+    toronto: { fsa: 'M5V', city: 'Toronto', province: 'ON', region: 'CA' },
+    vancouver: { fsa: 'V6B', city: 'Vancouver', province: 'BC', region: 'CA' },
+    calgary: { fsa: 'T2P', city: 'Calgary', province: 'AB', region: 'CA' },
+    edmonton: { fsa: 'T5J', city: 'Edmonton', province: 'AB', region: 'CA' },
+    winnipeg: { fsa: 'R3C', city: 'Winnipeg', province: 'MB', region: 'CA' },
+    halifax: { fsa: 'B3H', city: 'Halifax', province: 'NS', region: 'CA' }
+  };
+
+  if (cityMap[normCity]) {
+    return cityMap[normCity];
+  }
+
+  if (cleanPostal.length >= 1 && PROVINCE_MAP[cleanPostal[0]]) {
+    const prov = PROVINCE_MAP[cleanPostal[0]];
+    return {
+      fsa: `${cleanPostal[0]}1A`,
+      city: prov.fr,
+      province: prov.code,
+      region: prov.region || prov.code
+    };
+  }
+
+  return { fsa: 'H2T', city: clean, province: 'QC', region: 'MTL' };
+}
 
 /**
  * Génère le SVG de la rosace officielle de la Ville de Montréal (Georges Huel, 1981)
@@ -110,7 +372,8 @@ const PROVINCE_MAP = {
 };
 
 // Initialisation au chargement du DOM
-document.addEventListener('DOMContentLoaded', async () => {
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', async () => {
   await setupLanguage();
   detectInviteHash();
   setupEventListeners();
@@ -142,7 +405,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderMyCircleWidget();
     }
   }, 15000);
-});
+  });
+}
 
 /**
  * Gestion de la langue et de l'i18n
@@ -454,6 +718,34 @@ function setupEventListeners() {
     });
   }
 
+  // Case à cocher pour sélection manuelle d'instance (utilisateurs avancés)
+  const chkManual = document.getElementById('chkManualServer');
+  if (chkManual) {
+    chkManual.addEventListener('change', (e) => {
+      state.isManualServerChoice = e.target.checked;
+      const box = document.getElementById('recommendationsBox');
+      if (box) {
+        box.style.display = state.isManualServerChoice ? 'block' : 'none';
+        if (state.isManualServerChoice) {
+          box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    });
+  }
+
+  // Si une instance a été choisie depuis la page /repertoire
+  const preselected = localStorage.getItem('pacte_preselected_alt');
+  if (preselected) {
+    state.chosenAlternativeId = preselected;
+    state.isManualServerChoice = true;
+    if (chkManual) chkManual.checked = true;
+    localStorage.removeItem('pacte_preselected_alt');
+    setTimeout(() => {
+      const box = document.getElementById('recommendationsBox');
+      if (box) box.style.display = 'block';
+    }, 150);
+  }
+
   // Soumission du formulaire de pacte
   const form = document.getElementById('pactForm');
   if (form) {
@@ -476,7 +768,7 @@ function setupEventListeners() {
 }
 
 /**
- * Mise à jour visuelle lors de la saisie du code postal
+ * Mise à jour visuelle lors de la saisie de la ville ou du code postal
  */
 function updatePostalCodeFeedback() {
   const input = document.getElementById('postalCodeInput');
@@ -484,48 +776,47 @@ function updatePostalCodeFeedback() {
   const qcRecomBadge = document.getElementById('recomQcBadge');
   if (!input || !badge) return;
 
-  const val = input.value.trim().toUpperCase().replace(/\s+/g, '');
+  const val = input.value.trim();
   if (val.length >= 1) {
-    const firstLetter = val[0];
-    const prov = PROVINCE_MAP[firstLetter];
-    if (prov) {
-      state.userProvince = prov.code;
-      state.userRegion = prov.region || prov.code;
-      badge.style.display = 'inline-flex';
-      const provName = state.lang === 'fr' ? prov.fr : prov.en;
-      if (prov.region === 'MTL') {
-        badge.innerHTML = `📍 ${getMtlRosetteSvg(14)} QC - ${provName}`;
-        badge.className = 'geo-badge mtl';
-      } else {
-        const icon = prov.icon || (prov.code === 'QC' ? '⚜️' : '🍁');
-        badge.textContent = `📍 ${icon} ${prov.code} - ${provName}`;
-        badge.className = prov.code === 'QC' ? 'geo-badge qc' : 'geo-badge ca';
-      }
-
-      if (qcRecomBadge) {
-        if (prov.region === 'MTL') {
-          qcRecomBadge.style.display = 'inline-flex';
-          qcRecomBadge.className = 'recom-qc-badge mtl';
-          qcRecomBadge.innerHTML = `${getMtlRosetteSvg(12)} ${t('directory.recom_mtl_priority') || 'Solutions hébergées à Montréal priorisées (Loi 25)'}`;
-        } else if (prov.code === 'QC') {
-          qcRecomBadge.style.display = 'inline-flex';
-          qcRecomBadge.className = 'recom-qc-badge';
-          qcRecomBadge.innerHTML = `⚜️ ${t('directory.recom_qc_priority') || 'Solutions hébergées au Québec priorisées (Loi 25)'}`;
-        } else {
-          qcRecomBadge.style.display = 'none';
-        }
-      }
-      renderRecommendations();
-      renderDirectory();
-      return;
+    const resolved = resolveLocationInput(val);
+    state.userProvince = resolved.province;
+    state.userRegion = resolved.region;
+    badge.style.display = 'inline-flex';
+    if (resolved.region === 'MTL') {
+      badge.innerHTML = `📍 ${getMtlRosetteSvg(14)} ${resolved.city} (QC)`;
+      badge.className = 'geo-badge mtl';
+    } else {
+      const icon = resolved.province === 'QC' ? '⚜️' : '🍁';
+      badge.textContent = `📍 ${icon} ${resolved.city} (${resolved.province})`;
+      badge.className = resolved.province === 'QC' ? 'geo-badge qc' : 'geo-badge ca';
     }
+
+    if (qcRecomBadge) {
+      if (resolved.region === 'MTL') {
+        qcRecomBadge.style.display = 'inline-flex';
+        qcRecomBadge.className = 'recom-qc-badge mtl';
+        qcRecomBadge.innerHTML = `${getMtlRosetteSvg(12)} Solutions montréalaises priorisées`;
+      } else if (resolved.province === 'QC') {
+        qcRecomBadge.style.display = 'inline-flex';
+        qcRecomBadge.className = 'recom-qc-badge';
+        qcRecomBadge.innerHTML = `⚜️ Solutions québécoises priorisées`;
+      } else {
+        qcRecomBadge.style.display = 'none';
+      }
+    }
+    renderRecommendations();
+    if (document.getElementById('instancesGrid')) {
+      renderDirectory();
+    }
+    return;
   }
+
   state.userRegion = 'QC';
   badge.style.display = 'none';
   if (qcRecomBadge) {
     qcRecomBadge.style.display = state.userProvince === 'QC' ? 'inline-flex' : 'none';
     qcRecomBadge.className = 'recom-qc-badge';
-    qcRecomBadge.innerHTML = `⚜️ ${t('directory.recom_qc_priority') || 'Solutions hébergées au Québec priorisées (Loi 25)'}`;
+    qcRecomBadge.innerHTML = `⚜️ Solutions québécoises priorisées`;
   }
 }
 
@@ -536,13 +827,19 @@ function renderRecommendations() {
   const box = document.getElementById('recommendationsBox');
   const container = document.getElementById('recomCards');
   const qcRecomBadge = document.getElementById('recomQcBadge');
-  if (!box || !container || state.alternatives.length === 0) return;
+  const pickedBadge = document.getElementById('autoServerPickedBadge');
+  if (!container || state.alternatives.length === 0) return;
 
   // Filtrer les alternatives qui remplacent les réseaux cochés
-  const matching = state.alternatives.filter(alt => {
+  let matching = state.alternatives.filter(alt => {
     return alt.replaces.some(rep => {
       for (const selected of state.selectedNetworks) {
-        if (rep.toLowerCase().includes(selected.toLowerCase()) || selected.toLowerCase().includes(rep.toLowerCase())) {
+        const repL = rep.toLowerCase();
+        const selL = selected.toLowerCase();
+        if (repL.includes(selL) || selL.includes(repL)) {
+          return true;
+        }
+        if (selL.includes('facebook') && repL.includes('facebook')) {
           return true;
         }
       }
@@ -551,14 +848,10 @@ function renderRecommendations() {
   });
 
   if (matching.length === 0) {
-    box.style.display = 'none';
-    return;
+    matching = [...state.alternatives];
   }
 
-  // Trier pour mettre en avant les solutions locales :
-  // Si userRegion === 'MTL' -> 1) MTL, 2) QC, 3) support_fr
-  // Si userProvince === 'QC' -> 1) QC, 2) support_fr
-  // Sinon -> 1) province === userProvince
+  // Trier pour mettre en avant les solutions locales selon la région de l'utilisateur
   matching.sort((a, b) => {
     const aHier = getLocationHierarchy(a.location);
     const bHier = getLocationHierarchy(b.location);
@@ -593,21 +886,35 @@ function renderRecommendations() {
 
   const topMatches = matching.slice(0, 4);
 
-  // Par défaut, choisir la première si aucune n'est choisie
+  // Par défaut, choisir automatiquement la première alternative optimale
   if (!state.chosenAlternativeId || !matching.some(m => m.id === state.chosenAlternativeId)) {
     state.chosenAlternativeId = topMatches[0]?.id || null;
   }
 
-  box.style.display = 'block';
+  // Mise à jour de l'affichage de l'attribution automatique (Recommandation transparente)
+  const topAlt = state.alternatives.find(a => a.id === state.chosenAlternativeId) || topMatches[0];
+  if (topAlt && pickedBadge) {
+    const hier = getLocationHierarchy(topAlt.location);
+    const locText = hier.cityName || hier.provinceName || 'Canada';
+    pickedBadge.innerHTML = `<span class="badge-auto-choice">🎯 Serveur associé : <strong>${topAlt.name}</strong> (${getUsageLabel(topAlt)} &bull; ${locText})</span>`;
+  }
+
+  // Afficher ou masquer la sélection manuelle selon l'état de la case à cocher
+  const chkManual = document.getElementById('chkManualServer');
+  const showManual = (chkManual && chkManual.checked) || state.isManualServerChoice;
+  if (box) {
+    box.style.display = showManual ? 'block' : 'none';
+  }
+
   if (qcRecomBadge) {
     if (state.userRegion === 'MTL') {
       qcRecomBadge.style.display = 'inline-flex';
       qcRecomBadge.className = 'recom-qc-badge mtl';
-      qcRecomBadge.innerHTML = `${getMtlRosetteSvg(12)} ${t('directory.recom_mtl_priority') || 'Solutions hébergées à Montréal priorisées (Loi 25)'}`;
+      qcRecomBadge.innerHTML = `${getMtlRosetteSvg(12)} Solutions montréalaises priorisées`;
     } else if (state.userProvince === 'QC') {
       qcRecomBadge.style.display = 'inline-flex';
       qcRecomBadge.className = 'recom-qc-badge';
-      qcRecomBadge.innerHTML = `⚜️ ${t('directory.recom_qc_priority') || 'Solutions hébergées au Québec priorisées (Loi 25)'}`;
+      qcRecomBadge.innerHTML = `⚜️ Solutions québécoises priorisées`;
     } else {
       qcRecomBadge.style.display = 'none';
     }
@@ -648,18 +955,24 @@ function renderRecommendations() {
             ${langPill}
           </div>
         </div>
-        <div class="recom-card-sub">${alt.protocol}</div>
-        <div class="recom-card-host"><small>${alt.host}</small></div>
+        <div class="recom-card-sub">${getUsageLabel(alt)}</div>
+        <div class="recom-card-host"><small>📍 ${hier.cityName ? `${hier.cityName}, ` : ''}${hier.provinceName || 'Canada'}</small></div>
       </div>
     `;
   }).join('');
 
-  // Clic pour choisir l'alternative cible
+  // Clic pour choisir manuellement l'alternative cible
   container.querySelectorAll('.recom-card').forEach(card => {
     card.addEventListener('click', () => {
       container.querySelectorAll('.recom-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       state.chosenAlternativeId = card.dataset.recomId;
+      const chosen = state.alternatives.find(a => a.id === state.chosenAlternativeId);
+      if (chosen && pickedBadge) {
+        const hier = getLocationHierarchy(chosen.location);
+        const locText = hier.cityName || hier.provinceName || 'Canada';
+        pickedBadge.innerHTML = `<span class="badge-auto-choice">🎯 Serveur choisi : <strong>${chosen.name}</strong> (${getUsageLabel(chosen)} &bull; ${locText})</span>`;
+      }
     });
   });
 }
@@ -809,7 +1122,7 @@ function renderDirectory() {
               ${flagBadges}
               ${hostBadge}
               ${langBadges}
-              <span class="badge-tag proto">${catName}</span>
+              <span class="badge-tag proto">${getUsageLabel(alt)}</span>
             </div>
           </div>
           <div class="instance-replaces">
@@ -822,10 +1135,23 @@ function renderDirectory() {
           <div class="instance-meta">
             <div>📍 <strong>${state.lang === 'fr' ? 'Territoire :' : 'Location:'}</strong> ${locationStr} &bull; <small>${alt.host}</small></div>
             <div>🏛️ <strong>${state.lang === 'fr' ? 'Organisation :' : 'Organization:'}</strong> ${alt.org}</div>
-            <div>🛠️ <strong>${t('directory.stack_label') || 'Pile logicielle'} :</strong> ${stackBadge}</div>
-            <div>📂 <strong>${t('directory.project_source_label') || 'Code du projet'} :</strong> ${sourceBadge}</div>
             <div>💬 <strong>${state.lang === 'fr' ? 'Support :' : 'Support:'}</strong> ${alt.support_fr ? '<span class="lang-check" title="Support français validé">✔ FR</span>' : ''} ${alt.support_en ? '<span class="lang-check" title="Support anglais validé">✔ EN</span>' : ''}</div>
           </div>
+          
+          <!-- Section repliable pour les détails d'infrastructure -->
+          <details class="technical-details">
+            <summary class="technical-summary">${t('directory.tech_details_summary') || '🔧 En savoir plus : infrastructure technique et code source'}</summary>
+            <div class="technical-content">
+              <p class="technical-intro"><small>${t('directory.tech_details_intro') || 'Détails techniques pour les profanes du web et passionnés d\'informatique libre :'}</small></p>
+              <div class="technical-grid">
+                <div>⚙️ <strong>${t('directory.protocol_label') || 'Protocole ouvert'} :</strong> ${alt.protocol}</div>
+                <div>🛠️ <strong>${t('directory.stack_label') || 'Pile logicielle'} :</strong> ${stackBadge}</div>
+                <div>📂 <strong>${t('directory.project_source_label') || 'Code source du projet'} :</strong> ${sourceBadge}</div>
+                <div>🏢 <strong>${t('directory.host_datacenter') || 'Hébergement physique'} :</strong> ${alt.host}</div>
+              </div>
+            </div>
+          </details>
+
           <div class="instance-actions">
             <a href="${alt.url}" target="_blank" rel="noopener noreferrer" class="btn-instance-visit">
               ${t('directory.btn_visit') || 'Visiter l\'instance'} ↗
@@ -846,6 +1172,13 @@ function renderDirectory() {
       const targetAlt = state.alternatives.find(a => a.id === altId);
       if (targetAlt) {
         state.chosenAlternativeId = altId;
+        localStorage.setItem('pacte_preselected_alt', altId);
+
+        if (window.location.pathname.includes('/repertoire')) {
+          window.location.href = '/#engagement';
+          return;
+        }
+
         // Ajuster les réseaux sélectionnés
         if (targetAlt.replaces && targetAlt.replaces.length > 0) {
           state.selectedNetworks.clear();
@@ -859,6 +1192,9 @@ function renderDirectory() {
             }
           });
         }
+        state.isManualServerChoice = true;
+        const chk = document.getElementById('chkManualServer');
+        if (chk) chk.checked = true;
         renderRecommendations();
         // Défilement doux vers le formulaire
         document.getElementById('engagement')?.scrollIntoView({ behavior: 'smooth' });
@@ -1117,7 +1453,7 @@ async function renderMyCircleWidget() {
   }
 
   const chosenAlt = state.alternatives?.find(a => a.id === saved.chosenAlternativeId);
-  const chosenText = chosenAlt ? `&bull; Destination : <strong>${chosenAlt.name}</strong> (${chosenAlt.protocol})` : '';
+  const chosenText = chosenAlt ? `&bull; Serveur associé : <strong>${chosenAlt.name}</strong> (${getUsageLabel(chosenAlt)})` : '';
 
   widget.style.display = 'block';
   widget.innerHTML = `
@@ -1128,44 +1464,24 @@ async function renderMyCircleWidget() {
           <span>${t('circle_widget.title') || 'Mon cercle d\'action souverain'}</span>
         </h3>
         <p class="my-circle-subtitle">
-          ${t('circle_widget.subtitle') || 'Votre engagement est sauvegardé dans ce fureteur.'} ${chosenText}
+          ${t('circle_widget.subtitle') || 'Votre engagement est sauvegardé dans ce fureteur. Partagez votre lien privé pour faire le saut ensemble.'} ${chosenText}
         </p>
       </div>
       <div>${statusBadge}</div>
     </div>
 
-    <div class="my-circle-progress-box">
-      <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.95rem;">
-        <span>${t('circle_widget.status_label') || 'Progression de votre cercle :'} ${currentCount} / ${targetCount}</span>
-        <span>${percent}%</span>
-      </div>
-      <div class="my-circle-progress-track">
-        <div class="my-circle-progress-fill" style="width: ${percent}%;"></div>
-      </div>
-      <p style="font-size:0.85rem; color:${unlocked ? 'var(--accent-emerald)' : 'var(--text-muted)'}; margin-top:0.35rem;">
-        ${unlocked 
-          ? (t('circle_widget.unlocked_desc') || '🎉 Votre cercle est complet ! Vous pouvez maintenant migrer ensemble vers les réseaux souverains.')
-          : (t('circle_widget.waiting_text')?.replace('{needed}', needed) || `En attente de ${needed} ami(s) pour déclencher votre départ`)}
-      </p>
-    </div>
+    <!-- Jauge de masse critique visuelle et intuitive -->
+    ${renderCriticalMassGauge(currentCount, targetCount, unlocked)}
 
-    <div class="my-circle-invite-box">
-      <label style="font-size:0.85rem; font-weight:600;">🔗 ${state.lang === 'fr' ? 'Votre lien d\'invitation privée (à partager à vos amis)' : 'Your private invite link (share with friends)'}</label>
-      <div class="my-circle-invite-row">
-        <input type="text" readonly value="${inviteUrl}" id="myCircleInviteInput" class="my-circle-invite-input">
-        <button type="button" id="btnCopyMyCircleInvite" class="my-circle-btn-copy">${t('circle_widget.copy_btn') || 'Copier'}</button>
-      </div>
-    </div>
+    <!-- Boîte de message tout prêt pour SMS ou WhatsApp -->
+    ${renderReadyShareBox(inviteUrl, targetCount, saved.leavingNetworks, 'myCircle')}
 
-    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem; margin-top:0.5rem;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem; margin-top:0.6rem;">
       <div id="myCirclePushStatus" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
         ${state.isPushActive 
           ? `<span style="color:var(--accent-emerald); font-weight:600;">${t('circle_widget.push_active') || '🔔 Notifications actives pour ce cercle'}</span>`
           : `<span style="color:var(--text-muted);">${t('circle_widget.push_inactive') || '🔕 Notifications inactives'}</span> <button type="button" id="btnQuickEnablePush" class="btn-toggle-push" style="padding:0.25rem 0.65rem; font-size:0.75rem;">${t('circle_widget.enable_push_btn') || 'Activer'}</button>`}
         <button type="button" id="btnTestMyCirclePush" class="my-circle-btn-text" style="color:var(--accent-teal, #0d9488); font-size:0.8rem; margin-left:0.25rem;">🔔 ${t('circle_widget.test_push_btn') || 'Tester mes notifications'}</button>
-      </div>
-      <div>
-        <code style="font-size:0.75rem; background:rgba(0,0,0,0.05); padding:0.2rem 0.4rem; border-radius:4px;">npm run circle:simulate -- "${inviteUrl}"</code>
       </div>
     </div>
 
@@ -1179,27 +1495,8 @@ async function renderMyCircleWidget() {
     </div>
   `;
 
-  // Écouteur pour copier le lien
-  const copyBtn = document.getElementById('btnCopyMyCircleInvite');
-  if (copyBtn) {
-    copyBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(inviteUrl);
-        copyBtn.textContent = t('circle_widget.copied_btn') || '✓ Copié !';
-        showToast(state.lang === 'fr' ? 'Lien d\'invitation copié dans le presse-papier !' : 'Invite link copied to clipboard!');
-        setTimeout(() => {
-          copyBtn.textContent = t('circle_widget.copy_btn') || 'Copier';
-        }, 2500);
-      } catch {
-        const input = document.getElementById('myCircleInviteInput');
-        if (input) {
-          input.select();
-          document.execCommand('copy');
-          copyBtn.textContent = t('circle_widget.copied_btn') || '✓ Copié !';
-        }
-      }
-    });
-  }
+  // Attache les écouteurs pour la boîte de partage SMS/WhatsApp
+  attachShareBoxListeners('myCircle', inviteUrl, getReadyInviteMessage(inviteUrl, targetCount, saved.leavingNetworks));
 
   // Écouteur pour activer push en un clic
   const quickPushBtn = document.getElementById('btnQuickEnablePush');
@@ -1269,11 +1566,9 @@ async function handlePactSubmit(e) {
   const postalInput = document.getElementById('postalCodeInput');
   const emailInput = document.getElementById('emailInput');
 
-  const rawPostal = postalInput.value.trim().toUpperCase();
-  if (rawPostal.length < 3) {
-    alert(state.lang === 'fr' ? 'Veuillez saisir un code postal canadien valide.' : 'Please enter a valid Canadian postal code.');
-    return;
-  }
+  const rawCityOrPostal = postalInput ? postalInput.value.trim() : '';
+  const resolvedLoc = resolveLocationInput(rawCityOrPostal);
+  const fsa = resolvedLoc.fsa;
 
   try {
     submitBtn.disabled = true;
@@ -1284,7 +1579,6 @@ async function handlePactSubmit(e) {
     state.myBlindCircleId = await deriveBlindId(state.circleKeyBytes);
 
     // 2. Preuve de Travail (Proof-of-Work anti-spam)
-    const fsa = rawPostal.substring(0, 3);
     const powNonce = await solveProofOfWork(fsa);
 
     // S'assurer que pushSubscription est récupéré si la permission est déjà accordée
@@ -1302,7 +1596,7 @@ async function handlePactSubmit(e) {
 
     // 3. Payload d'engagement avec réseaux ciblés
     const payload = {
-      postal_code: rawPostal,
+      postal_code: fsa,
       email: emailInput.value.trim() || null,
       blind_circle_id: state.myBlindCircleId,
       inviter_circle_id: state.inviterCircleId || null,
@@ -1350,16 +1644,27 @@ async function handlePactSubmit(e) {
     // Afficher le widget de progression en direct
     await renderMyCircleWidget();
 
-    document.getElementById('inviteLinkInput').value = inviteUrl;
-    document.getElementById('circleTargetDisplay').textContent = `${state.targetCount} ${state.lang === 'fr' ? 'amis' : 'friends'}`;
+    // Afficher la jauge intuitive dans le modal
+    const modalGaugeBox = document.getElementById('modalGaugeContainer');
+    if (modalGaugeBox) {
+      modalGaugeBox.innerHTML = renderCriticalMassGauge(1, state.targetCount, false);
+    }
 
-    // Afficher la destination ciblée dans le modal
+    // Afficher le message tout prêt pour SMS ou WhatsApp
+    const modalReadyText = document.getElementById('modalReadyShareText');
+    const readyMsg = getReadyInviteMessage(inviteUrl, state.targetCount, Array.from(state.selectedNetworks));
+    if (modalReadyText) {
+      modalReadyText.textContent = readyMsg;
+    }
+    attachShareBoxListeners('modal', inviteUrl, readyMsg);
+
+    // Afficher la destination ciblée dans le modal sans jargon
     const chosenAlt = state.alternatives.find(a => a.id === state.chosenAlternativeId);
     const modalTargetBox = document.getElementById('modalTargetRecom');
     const modalTargetText = document.getElementById('modalTargetRecomText');
     if (chosenAlt && modalTargetBox && modalTargetText) {
       modalTargetBox.style.display = 'block';
-      modalTargetText.textContent = ` ${chosenAlt.name} (${chosenAlt.protocol}) - ${chosenAlt.url}`;
+      modalTargetText.textContent = ` ${chosenAlt.name} (${getUsageLabel(chosenAlt)}) - ${chosenAlt.url}`;
     }
 
     document.getElementById('successModal').classList.add('show');
