@@ -27,7 +27,13 @@ app.use((req, res, next) => {
 
 // Fichiers statiques (interface web, Service Worker, styles, scripts)
 const publicDir = path.join(__dirname, '../public');
+const sendHtmlNoCache = (res, fileName) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(publicDir, fileName));
+};
+
 app.use(express.static(publicDir, {
+  extensions: ['html'],
   setHeaders: (res, filePath) => {
     // Ne pas mettre en cache le Service Worker ni les pages HTML
     if (filePath.endsWith('sw.js') || filePath.endsWith('.html')) {
@@ -58,24 +64,24 @@ app.all('/api/*', (req, res) => {
 
 // Routes de pages dédiées
 app.get('/comment-ca-marche', (req, res) => {
-  res.sendFile(path.join(publicDir, 'comment-ca-marche.html'));
+  sendHtmlNoCache(res, 'comment-ca-marche.html');
 });
 
 app.get('/engagement', (req, res) => {
-  res.sendFile(path.join(publicDir, 'engagement.html'));
+  sendHtmlNoCache(res, 'engagement.html');
 });
 
 app.get('/repertoire', (req, res) => {
-  res.sendFile(path.join(publicDir, 'repertoire.html'));
+  sendHtmlNoCache(res, 'repertoire.html');
 });
 
 app.get('/statistiques', (req, res) => {
-  res.sendFile(path.join(publicDir, 'statistiques.html'));
+  sendHtmlNoCache(res, 'statistiques.html');
 });
 
 // Fallback SPA pour les liens directs (ex: /join#...)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(publicDir, 'index.html'));
+  sendHtmlNoCache(res, 'index.html');
 });
 
 // Démarrage du serveur et vérification des tables
