@@ -81,6 +81,27 @@ export async function deriveBlindId(keyBytes) {
 }
 
 /**
+ * Dérive de manière déterministe les identifiants de quartier (Zero-Knowledge)
+ * circleHash = SHA-256("pacte_neighborhood_channel_v1:" + fsa)
+ * keyBytes = SHA-256("pacte_neighborhood_key_v1:" + fsa)
+ */
+export async function deriveNeighborhoodCredentials(fsa) {
+  const normFsa = String(fsa || 'H2T').trim().toUpperCase().slice(0, 3);
+  const cryptoObj = getCrypto();
+  const enc = new TextEncoder();
+
+  const channelData = enc.encode(`pacte_neighborhood_channel_v1:${normFsa}`);
+  const channelHashBuf = await cryptoObj.subtle.digest('SHA-256', channelData);
+  const circleHash = bufToHex(channelHashBuf);
+
+  const keyData = enc.encode(`pacte_neighborhood_key_v1:${normFsa}`);
+  const keyHashBuf = await cryptoObj.subtle.digest('SHA-256', keyData);
+  const keyBytes = new Uint8Array(keyHashBuf);
+
+  return { circleHash, keyBytes, fsa: normFsa };
+}
+
+/**
  * Résout une Preuve de Travail (Proof-of-Work) légère
  * Calcule un nonce tel que SHA-256(payload + ':' + nonce) commence par '00'
  */

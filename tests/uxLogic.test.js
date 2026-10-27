@@ -30,6 +30,25 @@ describe('Logique UX & Simplification Citoyenne (app.js)', () => {
       msgFb,
       'Salut ! Dès qu\'on est 3 à s\'inscrire, on quitte Facebook ensemble. Rejoins mon groupe ici : https://pactenumerique.ca/#cercle=123&k=abc'
     );
+
+    // Nouveaux seuils stratégiques : 7, 13, 21
+    const msg7 = getReadyInviteMessage(inviteUrl, 7, ['Instagram']);
+    assert.strictEqual(
+      msg7,
+      'Salut ! Dès qu\'on est 7 à s\'inscrire, on quitte Instagram ensemble. Rejoins mon groupe ici : https://pactenumerique.ca/#cercle=123&k=abc'
+    );
+
+    const msg13 = getReadyInviteMessage(inviteUrl, 13, ['X / Twitter']);
+    assert.strictEqual(
+      msg13,
+      'Salut ! Dès qu\'on est 13 à s\'inscrire, on quitte X ensemble. Rejoins mon groupe ici : https://pactenumerique.ca/#cercle=123&k=abc'
+    );
+
+    const msg21 = getReadyInviteMessage(inviteUrl, 21, ['Facebook']);
+    assert.strictEqual(
+      msg21,
+      'Salut ! Dès qu\'on est 21 à s\'inscrire, on quitte Facebook ensemble. Rejoins mon groupe ici : https://pactenumerique.ca/#cercle=123&k=abc'
+    );
   });
 
   it('génère le message préformaté de preuve sociale pour publication sur X / Facebook', async () => {
@@ -39,6 +58,12 @@ describe('Logique UX & Simplification Citoyenne (app.js)', () => {
     assert.strictEqual(
       msg,
       'J’ai signé le pacte pour basculer vers un réseau libre dès qu’on est 5 dans mon cercle. Rejoignez mon départ ici : https://pactenumerique.ca/#cercle=123&k=abc'
+    );
+
+    const msg13 = getSocialShareMessage(inviteUrl, 13, ['X / Twitter']);
+    assert.strictEqual(
+      msg13,
+      'J’ai signé le pacte pour basculer vers un réseau libre dès qu’on est 13 dans mon cercle. Rejoignez mon départ ici : https://pactenumerique.ca/#cercle=123&k=abc'
     );
   });
 
@@ -56,6 +81,18 @@ describe('Logique UX & Simplification Citoyenne (app.js)', () => {
     const htmlComplete = renderCriticalMassGauge(5, 5, true);
     assert.ok(htmlComplete.includes('Masse critique atteinte'));
     assert.ok(htmlComplete.includes('width: 100%;'));
+
+    // Test seuil 13 et 21
+    const html13 = renderCriticalMassGauge(7, 13, false);
+    assert.ok(html13.includes('Déjà 7 personnes sur 13'));
+    assert.ok(html13.includes('width: 54%;'));
+
+    const html21 = renderCriticalMassGauge(21, 21, true);
+    assert.ok(html21.includes('Masse critique atteinte'));
+    assert.ok(html21.includes('width: 100%;'));
+    // Doit contenir 21 avatars
+    const avatarCount = (html21.match(/class="gauge-avatar\s/g) || []).length;
+    assert.strictEqual(avatarCount, 21);
   });
 
   it('résout automatiquement les villes ou codes postaux sans forcer la saisie de RTA', () => {

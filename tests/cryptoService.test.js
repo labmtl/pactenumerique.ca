@@ -116,5 +116,38 @@ describe('Service Cryptographique & Zero-Knowledge', () => {
     assert.strictEqual(typeof nonce, 'number');
     assert.strictEqual(verifyProofOfWork(blindId, nonce), true);
   });
+
+  it('dérive de manière déterministe les identifiants de quartier (deriveNeighborhoodCredentials)', async () => {
+    const { deriveNeighborhoodCredentials, encryptMessage, decryptMessage } = await import('../public/js/crypto.js');
+
+    const res1 = await deriveNeighborhoodCredentials('H2T');
+    assert.strictEqual(res1.fsa, 'H2T');
+    assert.strictEqual(res1.circleHash.length, 64);
+    assert.match(res1.circleHash, /^[0-9a-f]{64}$/);
+    assert.strictEqual(res1.keyBytes.length, 32);
+
+    // Déterminisme et insensibilité à la casse
+    const res2 = await deriveNeighborhoodCredentials('  h2t  ');
+    assert.strictEqual(res2.circleHash, res1.circleHash);
+    assert.deepStrictEqual(res2.keyBytes, res1.keyBytes);
+
+    // Secteurs différents = clés et canaux différents
+    const resQc = await deriveNeighborhoodCredentials('G1K');
+    assert.notStrictEqual(resQc.circleHash, res1.circleHash);
+    assert.notDeepStrictEqual(resQc.keyBytes, res1.keyBytes);
+
+    // E2EE sur le canal de quartier
+    const payload = JSON.stringify({
+      type: 'neighborhood_handle',
+      platform: 'Mastodon',
+      handle: '@voisin@qlub.ca',
+      note: 'Voisin du Mile-End'
+    });
+    const encrypted = await encryptMessage(payload, res1.keyBytes);
+    const decrypted = await decryptMessage(encrypted, res1.keyBytes);
+    const parsed = JSON.parse(decrypted);
+    assert.strictEqual(parsed.handle, '@voisin@qlub.ca');
+    assert.strictEqual(parsed.platform, 'Mastodon');
+  });
 });
 

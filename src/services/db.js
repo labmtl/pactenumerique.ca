@@ -182,7 +182,7 @@ export async function saveCommitment({ id, fsa, province, emailHash, encryptedEm
 /**
  * Crée un cercle aveugle
  */
-export async function createBlindCircle({ blindId, targetCount = 5 }) {
+export async function createBlindCircle({ blindId, targetCount = 13 }) {
   const p = await getDb();
   if (p) {
     await p.query(

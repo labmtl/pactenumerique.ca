@@ -8,7 +8,9 @@ export const state = {
   inviterCircleId: null,
   circleKeyBytes: null,
   myBlindCircleId: null,
-  targetCount: 5,
+  targetCount: 13,
+  joinNeighborhood: true,
+  activeCircleTab: 'private',
   pushSubscription: null,
   isPushActive: false,
   userProvince: 'QC', // Détecté via code postal ou ville (par défaut QC)

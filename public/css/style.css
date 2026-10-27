@@ -2833,5 +2833,424 @@ button {
   color: #065f46;
 }
 
+/* ==========================================================================
+   Onglets Cercle Privé vs Groupe de Quartier Géolocalisé
+   ========================================================================== */
+.circle-view-tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-body, #f8fafc);
+  padding: 0.35rem;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--border-color, #e2e8f0);
+  margin: 1rem 0 1.25rem 0;
+}
+
+.circle-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.circle-tab:hover {
+  color: var(--text-main, #0f172a);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.circle-tab.active {
+  background: #ffffff;
+  color: var(--accent-red, #dc2626);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.circle-tab .tab-badge {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--border-color, #e2e8f0);
+  color: var(--text-main, #0f172a);
+  font-weight: 700;
+}
+
+.circle-tab.active .tab-badge {
+  background: var(--accent-red-bg, #fef2f2);
+  color: var(--accent-red, #dc2626);
+}
+
+/* Option d'adhésion au groupe de quartier dans le formulaire */
+.neighborhood-optin-box {
+  background: var(--accent-indigo-bg, #f5f3ff);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.85rem 1rem;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+}
+
+.neighborhood-optin-box:hover {
+  border-color: rgba(99, 102, 241, 0.45);
+}
+
+.custom-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-checkbox-label input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.15rem;
+  accent-color: var(--accent-indigo, #6366f1);
+  cursor: pointer;
+}
+
+.custom-checkbox-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-main, #0f172a);
+}
+
+.neighborhood-help-text {
+  font-size: 0.76rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.35;
+}
+
+/* ==========================================================================
+   Groupe de Quartier Géolocalisé (Zero-Knowledge)
+   ========================================================================== */
+.neighborhood-group-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-lg, 14px);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.neighborhood-group-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.neighborhood-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.neighborhood-header-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.neighborhood-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.fsa-badge {
+  background: var(--accent-red, #dc2626);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full, 9999px);
+  letter-spacing: 0.03em;
+}
+
+.city-badge {
+  background: var(--accent-indigo-bg, #e0e7ff);
+  color: var(--accent-indigo, #4338ca);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.zk-badge {
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid #a7f3d0;
+}
+
+.neighborhood-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+
+.neighborhood-subtitle {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.4;
+}
+
+/* Annuaire des identifiants partagés */
+.neighborhood-handles-box {
+  background: #fafaf9;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 10px);
+  padding: 1rem;
+}
+
+.handles-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.handles-title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+
+.handles-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-indigo, #6366f1);
+  background: var(--accent-indigo-bg, #e0e7ff);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.neighborhood-handles-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.handles-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted, #64748b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.neighborhood-handle-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.handle-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.platform-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.platform-pill.mastodon {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.platform-pill.matrix {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.platform-pill.pixelfed {
+  background: #fdf2f8;
+  color: #be185d;
+}
+
+.platform-pill.lemmy {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.platform-pill.autre {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.handle-date {
+  font-size: 0.7rem;
+  color: var(--text-muted, #64748b);
+}
+
+.handle-card-address {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  word-break: break-all;
+}
+
+.handle-card-address .handle-link {
+  color: var(--accent-red, #dc2626);
+  text-decoration: none;
+}
+
+.handle-card-address .handle-link:hover {
+  text-decoration: underline;
+}
+
+.handle-note {
+  margin: 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--text-muted, #64748b);
+  line-height: 1.35;
+}
+
+.handle-card-author {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  margin-top: auto;
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--border-color, #e2e8f0);
+}
+
+/* Accordéon de partage */
+.share-handle-accordion {
+  border-top: 1px dashed var(--border-color, #e2e8f0);
+  padding-top: 0.75rem;
+}
+
+.btn-open-share-handle {
+  font-size: 0.84rem;
+  color: var(--accent-red, #dc2626);
+  cursor: pointer;
+  user-select: none;
+}
+
+.share-handle-form {
+  margin-top: 0.75rem;
+}
+
+.share-handle-desc {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.78rem;
+  color: var(--text-muted, #64748b);
+}
+
+.share-handle-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-share-handle-submit {
+  background: var(--gradient-maple);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.55rem 0.95rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-share-handle-submit:hover {
+  opacity: 0.92;
+}
+
+/* Section discussion locale */
+.neighborhood-chat-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.neighborhood-chat-heading {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+
+.btn-neighborhood-prompt {
+  background: #f1f5f9;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-full, 9999px);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.74rem;
+  color: var(--text-muted, #475569);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-neighborhood-prompt:hover {
+  background: #e2e8f0;
+  color: var(--text-main, #0f172a);
+}
+
+/* Ajustements jauge pour 21 avatars */
+@media (max-width: 640px) {
+  .gauge-avatars-row {
+    gap: 0.45rem;
+  }
+  .gauge-avatar {
+    width: 38px;
+    height: 38px;
+  }
+  .gauge-avatar .avatar-icon {
+    font-size: 1rem;
+  }
+  .circle-tab {
+    font-size: 0.78rem;
+    padding: 0.5rem 0.65rem;
+  }
+}
+
 
 

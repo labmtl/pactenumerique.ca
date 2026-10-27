@@ -174,6 +174,10 @@ export function updatePostalCodeFeedback() {
         qcRecomBadge.style.display = 'none';
       }
     }
+    const optinFsaLabel = document.getElementById('optinFsaLabel');
+    if (optinFsaLabel) {
+      optinFsaLabel.textContent = `${resolved.fsa} (${resolved.city})`;
+    }
   } else {
     badge.style.display = 'none';
     if (qcRecomBadge) qcRecomBadge.style.display = 'none';

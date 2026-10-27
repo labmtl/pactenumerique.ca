@@ -4,10 +4,12 @@
  * Chiffrement symétrique de bout en bout AES-GCM (256-bit)
  */
 import { state, t, showToast } from './state.js';
-import { encryptMessage, decryptMessage, solveProofOfWork } from '../crypto.js';
+import { encryptMessage, decryptMessage, solveProofOfWork, deriveNeighborhoodCredentials } from '../crypto.js';
 import { formatLongevity } from './longevity.js';
+import { resolveLocationInput } from './geo.js';
 
 let relayPollInterval = null;
+let neighborhoodPollInterval = null;
 
 /**
  * Récupère et déchiffre les paquets déposés sur le relais public pour un cercle
@@ -521,4 +523,390 @@ export function renderMigrationGuide(containerEl, leavingNetwork, circleHash, ke
       }
     });
   }
+}
+
+/**
+ * Rendu du groupe social géolocalisé de quartier (Zero-Knowledge)
+ * Permet aux voisins d'un même secteur (RTA/FSA) de communiquer,
+ * coordonner leur départ et échanger leurs identifiants vers des plateformes souveraines.
+ */
+export async function renderNeighborhoodGroupChat(containerEl, rawFsa = 'H2T') {
+  if (!containerEl) return;
+
+  const resolved = resolveLocationInput(rawFsa);
+  const fsa = resolved.fsa || 'H2T';
+  const cityName = resolved.city || 'Quartier local';
+
+  const { circleHash, keyBytes } = await deriveNeighborhoodCredentials(fsa);
+
+  const savedPseudo = (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_pseudo')) || '';
+  const defaultPseudo = savedPseudo || (state.lang === 'fr' ? 'Voisin(e)' : 'Neighbor');
+
+  containerEl.innerHTML = `
+    <div class="neighborhood-group-card">
+      <div class="neighborhood-group-header">
+        <div class="neighborhood-title-group">
+          <span class="neighborhood-header-icon" aria-hidden="true">📍</span>
+          <div>
+            <div class="neighborhood-badge-row">
+              <span class="fsa-badge">RTA ${fsa}</span>
+              <span class="city-badge">${cityName}</span>
+              <span class="zk-badge">🔒 Zero-Knowledge AES-256</span>
+            </div>
+            <h4 class="neighborhood-title">${t('circle_widget.neighborhood_title') || 'Groupe local de quartier'} (${fsa})</h4>
+            <p class="neighborhood-subtitle">${t('circle_widget.neighborhood_subtitle') || 'Échangez avec les citoyens de votre secteur et partagez vos identifiants souverains pour créer un réseau local libre et résilient.'}</p>
+          </div>
+        </div>
+        <button type="button" class="btn-refresh-relay" id="btnRefreshNeighborhood" title="Actualiser les messages">
+          🔄
+        </button>
+      </div>
+
+      <!-- Annuaire des identifiants souverains partagés dans le quartier -->
+      <div class="neighborhood-handles-box">
+        <div class="handles-box-header">
+          <h5 class="handles-title">🌐 ${t('circle_widget.neighborhood_directory_title') || 'Identifiants souverains partagés dans le quartier'}</h5>
+          <span class="handles-count" id="neighborhoodHandlesCount">0 profil</span>
+        </div>
+        
+        <div class="neighborhood-handles-list" id="neighborhoodHandlesList">
+          <div class="handles-empty-state">
+            <span>⏳</span> <span>Chargement des profils du quartier...</span>
+          </div>
+        </div>
+
+        <!-- Formulaire de partage d'identifiant souverain -->
+        <details class="share-handle-accordion" id="shareHandleAccordion" open>
+          <summary class="btn-open-share-handle">
+            <span>➕</span> <strong>${t('circle_widget.share_handle_heading') || 'Partager un identifiant souverain avec mes voisins'}</strong>
+          </summary>
+          <form class="share-handle-form" id="neighborhoodShareHandleForm">
+            <p class="share-handle-desc">${t('circle_widget.share_handle_desc') || 'Annoncez votre compte Mastodon, Pixelfed ou salon Matrix local pour que vos voisins puissent vous suivre et échanger :'}</p>
+            
+            <div class="share-handle-row">
+              <select id="neighborhoodPlatformSelect" class="input-select" style="max-width: 220px; font-size: 0.85rem;">
+                <option value="Mastodon">🐘 Mastodon / Fédiverse</option>
+                <option value="Matrix">💬 Salon Matrix / Chat</option>
+                <option value="Pixelfed">📸 Pixelfed / Photos</option>
+                <option value="Lemmy">📌 Lemmy / Forum</option>
+                <option value="Autre">🌐 Autre adresse souveraine</option>
+              </select>
+              <input 
+                type="text" 
+                id="neighborhoodHandleInput" 
+                class="input-field" 
+                placeholder="${t('circle_widget.share_handle_address_placeholder') || 'ex: @alice@qlub.ca ou #quartier:chat.quebec'}" 
+                required 
+                style="flex: 1; min-width: 220px;"
+              />
+            </div>
+
+            <div class="share-handle-row" style="margin-top: 0.5rem;">
+              <input 
+                type="text" 
+                id="neighborhoodNoteInput" 
+                class="input-field" 
+                placeholder="${t('circle_widget.share_handle_note_placeholder') || 'Un mot pour vos voisins (ex: Habitant du Plateau, au plaisir d\'échanger !)'}" 
+                maxlength="140"
+                style="flex: 1; min-width: 200px;"
+              />
+              <button type="submit" class="btn-share-handle-submit" id="btnSubmitNeighborhoodHandle">
+                ${t('circle_widget.share_handle_submit') || '📢 Partager avec mes voisins'}
+              </button>
+            </div>
+          </form>
+        </details>
+      </div>
+
+      <!-- Discussion locale entre voisins -->
+      <div class="neighborhood-chat-section">
+        <h5 class="neighborhood-chat-heading">💬 ${t('circle_widget.neighborhood_chat_title') || 'Discussion locale entre voisins'}</h5>
+
+        <!-- Flux des messages du quartier -->
+        <div class="relay-messages-stream neighborhood-stream" id="neighborhoodMessagesStream">
+          <div class="relay-loading-placeholder">
+            <span>⏳</span> <span>Déchiffrement des échanges du quartier...</span>
+          </div>
+        </div>
+
+        <!-- Suggestions de coordination de proximité -->
+        <div class="relay-quick-prompts">
+          <button type="button" class="btn-neighborhood-prompt" data-prompt="☕ Rencontre café numérique dans le quartier ce samedi ?">☕ Café numérique</button>
+          <button type="button" class="btn-neighborhood-prompt" data-prompt="💬 Qui a un salon Matrix pour notre coin ?">💬 Salon Matrix</button>
+          <button type="button" class="btn-neighborhood-prompt" data-prompt="❓ Quel serveur Mastodon me conseillez-vous ?">❓ Conseil Mastodon</button>
+        </div>
+
+        <!-- Formulaire d'envoi de message au quartier -->
+        <form class="relay-input-form" id="neighborhoodChatForm">
+          <input 
+            type="text" 
+            id="neighborhoodPseudoInput" 
+            class="relay-pseudo-field" 
+            placeholder="Pseudo" 
+            value="${defaultPseudo}"
+            maxlength="25"
+            title="Votre pseudo visible par vos voisins"
+          />
+          <input 
+            type="text" 
+            id="neighborhoodTextInput" 
+            class="relay-text-field" 
+            placeholder="${t('circle_widget.neighborhood_chat_placeholder') || 'Écrire un message chiffré aux voisins du secteur...'}"
+            maxlength="500" 
+            required 
+            autocomplete="off"
+          />
+          <button type="submit" class="btn-relay-send" id="btnNeighborhoodSend">
+            <span>Envoyer</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  `;
+
+  const handlesListEl = containerEl.querySelector('#neighborhoodHandlesList');
+  const handlesCountEl = containerEl.querySelector('#neighborhoodHandlesCount');
+  const streamEl = containerEl.querySelector('#neighborhoodMessagesStream');
+  const shareFormEl = containerEl.querySelector('#neighborhoodShareHandleForm');
+  const chatFormEl = containerEl.querySelector('#neighborhoodChatForm');
+  const textInput = containerEl.querySelector('#neighborhoodTextInput');
+  const pseudoInput = containerEl.querySelector('#neighborhoodPseudoInput');
+  const refreshBtn = containerEl.querySelector('#btnRefreshNeighborhood');
+
+  // Chargement et affichage des messages et annuaires
+  async function loadAndDisplayNeighborhoodData() {
+    try {
+      const messages = await fetchAndDecryptRelayBlobs(circleHash, keyBytes);
+
+      // 1. Filtrer les identifiants souverains partagés
+      const handleMsgs = messages.filter(m => m.type === 'neighborhood_handle' || m.sovereignHandle || (m.handle && m.platform));
+      
+      if (handlesCountEl) {
+        handlesCountEl.textContent = `${handleMsgs.length} profil${handleMsgs.length > 1 ? 's' : ''}`;
+      }
+
+      if (handlesListEl) {
+        if (handleMsgs.length === 0) {
+          handlesListEl.innerHTML = `
+            <div class="handles-empty-state">
+              <span>🌱</span>
+              <p>${t('circle_widget.neighborhood_directory_empty') || 'Aucun profil partagé pour l\'instant. Soyez le premier citoyen à annoncer votre profil !'}</p>
+            </div>
+          `;
+        } else {
+          handlesListEl.innerHTML = handleMsgs.map(item => {
+            const platform = item.platform || 'Mastodon';
+            const handle = item.sovereignHandle || item.handle || '';
+            const author = item.author || (state.lang === 'fr' ? 'Voisin(e)' : 'Neighbor');
+            const note = item.note ? `<p class="handle-note">« ${item.note.replace(/</g, '&lt;').replace(/>/g, '&gt;')} »</p>` : '';
+            const dateStr = item.timestamp ? new Date(item.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+
+            let icon = '🐘';
+            if (platform.includes('Matrix')) icon = '💬';
+            else if (platform.includes('Pixelfed')) icon = '📸';
+            else if (platform.includes('Lemmy')) icon = '📌';
+            else if (platform.includes('Autre')) icon = '🌐';
+
+            // Lien cliquable si web ou matrix
+            let linkHtml = `<strong>${handle}</strong>`;
+            if (/^https?:\/\//i.test(handle)) {
+              linkHtml = `<a href="${handle}" target="_blank" rel="noopener noreferrer" class="handle-link">${handle} ↗</a>`;
+            } else if (/^@[\w.-]+@[\w.-]+$/i.test(handle)) {
+              const [ , user, domain ] = handle.split('@');
+              linkHtml = `<a href="https://${domain}/@${user}" target="_blank" rel="noopener noreferrer" class="handle-link">${handle} ↗</a>`;
+            }
+
+            let sourceBadge = '';
+            if (item.sourceProfile) {
+              const raw = String(item.sourceProfile).trim();
+              const clean = raw.replace(/^https?:\/\/(www\.)?/, '');
+              const href = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+              sourceBadge = `<a href="${href}" target="_blank" rel="noopener noreferrer" class="relay-source-profile-tag" title="Ex-profil commercial">🔗 ${clean}</a>`;
+            }
+
+            return `
+              <div class="neighborhood-handle-card">
+                <div class="handle-card-top">
+                  <span class="platform-pill ${platform.toLowerCase()}">${icon} ${platform}</span>
+                  ${sourceBadge}
+                  <span class="handle-date">${dateStr}</span>
+                </div>
+                <div class="handle-card-address">${linkHtml}</div>
+                ${note}
+                <div class="handle-card-author">Partagé par <strong>${author}</strong></div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // 2. Afficher la boîte de discussion locale
+      if (streamEl) {
+        if (messages.length === 0) {
+          streamEl.innerHTML = `
+            <div class="relay-empty-state">
+              <span class="empty-icon">💬</span>
+              <p>${t('circle_widget.neighborhood_empty_chat') || `Bienvenue dans l'espace de quartier ${fsa} ! Envoyez un premier message pour briser la glace avec vos voisins.`}</p>
+            </div>
+          `;
+        } else {
+          streamEl.innerHTML = messages.map(msg => {
+            const author = msg.author || (state.lang === 'fr' ? 'Voisin(e)' : 'Neighbor');
+            const isMe = author.toLowerCase() === (pseudoInput?.value || defaultPseudo).toLowerCase();
+            const dateStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            const text = (msg.text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            let extraTag = '';
+            if (msg.type === 'neighborhood_handle' || msg.sovereignHandle) {
+              extraTag = `<div class="relay-handle-tag">🏷️ Profil partagé : <strong>${msg.sovereignHandle || msg.handle}</strong> (${msg.platform || 'Souverain'})</div>`;
+            }
+
+            let sourceBadge = '';
+            if (msg.sourceProfile) {
+              const raw = String(msg.sourceProfile).trim();
+              const cleanDisplay = raw.replace(/^https?:\/\/(www\.)?/, '');
+              const href = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+              sourceBadge = `<a href="${href}" target="_blank" rel="noopener noreferrer" class="relay-source-profile-tag" title="Profil vérifié sur la plateforme source">🔗 ${cleanDisplay}</a>`;
+            }
+
+            return `
+              <div class="relay-msg-bubble ${isMe ? 'is-me' : 'is-friend'}">
+                <div class="relay-msg-header">
+                  <span class="relay-msg-author">${author}</span>
+                  ${sourceBadge}
+                  <span class="relay-msg-time">${dateStr}</span>
+                </div>
+                <div class="relay-msg-body">${text}</div>
+                ${extraTag}
+              </div>
+            `;
+          }).join('');
+
+          streamEl.scrollTop = streamEl.scrollHeight;
+        }
+      }
+    } catch (err) {
+      if (streamEl) {
+        streamEl.innerHTML = `<p style="color:var(--accent-rose); font-size:0.85rem;">Erreur de déchiffrement : ${err.message}</p>`;
+      }
+    }
+  }
+
+  // Chargement initial
+  await loadAndDisplayNeighborhoodData();
+
+  // Actualisation manuelle
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.classList.add('spinning');
+      await loadAndDisplayNeighborhoodData();
+      setTimeout(() => refreshBtn.classList.remove('spinning'), 500);
+    });
+  }
+
+  // Écouteurs pour les prompts de quartier
+  containerEl.querySelectorAll('.btn-neighborhood-prompt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prompt = btn.getAttribute('data-prompt');
+      if (textInput && prompt) {
+        textInput.value = prompt;
+        textInput.focus();
+      }
+    });
+  });
+
+  // Soumission de partage d'identifiant souverain
+  if (shareFormEl) {
+    shareFormEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const platformSelect = containerEl.querySelector('#neighborhoodPlatformSelect');
+      const handleInput = containerEl.querySelector('#neighborhoodHandleInput');
+      const noteInput = containerEl.querySelector('#neighborhoodNoteInput');
+      const submitBtn = containerEl.querySelector('#btnSubmitNeighborhoodHandle');
+
+      const platform = platformSelect ? platformSelect.value : 'Mastodon';
+      const handle = handleInput ? handleInput.value.trim() : '';
+      const note = noteInput ? noteInput.value.trim() : '';
+      const author = pseudoInput ? pseudoInput.value.trim() : defaultPseudo;
+
+      if (!handle) return;
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        if (typeof localStorage !== 'undefined' && author) {
+          localStorage.setItem('pacte_my_pseudo', author);
+        }
+
+        const savedSourceProfile = state.savedCircleData?.sourceProfile || (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_source_profile')) || null;
+
+        await postEncryptedRelayMessage(circleHash, keyBytes, {
+          type: 'neighborhood_handle',
+          author,
+          platform,
+          sovereignHandle: handle,
+          note: note || null,
+          sourceProfile: savedSourceProfile,
+          text: `J'ai partagé mon profil ${platform} (${handle}) avec les voisins du secteur !`,
+          timestamp: Date.now()
+        });
+
+        if (handleInput) handleInput.value = '';
+        if (noteInput) noteInput.value = '';
+        showToast(state.lang === 'fr' ? 'Profil souverain partagé avec vos voisins !' : 'Sovereign handle shared with neighbors!');
+        await loadAndDisplayNeighborhoodData();
+      } catch (err) {
+        alert(err.message || 'Erreur lors du partage');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // Soumission de message dans la discussion locale
+  if (chatFormEl) {
+    chatFormEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = textInput ? textInput.value.trim() : '';
+      const author = pseudoInput ? pseudoInput.value.trim() : defaultPseudo;
+
+      if (!text) return;
+
+      const sendBtn = containerEl.querySelector('#btnNeighborhoodSend');
+      if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.textContent = '...';
+      }
+
+      try {
+        if (typeof localStorage !== 'undefined' && author) {
+          localStorage.setItem('pacte_my_pseudo', author);
+        }
+
+        const savedSourceProfile = state.savedCircleData?.sourceProfile || (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_source_profile')) || null;
+
+        await postEncryptedRelayMessage(circleHash, keyBytes, {
+          type: 'chat',
+          author,
+          sourceProfile: savedSourceProfile,
+          text,
+          timestamp: Date.now()
+        });
+
+        if (textInput) textInput.value = '';
+        await loadAndDisplayNeighborhoodData();
+        showToast(state.lang === 'fr' ? 'Message de quartier déposé !' : 'Neighborhood message posted!');
+      } catch (err) {
+        alert(err.message || 'Erreur lors de l\'envoi');
+      } finally {
+        if (sendBtn) {
+          sendBtn.disabled = false;
+          sendBtn.textContent = 'Envoyer';
+        }
+      }
+    });
+  }
+
+  // Polling automatique discret toutes les 20 secondes
+  if (neighborhoodPollInterval) clearInterval(neighborhoodPollInterval);
+  neighborhoodPollInterval = setInterval(loadAndDisplayNeighborhoodData, 20000);
 }

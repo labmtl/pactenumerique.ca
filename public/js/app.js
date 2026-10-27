@@ -13,6 +13,7 @@ export * from './modules/push-ui.js';
 export * from './modules/pact-form.js';
 export * from './modules/stats.js';
 export * from './modules/relay-chat.js';
+export * from './crypto.js';
 
 // 2. Imports internes pour l'initialisation de l'application
 import { state, t, setupLanguage, applyTranslations, showToast } from './modules/state.js';
@@ -118,7 +119,7 @@ function setupEventListeners() {
       document.querySelectorAll('.threshold-btn').forEach(b => b.classList.remove('active'));
       const target = e.currentTarget;
       target.classList.add('active');
-      state.targetCount = Number(target.dataset.threshold) || 5;
+      state.targetCount = Number(target.dataset.threshold) || 13;
     });
   });
 

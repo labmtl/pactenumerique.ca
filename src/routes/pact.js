@@ -71,7 +71,7 @@ router.post('/commit', async (req, res) => {
       }
       await createBlindCircle({
         blindId: blind_circle_id,
-        targetCount: Math.min(Math.max(Number(target_count) || 5, 2), 50)
+        targetCount: Math.min(Math.max(Number(target_count) || 13, 2), 50)
       });
 
       if (push_subscription) {

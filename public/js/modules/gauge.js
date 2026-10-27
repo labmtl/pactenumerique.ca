@@ -35,7 +35,7 @@ export function renderCriticalMassGauge(currentCount, targetCount, isUnlocked) {
   }
 
   const avatars = [];
-  const displayLimit = Math.min(targetCount, 10);
+  const displayLimit = Math.min(targetCount, 21);
   for (let i = 0; i < displayLimit; i++) {
     const isJoined = i < currentCount;
     const isMe = i === 0;
@@ -76,7 +76,7 @@ export function renderCriticalMassGauge(currentCount, targetCount, isUnlocked) {
 /**
  * Génère un message d'invitation concret et prêt à l'envoi
  */
-export function getReadyInviteMessage(inviteUrl, targetCount = 5, networks = null) {
+export function getReadyInviteMessage(inviteUrl, targetCount = 13, networks = null) {
   let netText = 'la Big Tech';
   if (networks && networks.length > 0) {
     const netList = Array.isArray(networks) ? networks : Array.from(networks);
@@ -101,7 +101,7 @@ export function getReadyInviteMessage(inviteUrl, targetCount = 5, networks = nul
  * Génère le message ciblé pour publication sociale sur la plateforme d'origine
  * (Format officiel requis pour le recrutement et la validation sociale)
  */
-export function getSocialShareMessage(inviteUrl, targetCount = 5, networks = null) {
+export function getSocialShareMessage(inviteUrl, targetCount = 13, networks = null) {
   if (state.lang === 'en') {
     return `I signed the pledge to switch to an open network as soon as there are ${targetCount} of us in my circle. Join my departure here: ${inviteUrl}`;
   }

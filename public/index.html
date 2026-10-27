@@ -149,17 +149,17 @@
             
             <p class="input-help" style="margin-bottom: 0.75rem;" data-i18n="form.threshold_label">Combien d'amis doivent vous rejoindre pour déclencher votre départ ?</p>
             <div class="threshold-options">
-              <button type="button" class="threshold-btn" data-threshold="3">
-                3 amis
-                <span data-i18n="form.threshold_opt_3">Rapide</span>
+              <button type="button" class="threshold-btn" data-threshold="7">
+                7 amis
+                <span data-i18n="form.threshold_opt_7">Noyau actif</span>
               </button>
-              <button type="button" class="threshold-btn active" data-threshold="5">
-                5 amis
-                <span data-i18n="form.threshold_opt_5">Recommandé</span>
+              <button type="button" class="threshold-btn active" data-threshold="13">
+                13 amis
+                <span data-i18n="form.threshold_opt_13">Recommandé</span>
               </button>
-              <button type="button" class="threshold-btn" data-threshold="10">
-                10 amis
-                <span data-i18n="form.threshold_opt_10">Cercle étendu</span>
+              <button type="button" class="threshold-btn" data-threshold="21">
+                21 amis
+                <span data-i18n="form.threshold_opt_21">Mouvement local</span>
               </button>
             </div>
 
@@ -189,6 +189,17 @@
               </div>
 
               <p class="input-help" data-i18n="form.postal_help">Aucune adresse exacte requise. Permet uniquement de regrouper les engagements citoyens de votre secteur.</p>
+
+              <!-- Option groupe de quartier souverain géolocalisé -->
+              <div class="neighborhood-optin-box" id="neighborhoodOptinBox">
+                <label class="custom-checkbox-label" for="joinNeighborhoodInput">
+                  <input type="checkbox" id="joinNeighborhoodInput" checked>
+                  <span class="custom-checkbox-text">
+                    <span>📍 <strong data-i18n="form.neighborhood_optin_title">Rejoindre le groupe local de mon secteur (<span id="optinFsaLabel">H2T (Plateau)</span>)</strong></span>
+                    <span class="neighborhood-help-text" data-i18n="form.neighborhood_optin_desc">Échangez avec vos voisins et partagez vos identifiants vers des plateformes souveraines (Mastodon, Matrix, Lemmy) pour créer des petits groupes sociaux géolocalisés.</span>
+                  </span>
+                </label>
+              </div>
             </div>
 
             <!-- Option notification appareil (optionnelle, sans compte ni courriel) -->

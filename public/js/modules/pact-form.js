@@ -15,13 +15,19 @@ import { syncPushSubscriptionWithCircle, testLocalNotification } from './push-ui
 import {
   generateRandomKeyBytes,
   deriveBlindId,
+  deriveNeighborhoodCredentials,
   bufToBase64Url,
   base64UrlToBuf,
   solveProofOfWork
 } from '../crypto.js';
 import { checkOrRestorePushSubscription } from '../push.js';
 import { loadTerritoryStats } from './stats.js';
-import { renderRelayChat, renderMigrationGuide, postEncryptedRelayMessage } from './relay-chat.js';
+import {
+  renderRelayChat,
+  renderMigrationGuide,
+  postEncryptedRelayMessage,
+  renderNeighborhoodGroupChat
+} from './relay-chat.js';
 
 /**
  * Détection du parrainage aveugle dans le fragment d'URL (#cercle=...&k=...)
@@ -69,7 +75,7 @@ export async function renderGuestInviteWidget(circleHash, keyBytes) {
   if (!widget) return;
 
   let currentCount = 1;
-  let targetCount = 5;
+  let targetCount = 13;
   let unlocked = false;
 
   try {
@@ -191,7 +197,7 @@ export async function restoreSavedCircle() {
         state.circleKeyBytes = base64UrlToBuf(data.keyB64);
       }
       if (data.targetCount) {
-        state.targetCount = Number(data.targetCount) || 5;
+        state.targetCount = Number(data.targetCount) || 13;
       }
       if (data.chosenAlternativeId) {
         state.chosenAlternativeId = data.chosenAlternativeId;
@@ -228,7 +234,7 @@ export async function renderMyCircleWidget() {
 
   // Interroger le statut en direct depuis l'API
   let currentCount = 1;
-  let targetCount = Number(saved.targetCount) || 5;
+  let targetCount = Number(saved.targetCount) || 13;
   let unlocked = false;
 
   try {
@@ -288,17 +294,36 @@ export async function renderMyCircleWidget() {
       <div>${statusBadge}</div>
     </div>
 
-    <!-- Jauge de masse critique visuelle et intuitive -->
-    ${renderCriticalMassGauge(currentCount, targetCount, unlocked)}
+    <!-- Sélecteur d'onglets : Cercle privé vs Voisins du quartier -->
+    <div class="circle-view-tabs" role="tablist">
+      <button type="button" class="circle-tab ${state.activeCircleTab !== 'neighborhood' ? 'active' : ''}" id="tabPrivateCircle" role="tab" aria-selected="${state.activeCircleTab !== 'neighborhood'}">
+        👥 <span>${t('circle_widget.tab_my_circle') || 'Mon cercle privé'}</span>
+        <span class="tab-badge">${currentCount}/${targetCount}</span>
+      </button>
+      <button type="button" class="circle-tab ${state.activeCircleTab === 'neighborhood' ? 'active' : ''}" id="tabNeighborhoodGroup" role="tab" aria-selected="${state.activeCircleTab === 'neighborhood'}">
+        📍 <span>${t('circle_widget.tab_neighborhood') || 'Voisins du quartier'} (${saved.fsa || 'H2T'})</span>
+      </button>
+    </div>
 
-    <!-- Boîte de message tout prêt pour X, Facebook, LinkedIn, SMS ou WhatsApp -->
-    ${renderReadyShareBox(inviteUrl, targetCount, saved.leavingNetworks, 'myCircle')}
+    <!-- VUE 1 : Mon cercle privé -->
+    <div id="panePrivateCircle" class="circle-view-pane" style="display: ${state.activeCircleTab !== 'neighborhood' ? 'block' : 'none'};">
+      <!-- Jauge de masse critique visuelle et intuitive -->
+      ${renderCriticalMassGauge(currentCount, targetCount, unlocked)}
 
-    <!-- Boîte morte chiffrée (Mini-clavardage asynchrone Zero-Knowledge) -->
-    <div id="myCircleRelayChatContainer" style="margin-top: 1.25rem;"></div>
+      <!-- Boîte de message tout prêt pour X, Facebook, LinkedIn, SMS ou WhatsApp -->
+      ${renderReadyShareBox(inviteUrl, targetCount, saved.leavingNetworks, 'myCircle')}
 
-    <!-- Guide de migration coordonnée (déverrouillé au seuil) -->
-    <div id="myCircleMigrationGuideContainer" style="margin-top: 1.25rem;"></div>
+      <!-- Boîte morte chiffrée (Mini-clavardage asynchrone Zero-Knowledge) -->
+      <div id="myCircleRelayChatContainer" style="margin-top: 1.25rem;"></div>
+
+      <!-- Guide de migration coordonnée (déverrouillé au seuil) -->
+      <div id="myCircleMigrationGuideContainer" style="margin-top: 1.25rem;"></div>
+    </div>
+
+    <!-- VUE 2 : Groupe géolocalisé de quartier (Voisins) -->
+    <div id="paneNeighborhoodGroup" class="circle-view-pane" style="display: ${state.activeCircleTab === 'neighborhood' ? 'block' : 'none'};">
+      <div id="myNeighborhoodChatContainer" style="margin-top: 0.5rem;"></div>
+    </div>
 
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem; margin-top:1rem;">
       <div id="myCirclePushStatus" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
@@ -318,6 +343,42 @@ export async function renderMyCircleWidget() {
       </button>
     </div>
   `;
+
+  // Gestion des onglets
+  const tabPrivateBtn = widget.querySelector('#tabPrivateCircle');
+  const tabNeighborhoodBtn = widget.querySelector('#tabNeighborhoodGroup');
+  const panePrivate = widget.querySelector('#panePrivateCircle');
+  const paneNeighborhood = widget.querySelector('#paneNeighborhoodGroup');
+  const neighContainer = widget.querySelector('#myNeighborhoodChatContainer');
+
+  function switchTab(targetTab) {
+    state.activeCircleTab = targetTab;
+    if (targetTab === 'neighborhood') {
+      tabPrivateBtn?.classList.remove('active');
+      tabPrivateBtn?.setAttribute('aria-selected', 'false');
+      tabNeighborhoodBtn?.classList.add('active');
+      tabNeighborhoodBtn?.setAttribute('aria-selected', 'true');
+      if (panePrivate) panePrivate.style.display = 'none';
+      if (paneNeighborhood) paneNeighborhood.style.display = 'block';
+      if (neighContainer) {
+        renderNeighborhoodGroupChat(neighContainer, saved.fsa || 'H2T');
+      }
+    } else {
+      tabNeighborhoodBtn?.classList.remove('active');
+      tabNeighborhoodBtn?.setAttribute('aria-selected', 'false');
+      tabPrivateBtn?.classList.add('active');
+      tabPrivateBtn?.setAttribute('aria-selected', 'true');
+      if (paneNeighborhood) paneNeighborhood.style.display = 'none';
+      if (panePrivate) panePrivate.style.display = 'block';
+    }
+  }
+
+  tabPrivateBtn?.addEventListener('click', () => switchTab('private'));
+  tabNeighborhoodBtn?.addEventListener('click', () => switchTab('neighborhood'));
+
+  if (state.activeCircleTab === 'neighborhood' && neighContainer) {
+    renderNeighborhoodGroupChat(neighContainer, saved.fsa || 'H2T');
+  }
 
   // Attache les écouteurs pour la boîte de partage (X, Facebook, LinkedIn, SMS, WhatsApp)
   attachShareBoxListeners('myCircle', inviteUrl, getReadyInviteMessage(inviteUrl, targetCount, saved.leavingNetworks));
@@ -480,6 +541,9 @@ export async function handlePactSubmit(e) {
     const sourceProfileInput = document.getElementById('sourceProfileInput');
     const sourceProfile = sourceProfileInput ? sourceProfileInput.value.trim() : '';
 
+    const joinNeighborhoodCheck = document.getElementById('joinNeighborhoodInput');
+    const joinNeighborhood = joinNeighborhoodCheck ? joinNeighborhoodCheck.checked : true;
+
     // Sauvegarder dans localStorage pour conserver la progression au rechargement
     const myCircleData = {
       blindId: state.myBlindCircleId,
@@ -489,12 +553,31 @@ export async function handlePactSubmit(e) {
       createdAt: new Date().toISOString(),
       chosenAlternativeId: state.chosenAlternativeId,
       leavingNetworks: Array.from(state.selectedNetworks),
-      sourceProfile: sourceProfile || null
+      sourceProfile: sourceProfile || null,
+      joinNeighborhood: joinNeighborhood
     };
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('pacte_my_circle', JSON.stringify(myCircleData));
     }
     state.savedCircleData = myCircleData;
+
+    // Message amical initial dans le groupe de quartier si activé
+    if (joinNeighborhood) {
+      try {
+        const { circleHash: neighHash, keyBytes: neighKey } = await deriveNeighborhoodCredentials(fsa);
+        await postEncryptedRelayMessage(neighHash, neighKey, {
+          type: 'chat',
+          author: (sourceProfile ? sourceProfile.replace(/^https?:\/\/(www\.)?/, '') : '') || (state.lang === 'fr' ? 'Nouveau voisin' : 'New neighbor'),
+          sourceProfile: sourceProfile || null,
+          text: state.lang === 'fr'
+            ? `Pacte signé dans le secteur ${fsa} ! Prêt(e) à coordonner notre départ des réseaux commerciaux.`
+            : `Pledge signed in ${fsa} area! Ready to coordinate our departure from commercial networks.`,
+          timestamp: Date.now()
+        });
+      } catch (neighErr) {
+        console.warn('[Quartier] Message initial non déposé:', neighErr);
+      }
+    }
 
     // Déposer le message initial sur la boîte morte chiffrée
     try {
