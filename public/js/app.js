@@ -25,7 +25,8 @@ import {
   restoreSavedCircle,
   renderMyCircleWidget,
   handlePactSubmit,
-  handleCopyInviteLink
+  handleCopyInviteLink,
+  updatePledgeStatement
 } from './modules/pact-form.js';
 import { loadTerritoryStats } from './modules/stats.js';
 import { playCelebrationChime } from './modules/gauge.js';
@@ -69,6 +70,7 @@ function setupEventListeners() {
       card.classList.add('active');
       const net = card.dataset.network;
       state.selectedNetworks = new Set([net]);
+      updatePledgeStatement();
 
       const iconEl = document.getElementById('sourceProfilePrefixIcon');
       const inputEl = document.getElementById('sourceProfileInput');
@@ -120,6 +122,7 @@ function setupEventListeners() {
       const target = e.currentTarget;
       target.classList.add('active');
       state.targetCount = Number(target.dataset.threshold) || 13;
+      updatePledgeStatement();
     });
   });
 
@@ -271,10 +274,12 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       updatePostalCodeFeedback();
       renderRecommendations();
       renderDirectory();
+      updatePledgeStatement();
     });
 
     detectInviteHash();
     setupEventListeners();
+    updatePledgeStatement();
     loadTerritoryStats();
     await loadAlternatives();
     await registerServiceWorker();

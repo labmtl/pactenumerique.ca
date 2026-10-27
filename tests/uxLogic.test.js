@@ -174,5 +174,7 @@ describe('Logique UX & Simplification Citoyenne (app.js)', () => {
     assert.ok(!engagementHtml.includes('3 caractères de la RTA'), 'engagement.html ne doit plus imposer de jargon administratif (RTA)');
     assert.ok(!engagementHtml.includes('Je veux quitter '), 'les cartes de plateformes doivent être concises sans répéter "Je veux quitter"');
     assert.ok(engagementHtml.includes('pact-optional-details'), 'les options secondaires doivent être repliées dans un accordéon <details> par défaut');
+    assert.ok(engagementHtml.includes('id="pseudoInput"'), 'engagement.html doit capturer un prénom ou pseudo pour identifier le membre auprès de ses amis');
+    assert.ok(engagementHtml.includes('id="pactPledgeStatement"') && engagementHtml.includes('Je m\'engage à quitter'), 'engagement.html doit afficher explicitement le texte de l\'engagement ("Je m\'engage à...") au-dessus de la signature');
   });
 });

@@ -36,10 +36,11 @@ export function renderCriticalMassGauge(currentCount, targetCount, isUnlocked) {
 
   const avatars = [];
   const displayLimit = Math.min(targetCount, 21);
+  const myCustomName = state.savedCircleData?.pseudo || (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_pseudo')) || '';
   for (let i = 0; i < displayLimit; i++) {
     const isJoined = i < currentCount;
     const isMe = i === 0;
-    const label = isMe ? (t('circle_widget.avatar_me') || 'Moi') : (isJoined ? (t('circle_widget.avatar_friend') || 'Ami') : '');
+    const label = isMe ? (myCustomName || t('circle_widget.avatar_me') || 'Moi') : (isJoined ? (t('circle_widget.avatar_friend') || 'Ami') : '');
     const avatarClass = isJoined ? (isMe ? 'gauge-avatar joined is-me' : 'gauge-avatar joined') : 'gauge-avatar waiting';
     const icon = isJoined ? (isMe ? '👤' : '👥') : '⏳';
 

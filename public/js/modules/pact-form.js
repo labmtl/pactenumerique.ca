@@ -23,6 +23,7 @@ import {
 import { checkOrRestorePushSubscription } from '../push.js';
 import { loadTerritoryStats } from './stats.js';
 import {
+  fetchAndDecryptRelayBlobs,
   renderRelayChat,
   renderMigrationGuide,
   postEncryptedRelayMessage,
@@ -101,23 +102,46 @@ export async function renderGuestInviteWidget(circleHash, keyBytes) {
 
   const percent = Math.min(100, Math.round((currentCount / targetCount) * 100));
 
+  // Découvrir le nom de l'initiateur et des membres via les messages chiffrés du groupe
+  let initiatorName = null;
+  try {
+    const msgs = await fetchAndDecryptRelayBlobs(circleHash, keyBytes);
+    if (msgs.length > 0 && msgs[0].author && !['Initiateur', 'Initiator', 'Moi', 'Me'].includes(msgs[0].author)) {
+      initiatorName = msgs[0].author.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  } catch {
+    // Ignorer si pas encore de messages
+  }
+
+  const savedGuestPseudo = (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_pseudo')) || '';
+
   widget.style.display = 'block';
   widget.innerHTML = `
     <div class="guest-invite-card">
       <div class="guest-invite-header">
-        <span class="guest-badge">💌 Invitation d'un proche</span>
+        <span class="guest-badge">💌 ${initiatorName ? `Invitation de ${initiatorName}` : 'Invitation d\'un proche'}</span>
         <h3 class="guest-title">On quitte les réseaux commerciaux ensemble ?</h3>
-        <p class="guest-desc">Un ami vous invite à faire le saut vers un réseau libre dès que le groupe est complet. Aucun compte ni courriel requis.</p>
+        <p class="guest-desc">${initiatorName ? `<strong>${initiatorName}</strong> vous invite` : 'Un ami vous invite'} à faire le saut vers un réseau libre dès que le groupe est complet. Aucun compte ni courriel requis.</p>
       </div>
 
       <!-- Jauge de progression du cercle d'amis -->
       ${renderCriticalMassGauge(currentCount, targetCount, unlocked)}
 
-      <div class="guest-join-action" style="text-align:center; margin: 1.25rem 0;">
-        <button type="button" class="btn-submit" id="btnGuestJoinCircle" style="max-width: 420px; margin: 0 auto;">
-          <span>🤝</span> <span>J'embarque dans le groupe (1 clic)</span>
+      <form class="guest-join-action" id="guestJoinForm" style="max-width: 440px; margin: 1.25rem auto; display: flex; flex-direction: column; gap: 0.65rem;">
+        <input
+          type="text"
+          id="guestPseudoInput"
+          class="input-field"
+          placeholder="${state.lang === 'fr' ? 'Votre prénom ou pseudo (pour vos amis)' : 'Your name or handle (for your friends)'}"
+          value="${savedGuestPseudo}"
+          maxlength="40"
+          required
+          style="text-align: center;"
+        />
+        <button type="submit" class="btn-submit" id="btnGuestJoinCircle" style="margin-top: 0;">
+          <span>🤝</span> <span>J'embarque dans le groupe</span>
         </button>
-      </div>
+      </form>
 
       <!-- Guide de migration si déjà débloqué -->
       <div id="guestMigrationGuide"></div>
@@ -146,23 +170,31 @@ export async function renderGuestInviteWidget(circleHash, keyBytes) {
     }
   }
 
+  const joinForm = widget.querySelector('#guestJoinForm');
   const joinBtn = widget.querySelector('#btnGuestJoinCircle');
-  if (joinBtn) {
-    joinBtn.addEventListener('click', async () => {
+  const guestPseudoEl = widget.querySelector('#guestPseudoInput');
+  if (joinForm && joinBtn) {
+    joinForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const guestPseudo = (guestPseudoEl ? guestPseudoEl.value.trim() : '') || (state.lang === 'fr' ? 'Ami(e)' : 'Friend');
       joinBtn.disabled = true;
       joinBtn.textContent = 'Connexion...';
       try {
+        if (typeof localStorage !== 'undefined' && guestPseudo) {
+          localStorage.setItem('pacte_my_pseudo', guestPseudo);
+        }
+
         await fetch('/api/circle/join', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ blind_circle_id: circleHash })
         });
 
-        // Déposer un message chiffré dans la boîte morte
+        // Déposer un message chiffré dans le mur du groupe avec le vrai prénom/pseudo
         try {
           await postEncryptedRelayMessage(circleHash, keyBytes, {
             type: 'chat',
-            author: state.lang === 'fr' ? 'Un ami' : 'A friend',
+            author: guestPseudo,
             text: state.lang === 'fr' ? 'Je viens de rejoindre le départ collectif ! 🚀' : 'I just joined the departure! 🚀',
             timestamp: Date.now()
           });
@@ -175,6 +207,7 @@ export async function renderGuestInviteWidget(circleHash, keyBytes) {
           keyB64: bufToBase64Url(keyBytes),
           targetCount,
           fsa: 'H2T',
+          pseudo: guestPseudo,
           createdAt: new Date().toISOString(),
           leavingNetworks: ['X / Twitter']
         };
@@ -182,14 +215,44 @@ export async function renderGuestInviteWidget(circleHash, keyBytes) {
         state.myBlindCircleId = circleHash;
         state.savedCircleData = circleData;
 
-        showToast(state.lang === 'fr' ? 'Vous avez rejoint le cercle !' : 'You joined the circle!');
+        showToast(state.lang === 'fr' ? 'Vous avez rejoint le groupe !' : 'You joined the group!');
         await renderMyCircleWidget();
       } catch (err) {
         alert(err.message || 'Erreur');
         joinBtn.disabled = false;
-        joinBtn.textContent = 'Rejoindre ce départ';
+        joinBtn.textContent = 'J\'embarque dans le groupe';
       }
     });
+  }
+}
+
+/**
+ * Met à jour dynamiquement l'énoncé d'engagement ("Je m'engage à...")
+ * et synchronise state.targetCount / state.selectedNetworks avec les boutons actifs du formulaire
+ */
+export function updatePledgeStatement() {
+  if (typeof document === 'undefined') return;
+
+  const activeThresholdBtn = document.querySelector('#pactForm .threshold-btn.active');
+  if (activeThresholdBtn && activeThresholdBtn.dataset.threshold) {
+    state.targetCount = Number(activeThresholdBtn.dataset.threshold) || 13;
+  }
+
+  const activePlatformBtn = document.querySelector('#pactForm .origin-platform-card.active');
+  if (activePlatformBtn && activePlatformBtn.dataset.network) {
+    state.selectedNetworks = new Set([activePlatformBtn.dataset.network]);
+  }
+
+  const count = state.targetCount || 13;
+  const net = Array.from(state.selectedNetworks)[0] || 'X / Twitter';
+
+  const statementEl = document.getElementById('pledgeStatementText');
+  if (statementEl) {
+    if (state.lang === 'en') {
+      statementEl.innerHTML = `“I pledge to leave <strong id="pledgeNetworkName">${net}</strong> for an open, locally hosted social network as soon as <strong id="pledgeTargetCount">${count} friends</strong> join my departure group. Until that threshold is reached, I don't have to change anything.”`;
+    } else {
+      statementEl.innerHTML = `« Je m'engage à quitter <strong id="pledgeNetworkName">${net}</strong> pour un réseau social libre et hébergé ici dès que <strong id="pledgeTargetCount">${count} amis</strong> auront rejoint mon groupe de départ. Tant que ce seuil n'est pas atteint, je n'ai rien à changer. »`;
+    }
   }
 }
 
@@ -200,7 +263,10 @@ export async function restoreSavedCircle() {
   if (typeof localStorage === 'undefined') return;
 
   const saved = localStorage.getItem('pacte_my_circle');
-  if (!saved) return;
+  if (!saved) {
+    updatePledgeStatement();
+    return;
+  }
 
   try {
     const data = JSON.parse(saved);
@@ -211,7 +277,15 @@ export async function restoreSavedCircle() {
         state.circleKeyBytes = base64UrlToBuf(data.keyB64);
       }
       if (data.targetCount) {
-        state.targetCount = Number(data.targetCount) || 13;
+        const savedTarget = Number(data.targetCount) || 13;
+        const matchingBtn = typeof document !== 'undefined'
+          ? document.querySelector(`#pactForm .threshold-btn[data-threshold="${savedTarget}"]`)
+          : null;
+        if (matchingBtn) {
+          document.querySelectorAll('#pactForm .threshold-btn').forEach(b => b.classList.remove('active'));
+          matchingBtn.classList.add('active');
+          state.targetCount = savedTarget;
+        }
       }
       if (data.chosenAlternativeId) {
         state.chosenAlternativeId = data.chosenAlternativeId;
@@ -424,11 +498,12 @@ export async function renderMyCircleWidget() {
       state.isFormManuallyShown = !state.isFormManuallyShown;
       if (state.isFormManuallyShown) {
         form.style.display = 'block';
+        updatePledgeStatement();
         toggleFormBtn.textContent = t('circle_widget.toggle_form_hide') || 'Masquer le formulaire';
         form.scrollIntoView({ behavior: 'smooth' });
       } else {
         form.style.display = 'none';
-        toggleFormBtn.textContent = t('circle_widget.toggle_form_show') || 'Afficher le formulaire d\'engagement';
+        toggleFormBtn.textContent = t('circle_widget.toggle_form_show') || 'Modifier mon engagement';
       }
     });
   }
@@ -447,6 +522,7 @@ export async function renderMyCircleWidget() {
         state.isFormManuallyShown = true;
         widget.style.display = 'none';
         if (form) form.style.display = 'block';
+        updatePledgeStatement();
         showToast(state.lang === 'fr' ? 'Progression locale réinitialisée.' : 'Local progress reset.');
       }
     });
@@ -461,6 +537,9 @@ export async function handlePactSubmit(e) {
     e.preventDefault();
   }
   if (typeof document === 'undefined') return;
+
+  // Toujours synchroniser le seuil et le réseau avec les boutons réellement sélectionnés dans le formulaire
+  updatePledgeStatement();
 
   const submitBtn = document.getElementById('btnSubmitPact');
   const postalInput = document.getElementById('postalCodeInput');
@@ -530,8 +609,14 @@ export async function handlePactSubmit(e) {
     const keyB64 = bufToBase64Url(state.circleKeyBytes);
     const inviteUrl = `${window.location.origin}/#cercle=${state.myBlindCircleId}&k=${keyB64}`;
 
+    const pseudoInput = document.getElementById('pseudoInput');
     const sourceProfileInput = document.getElementById('sourceProfileInput');
     const sourceProfile = sourceProfileInput ? sourceProfileInput.value.trim() : '';
+    const pseudo = (pseudoInput ? pseudoInput.value.trim() : '') || (sourceProfile ? sourceProfile.replace(/^https?:\/\/(www\.)?/, '') : '');
+
+    if (typeof localStorage !== 'undefined' && pseudo) {
+      localStorage.setItem('pacte_my_pseudo', pseudo);
+    }
 
     const joinNeighborhoodCheck = document.getElementById('joinNeighborhoodInput');
     const joinNeighborhood = joinNeighborhoodCheck ? joinNeighborhoodCheck.checked : true;
@@ -542,6 +627,7 @@ export async function handlePactSubmit(e) {
       keyB64: keyB64,
       targetCount: state.targetCount,
       fsa: fsa,
+      pseudo: pseudo || null,
       createdAt: new Date().toISOString(),
       chosenAlternativeId: state.chosenAlternativeId,
       leavingNetworks: Array.from(state.selectedNetworks),
@@ -553,13 +639,15 @@ export async function handlePactSubmit(e) {
     }
     state.savedCircleData = myCircleData;
 
+    const displayAuthor = pseudo || (state.lang === 'fr' ? 'Membre du pacte' : 'Pact member');
+
     // Message amical initial dans le groupe de quartier si activé
     if (joinNeighborhood) {
       try {
         const { circleHash: neighHash, keyBytes: neighKey } = await deriveNeighborhoodCredentials(fsa);
         await postEncryptedRelayMessage(neighHash, neighKey, {
           type: 'chat',
-          author: (sourceProfile ? sourceProfile.replace(/^https?:\/\/(www\.)?/, '') : '') || (state.lang === 'fr' ? 'Nouveau voisin' : 'New neighbor'),
+          author: displayAuthor,
           sourceProfile: sourceProfile || null,
           text: state.lang === 'fr'
             ? `Pacte signé dans le secteur ${fsa} ! Prêt(e) à coordonner notre départ des réseaux commerciaux.`
@@ -571,16 +659,16 @@ export async function handlePactSubmit(e) {
       }
     }
 
-    // Déposer le message initial sur la boîte morte chiffrée
+    // Déposer le message initial dans le groupe privé
     try {
       const leavingName = Array.from(state.selectedNetworks)[0] || 'la Big Tech';
       await postEncryptedRelayMessage(state.myBlindCircleId, state.circleKeyBytes, {
         type: 'chat',
-        author: sourceProfile || (state.lang === 'fr' ? 'Initiateur' : 'Initiator'),
+        author: displayAuthor,
         sourceProfile: sourceProfile || null,
         text: state.lang === 'fr'
-          ? `Pacte signé pour quitter ${leavingName} ! Bienvenue dans notre cercle confidentiel.`
-          : `Pledge signed to leave ${leavingName}! Welcome to our private circle.`,
+          ? `J'ai lancé ce groupe pour quitter ${leavingName} ensemble !`
+          : `I started this group to leave ${leavingName} together!`,
         timestamp: Date.now()
       });
     } catch (relayErr) {

@@ -111,23 +111,43 @@
             </div>
           </div>
 
-          <!-- 3. Quelle ville ou quartier ? -->
+          <!-- 3. Qui êtes-vous (pour vos amis) et quelle ville ? -->
           <div class="form-group-block">
-            <label for="postalCodeInput" class="block-title" style="margin-bottom: 0.5rem; cursor: pointer;" data-i18n="form.postal_label">3. Votre ville ou début de code postal</label>
-            <div class="location-input-row">
-              <input 
-                type="text" 
-                id="postalCodeInput" 
-                class="input-field" 
-                placeholder="ex: Montréal, Québec, Gatineau ou H2T..." 
-                data-i18n-placeholder="form.postal_placeholder"
-                maxlength="30"
-                autocomplete="address-level2"
-                value="Montréal"
-              >
-              <div id="geoBadge" class="geo-badge" style="display: none;"></div>
+            <h3 class="block-title" data-i18n="form.step3_identity_title">3. Pour que vos amis vous reconnaissent</h3>
+            
+            <div class="identity-location-grid">
+              <div>
+                <label for="pseudoInput" class="field-sub-label" data-i18n="form.pseudo_label">Votre prénom ou pseudo</label>
+                <input 
+                  type="text" 
+                  id="pseudoInput" 
+                  class="input-field" 
+                  placeholder="ex: Julie, Marc ou @monpseudo" 
+                  data-i18n-placeholder="form.pseudo_placeholder"
+                  maxlength="40"
+                  autocomplete="nickname"
+                  required
+                >
+              </div>
+
+              <div>
+                <label for="postalCodeInput" class="field-sub-label" data-i18n="form.postal_label">Votre ville ou code postal</label>
+                <div class="location-input-row">
+                  <input 
+                    type="text" 
+                    id="postalCodeInput" 
+                    class="input-field" 
+                    placeholder="ex: Montréal, Québec, H2T..." 
+                    data-i18n-placeholder="form.postal_placeholder"
+                    maxlength="30"
+                    autocomplete="address-level2"
+                    value="Montréal"
+                  >
+                  <div id="geoBadge" class="geo-badge" style="display: none;"></div>
+                </div>
+              </div>
             </div>
-            <p class="input-help" data-i18n="form.postal_help">Sert uniquement à recommander un serveur local près de chez vous.</p>
+            <p class="input-help" data-i18n="form.postal_help">🔒 Votre nom n'est visible que par les amis à qui vous envoyez votre lien privé. La ville sert à suggérer un serveur local.</p>
           </div>
 
           <!-- Options facultatives repliées par défaut -->
@@ -170,6 +190,14 @@
           <button type="button" id="btnTogglePush" class="btn-toggle-push" style="display: none;" data-i18n="form.enable_push">
             M'alerter sur cet appareil
           </button>
+
+          <!-- Texte explicite de l'engagement au-dessus de la signature -->
+          <div class="pact-pledge-statement" id="pactPledgeStatement">
+            <div class="pledge-statement-label" data-i18n="form.pledge_statement_label">📜 Ce que signifie votre signature :</div>
+            <p class="pledge-statement-text" id="pledgeStatementText">
+              « Je m'engage à quitter <strong id="pledgeNetworkName">X / Twitter</strong> pour un réseau social libre et hébergé ici dès que <strong id="pledgeTargetCount">13 amis</strong> auront rejoint mon groupe de départ. Tant que ce seuil n'est pas atteint, je n'ai rien à changer. »
+            </p>
+          </div>
 
           <button type="submit" id="btnSubmitPact" class="btn-submit">
             <span>✍️</span>

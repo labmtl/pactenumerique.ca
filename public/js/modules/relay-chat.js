@@ -109,8 +109,8 @@ export async function postEncryptedRelayMessage(circleHash, keyBytes, messagePay
 export async function renderRelayChat(containerEl, circleHash, keyBytes) {
   if (!containerEl || !circleHash || !keyBytes) return;
 
-  const savedPseudo = (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_pseudo')) || '';
-  const defaultPseudo = savedPseudo || (state.lang === 'fr' ? 'Moi' : 'Me');
+  const savedPseudo = (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_pseudo')) || state.savedCircleData?.pseudo || '';
+  const defaultPseudo = savedPseudo;
 
   containerEl.innerHTML = `
     <div class="relay-chat-card">
@@ -147,16 +147,17 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
           type="text" 
           id="relayPseudoInput" 
           class="relay-pseudo-field" 
-          placeholder="${state.lang === 'fr' ? 'Pseudo' : 'Name'}" 
+          placeholder="${state.lang === 'fr' ? 'Votre prénom' : 'Your name'}" 
           value="${defaultPseudo}"
-          maxlength="25"
-          title="Votre pseudo visible uniquement par vos proches"
+          maxlength="35"
+          required
+          title="Votre prénom ou pseudo visible par vos proches"
         />
         <input 
           type="text" 
           id="relayTextInput" 
           class="relay-text-field" 
-          placeholder="${t('relay_chat.placeholder') || 'Écrire un message chiffré à vos proches...'}"
+          placeholder="${t('relay_chat.placeholder') || 'Écrire un message à vos amis...'}"
           maxlength="500" 
           required 
           autocomplete="off"
@@ -183,7 +184,7 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
         streamEl.innerHTML = `
           <div class="relay-empty-state">
             <span class="empty-icon">💬</span>
-            <p>${t('relay_chat.empty') || 'Aucun message pour le moment. Déposez le premier mot pour coordonner le grand départ !'}</p>
+            <p>${t('relay_chat.empty') || 'Aucun message pour le moment. Laissez un premier mot à vos amis !'}</p>
           </div>
         `;
         return;
@@ -191,7 +192,8 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
 
       streamEl.innerHTML = messages.map(msg => {
         const author = msg.author || (state.lang === 'fr' ? 'Ami(e)' : 'Friend');
-        const isMe = author.toLowerCase() === (pseudoInput.value || defaultPseudo).toLowerCase();
+        const currentMyName = (pseudoInput?.value || defaultPseudo || '').trim().toLowerCase();
+        const isMe = Boolean(currentMyName) && author.toLowerCase() === currentMyName;
         const dateStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
         const text = (msg.text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const handle = msg.handle ? `<div class="relay-handle-tag">🏷️ <strong>${msg.handle}</strong></div>` : '';
@@ -539,8 +541,8 @@ export async function renderNeighborhoodGroupChat(containerEl, rawFsa = 'H2T') {
 
   const { circleHash, keyBytes } = await deriveNeighborhoodCredentials(fsa);
 
-  const savedPseudo = (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_pseudo')) || '';
-  const defaultPseudo = savedPseudo || (state.lang === 'fr' ? 'Voisin(e)' : 'Neighbor');
+  const savedPseudo = (typeof localStorage !== 'undefined' && localStorage.getItem('pacte_my_pseudo')) || state.savedCircleData?.pseudo || '';
+  const defaultPseudo = savedPseudo;
 
   containerEl.innerHTML = `
     <div class="neighborhood-group-card">
@@ -642,10 +644,11 @@ export async function renderNeighborhoodGroupChat(containerEl, rawFsa = 'H2T') {
             type="text" 
             id="neighborhoodPseudoInput" 
             class="relay-pseudo-field" 
-            placeholder="Pseudo" 
+            placeholder="${state.lang === 'fr' ? 'Votre prénom' : 'Your name'}" 
             value="${defaultPseudo}"
-            maxlength="25"
-            title="Votre pseudo visible par vos voisins"
+            maxlength="35"
+            required
+            title="Votre prénom ou pseudo visible par vos voisins"
           />
           <input 
             type="text" 
@@ -752,7 +755,8 @@ export async function renderNeighborhoodGroupChat(containerEl, rawFsa = 'H2T') {
         } else {
           streamEl.innerHTML = messages.map(msg => {
             const author = msg.author || (state.lang === 'fr' ? 'Voisin(e)' : 'Neighbor');
-            const isMe = author.toLowerCase() === (pseudoInput?.value || defaultPseudo).toLowerCase();
+            const currentMyName = (pseudoInput?.value || defaultPseudo || '').trim().toLowerCase();
+            const isMe = Boolean(currentMyName) && author.toLowerCase() === currentMyName;
             const dateStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
             const text = (msg.text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
