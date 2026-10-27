@@ -56,76 +56,49 @@
         <!-- Panneau de progression du cercle sauvegardé localement -->
         <div id="myCircleWidget" class="my-circle-widget" style="display: none;"></div>
 
-        <!-- Formulaire d'engagement en 2 étapes simples -->
+        <!-- Formulaire d'engagement simplifié en 3 choix rapides -->
         <form id="pactForm">
           
-          <!-- ÉTAPE 1 : Quelle plateforme voulez-vous quitter ? -->
+          <!-- 1. Quel réseau quitter ? -->
           <div class="form-group-block">
-            <h3 class="block-title" data-i18n="form.step1_title">1. Quelle plateforme voulez-vous quitter ?</h3>
-            <p class="input-help" data-i18n="form.step_networks_desc">Sélectionnez la plateforme commerciale dont vous voulez vous libérer :</p>
+            <h3 class="block-title" data-i18n="form.step1_title">1. Quel réseau souhaitez-vous quitter ?</h3>
             
-            <div class="origin-platform-grid" id="originPlatformGrid">
+            <div class="origin-platform-grid" id="originPlatformGrid" role="radiogroup" aria-label="Plateforme à quitter">
               <button type="button" class="origin-platform-card active" data-network="X / Twitter">
-                <span class="platform-icon">🐦</span>
-                <span class="platform-label">Je veux quitter X / Twitter</span>
+                <span class="platform-icon" aria-hidden="true">🐦</span>
+                <span class="platform-label">X / Twitter</span>
               </button>
               <button type="button" class="origin-platform-card" data-network="Facebook">
-                <span class="platform-icon">👥</span>
-                <span class="platform-label">Je veux quitter Facebook</span>
+                <span class="platform-icon" aria-hidden="true">👥</span>
+                <span class="platform-label">Facebook</span>
               </button>
               <button type="button" class="origin-platform-card" data-network="Instagram">
-                <span class="platform-icon">📸</span>
-                <span class="platform-label">Je veux quitter Instagram</span>
+                <span class="platform-icon" aria-hidden="true">📸</span>
+                <span class="platform-label">Instagram</span>
               </button>
               <button type="button" class="origin-platform-card" data-network="LinkedIn">
-                <span class="platform-icon">💼</span>
-                <span class="platform-label">Je veux quitter LinkedIn</span>
+                <span class="platform-icon" aria-hidden="true">💼</span>
+                <span class="platform-label">LinkedIn</span>
               </button>
               <button type="button" class="origin-platform-card" data-network="YouTube">
-                <span class="platform-icon">🎬</span>
-                <span class="platform-label">Je veux quitter YouTube / TikTok</span>
+                <span class="platform-icon" aria-hidden="true">🎬</span>
+                <span class="platform-label">YouTube / TikTok</span>
               </button>
               <button type="button" class="origin-platform-card" data-network="WhatsApp">
-                <span class="platform-icon">💬</span>
-                <span class="platform-label">Je veux quitter WhatsApp / Discord</span>
+                <span class="platform-icon" aria-hidden="true">💬</span>
+                <span class="platform-label">WhatsApp / Discord</span>
               </button>
-            </div>
-            <p class="input-help" style="margin-top: 0.65rem; font-size: 0.85rem; color: var(--text-muted);">
-              ✨ <em>L'instance d'accueil souveraine vous sera suggérée lors du déclenchement final de la bascule.</em>
-            </p>
-
-            <!-- Identifiant ou profil public sur la plateforme source (Zero-Knowledge, chiffré de bout en bout) -->
-            <div class="source-profile-box" style="margin-top: 1.15rem; background: var(--bg-card-subtle); padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-              <label for="sourceProfileInput" class="input-help" style="font-weight: 600; color: var(--text-main); display: block; margin-bottom: 0.35rem;" id="sourceProfileLabel">
-                Lien de votre profil sur la plateforme à quitter <span style="font-weight: 400; color: var(--text-muted);">(optionnel)</span>
-              </label>
-              <div class="source-profile-input-wrapper" style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.3rem 0.6rem;">
-                <span class="source-profile-prefix-icon" id="sourceProfilePrefixIcon" style="font-size: 1.1rem;">🐦</span>
-                <input 
-                  type="text" 
-                  id="sourceProfileInput" 
-                  class="source-profile-field" 
-                  placeholder="ex: https://x.com/rngadam ou @rngadam"
-                  autocomplete="username"
-                  maxlength="120"
-                  style="border: none; outline: none; width: 100%; font-family: inherit; font-size: 0.9rem; color: var(--text-main); background: transparent;"
-                >
-              </div>
-              <p class="input-help" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.45rem; line-height: 1.4;">
-                🔒 <strong>Preuve sociale chiffrée de bout en bout :</strong> Seuls vos proches détenant la clé du cercle pourront voir ce lien pour valider votre départ. Notre serveur ne reçoit aucun profil en clair.
-              </p>
             </div>
           </div>
 
-          <!-- ÉTAPE 2 : Avec combien d'amis voulez-vous partir ? -->
+          <!-- 2. Combien d'amis ? -->
           <div class="form-group-block">
             <h3 class="block-title" data-i18n="form.step2_title">2. Avec combien d'amis voulez-vous partir ?</h3>
-            
-            <p class="input-help" style="margin-bottom: 0.75rem;" data-i18n="form.threshold_label">Combien d'amis doivent vous rejoindre pour déclencher votre départ ?</p>
-            <div class="threshold-options">
+            <p class="input-help" style="margin-top: -0.35rem; margin-bottom: 0.75rem;" data-i18n="form.threshold_label">Vous ne ferez le saut que lorsque ce nombre d'amis aura rejoint votre groupe :</p>
+            <div class="threshold-options" role="radiogroup" aria-label="Nombre d'amis requis">
               <button type="button" class="threshold-btn" data-threshold="7">
                 7 amis
-                <span data-i18n="form.threshold_opt_7">Noyau actif</span>
+                <span data-i18n="form.threshold_opt_7">Petit groupe</span>
               </button>
               <button type="button" class="threshold-btn active" data-threshold="13">
                 13 amis
@@ -133,60 +106,70 @@
               </button>
               <button type="button" class="threshold-btn" data-threshold="21">
                 21 amis
-                <span data-i18n="form.threshold_opt_21">Mouvement local</span>
+                <span data-i18n="form.threshold_opt_21">Grand cercle</span>
               </button>
             </div>
+          </div>
 
-            <!-- Région allégée (3 caractères de la RTA ou ville) - Aucun courriel requis -->
-            <div style="margin-top: 1.5rem;">
-              <label for="postalCodeInput" class="input-help" style="font-weight:600; color:var(--text-main);" data-i18n="form.postal_label">Votre quartier (3 caractères de la RTA) ou ville</label>
+          <!-- 3. Quelle ville ou quartier ? -->
+          <div class="form-group-block">
+            <label for="postalCodeInput" class="block-title" style="margin-bottom: 0.5rem; cursor: pointer;" data-i18n="form.postal_label">3. Votre ville ou début de code postal</label>
+            <div class="location-input-row">
               <input 
                 type="text" 
                 id="postalCodeInput" 
                 class="input-field" 
-                placeholder="ex: H2T, G1K, Montréal, Québec..." 
+                placeholder="ex: Montréal, Québec, Gatineau ou H2T..." 
                 data-i18n-placeholder="form.postal_placeholder"
                 maxlength="30"
                 autocomplete="address-level2"
-                value="H2T"
+                value="Montréal"
               >
               <div id="geoBadge" class="geo-badge" style="display: none;"></div>
-              
-              <!-- Puces de sélection rapide de la RTA -->
-              <div class="fsa-quick-pills" id="fsaQuickPills">
-                <span style="font-size:0.75rem; color:var(--text-muted); align-self:center;">RTA rapides :</span>
-                <button type="button" class="fsa-pill active" data-fsa="H2T">H2T (Plateau)</button>
-                <button type="button" class="fsa-pill" data-fsa="G1K">G1K (Québec)</button>
-                <button type="button" class="fsa-pill" data-fsa="H1W">H1W (Hochelaga)</button>
-                <button type="button" class="fsa-pill" data-fsa="J4H">J4H (Longueuil)</button>
-                <button type="button" class="fsa-pill" data-fsa="K1P">K1P (Gatineau/Ottawa)</button>
+            </div>
+            <p class="input-help" data-i18n="form.postal_help">Sert uniquement à recommander un serveur local près de chez vous.</p>
+          </div>
+
+          <!-- Options facultatives repliées par défaut -->
+          <details class="pact-optional-details">
+            <summary class="pact-optional-summary">
+              <span>⚙️</span> <span data-i18n="form.optional_settings">Options facultatives (lien de profil, voisins du quartier)</span>
+            </summary>
+            <div class="pact-optional-body">
+              <div class="source-profile-box">
+                <label for="sourceProfileInput" class="input-help" style="font-weight: 600; color: var(--text-main); display: block; margin-bottom: 0.35rem;" id="sourceProfileLabel">
+                  Votre pseudo ou profil actuel <span style="font-weight: 400; color: var(--text-muted);">(facultatif, pour que vos amis vous reconnaissent)</span>
+                </label>
+                <div class="source-profile-input-wrapper" style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.35rem 0.65rem;">
+                  <span class="source-profile-prefix-icon" id="sourceProfilePrefixIcon" style="font-size: 1.1rem;" aria-hidden="true">🐦</span>
+                  <input 
+                    type="text" 
+                    id="sourceProfileInput" 
+                    class="source-profile-field" 
+                    placeholder="ex: @monpseudo"
+                    autocomplete="username"
+                    maxlength="120"
+                    style="border: none; outline: none; width: 100%; font-family: inherit; font-size: 0.9rem; color: var(--text-main); background: transparent;"
+                  >
+                </div>
               </div>
 
-              <p class="input-help" data-i18n="form.postal_help">Aucune adresse exacte requise. Permet uniquement de regrouper les engagements citoyens de votre secteur.</p>
-
-              <!-- Option groupe de quartier souverain géolocalisé -->
-              <div class="neighborhood-optin-box" id="neighborhoodOptinBox">
+              <div class="neighborhood-optin-box" id="neighborhoodOptinBox" style="margin-top: 0.85rem;">
                 <label class="custom-checkbox-label" for="joinNeighborhoodInput">
                   <input type="checkbox" id="joinNeighborhoodInput" checked>
                   <span class="custom-checkbox-text">
-                    <span>📍 <strong data-i18n="form.neighborhood_optin_title">Rejoindre le groupe local de mon secteur (<span id="optinFsaLabel">H2T (Plateau)</span>)</strong></span>
-                    <span class="neighborhood-help-text" data-i18n="form.neighborhood_optin_desc">Échangez avec vos voisins et partagez vos identifiants vers des plateformes souveraines (Mastodon, Matrix, Lemmy) pour créer des petits groupes sociaux géolocalisés.</span>
+                    <span>📍 <strong data-i18n="form.neighborhood_optin_title">Rejoindre aussi l'espace local de mon quartier (<span id="optinFsaLabel">H2T (Montréal)</span>)</strong></span>
+                    <span class="neighborhood-help-text" data-i18n="form.neighborhood_optin_desc">Permet de découvrir des voisins qui passent eux aussi aux réseaux libres.</span>
                   </span>
                 </label>
               </div>
             </div>
+          </details>
 
-            <!-- Option notification appareil (optionnelle, sans compte ni courriel) -->
-            <div class="push-toggle-box" style="margin-top: 1.25rem;">
-              <div class="push-info">
-                <h5 data-i18n="form.push_title">Alerte discrète sur cet appareil</h5>
-                <p data-i18n="form.push_desc">Recevez une alerte discrète dès que votre cercle a atteint sa masse critique.</p>
-              </div>
-              <button type="button" id="btnTogglePush" class="btn-toggle-push" data-i18n="form.enable_push">
-                M'alerter sur cet appareil
-              </button>
-            </div>
-          </div>
+          <!-- Bouton caché de synchronisation push (utilisé par le tableau de bord après signature) -->
+          <button type="button" id="btnTogglePush" class="btn-toggle-push" style="display: none;" data-i18n="form.enable_push">
+            M'alerter sur cet appareil
+          </button>
 
           <button type="submit" id="btnSubmitPact" class="btn-submit">
             <span>✍️</span>
@@ -194,57 +177,11 @@
           </button>
 
           <p class="legal-notice" data-i18n="form.legal_notice">
-            Respect total de votre vie privée (Zéro-connaissance).
+            🔒 100 % anonyme — aucun compte ni courriel requis.
           </p>
         </form>
       </div>
     </section>
-
-    <!-- Modal de Succès avec Jauge Intuitive & Partage SMS / WhatsApp -->
-    <div id="successModal" class="modal-backdrop">
-      <div class="modal-dialog">
-        <h3 data-i18n="modal_success.title">🎉 Félicitations, vous faites partie du pacte !</h3>
-        <p data-i18n="modal_success.subtitle">Voici votre cercle privé. Partagez le message tout prêt avec vos proches pour faire le saut ensemble.</p>
-
-        <!-- Jauge intuitive insérée dynamiquement -->
-        <div id="modalGaugeContainer"></div>
-
-        <!-- Boîte de partage SMS / WhatsApp tout prêt -->
-        <div class="ready-share-box">
-          <div class="ready-share-header">
-            <strong>💬 <span data-i18n="circle_widget.share_ready_title">Message tout prêt à envoyer à vos proches :</span></strong>
-          </div>
-          <div class="ready-share-bubble">
-            <p id="modalReadyShareText"></p>
-          </div>
-          <div class="ready-share-actions">
-            <button type="button" class="btn-share-social whatsapp" id="modalBtnWhatsApp">
-              <span>💬</span> <span>WhatsApp</span>
-            </button>
-            <button type="button" class="btn-share-social sms" id="modalBtnSMS">
-              <span>📱</span> <span>SMS</span>
-            </button>
-            <button type="button" class="btn-share-social copy" id="modalBtnCopyMessage">
-              <span>📋</span> <span data-i18n="circle_widget.btn_copy_message">Copier le message</span>
-            </button>
-            <button type="button" class="btn-share-social link-only" id="modalBtnCopyLink">
-              <span>🔗</span> <span data-i18n="circle_widget.btn_copy_link">Copier le lien</span>
-            </button>
-          </div>
-        </div>
-
-        <div id="modalTargetRecom" class="modal-privacy-callout" style="display:none; margin-bottom:1rem; border-left:3px solid var(--accent-emerald);">
-          <strong>🎯 Serveur sélectionné pour votre cercle :</strong>
-          <span id="modalTargetRecomText"></span>
-        </div>
-
-        <div class="modal-privacy-callout">
-          🔒 Confidentialité totale : Le lien est sécurisé directement dans votre fureteur. Notre serveur ne sait pas qui sont vos amis.
-        </div>
-
-        <button id="btnModalClose" class="btn-modal-close" data-i18n="modal_success.close_btn">Voir mon tableau de bord</button>
-      </div>
-    </div>
   </main>
 
   <!-- Pied de page -->

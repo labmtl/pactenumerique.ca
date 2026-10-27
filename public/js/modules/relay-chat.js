@@ -118,8 +118,8 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
         <div class="relay-chat-title-group">
           <span class="relay-chat-icon" aria-hidden="true">🔒</span>
           <div>
-            <h4 class="relay-chat-title">${t('relay_chat.title') || 'Boîte morte chiffrée (Zero-Knowledge)'}</h4>
-            <p class="relay-chat-subtitle">${t('relay_chat.subtitle') || 'Coordination chiffrée de bout en bout (AES-GCM). Aucun compte requis.'}</p>
+            <h4 class="relay-chat-title">${t('relay_chat.title') || 'Messages privés du groupe'}</h4>
+            <p class="relay-chat-subtitle">${t('relay_chat.subtitle') || 'Visible uniquement par les personnes ayant le lien de votre groupe.'}</p>
           </div>
         </div>
         <button type="button" class="btn-refresh-relay" id="btnRefreshRelay" title="Actualiser les messages">
@@ -130,7 +130,7 @@ export async function renderRelayChat(containerEl, circleHash, keyBytes) {
       <!-- Flux des messages déchiffrés -->
       <div class="relay-messages-stream" id="relayMessagesStream">
         <div class="relay-loading-placeholder">
-          <span>⏳</span> <span>${state.lang === 'fr' ? 'Déchiffrement des messages sécurisés...' : 'Decrypting secure messages...'}</span>
+          <span>⏳</span> <span>${state.lang === 'fr' ? 'Chargement des messages...' : 'Loading messages...'}</span>
         </div>
       </div>
 
@@ -549,12 +549,12 @@ export async function renderNeighborhoodGroupChat(containerEl, rawFsa = 'H2T') {
           <span class="neighborhood-header-icon" aria-hidden="true">📍</span>
           <div>
             <div class="neighborhood-badge-row">
-              <span class="fsa-badge">RTA ${fsa}</span>
+              <span class="fsa-badge">${fsa}</span>
               <span class="city-badge">${cityName}</span>
-              <span class="zk-badge">🔒 Zero-Knowledge AES-256</span>
+              <span class="zk-badge">🔒 Espace local privé</span>
             </div>
-            <h4 class="neighborhood-title">${t('circle_widget.neighborhood_title') || 'Groupe local de quartier'} (${fsa})</h4>
-            <p class="neighborhood-subtitle">${t('circle_widget.neighborhood_subtitle') || 'Échangez avec les citoyens de votre secteur et partagez vos identifiants souverains pour créer un réseau local libre et résilient.'}</p>
+            <h4 class="neighborhood-title">${t('circle_widget.neighborhood_title') || 'Espace local de quartier'} (${fsa})</h4>
+            <p class="neighborhood-subtitle">${t('circle_widget.neighborhood_subtitle') || 'Découvrez les voisins de votre secteur et partagez vos comptes sur les réseaux libres.'}</p>
           </div>
         </div>
         <button type="button" class="btn-refresh-relay" id="btnRefreshNeighborhood" title="Actualiser les messages">
@@ -565,7 +565,7 @@ export async function renderNeighborhoodGroupChat(containerEl, rawFsa = 'H2T') {
       <!-- Annuaire des identifiants souverains partagés dans le quartier -->
       <div class="neighborhood-handles-box">
         <div class="handles-box-header">
-          <h5 class="handles-title">🌐 ${t('circle_widget.neighborhood_directory_title') || 'Identifiants souverains partagés dans le quartier'}</h5>
+          <h5 class="handles-title">🌐 ${t('circle_widget.neighborhood_directory_title') || 'Comptes libres partagés dans le quartier'}</h5>
           <span class="handles-count" id="neighborhoodHandlesCount">0 profil</span>
         </div>
         
@@ -575,10 +575,10 @@ export async function renderNeighborhoodGroupChat(containerEl, rawFsa = 'H2T') {
           </div>
         </div>
 
-        <!-- Formulaire de partage d'identifiant souverain -->
-        <details class="share-handle-accordion" id="shareHandleAccordion" open>
+        <!-- Formulaire de partage d'identifiant souverain (replié par défaut) -->
+        <details class="share-handle-accordion" id="shareHandleAccordion">
           <summary class="btn-open-share-handle">
-            <span>➕</span> <strong>${t('circle_widget.share_handle_heading') || 'Partager un identifiant souverain avec mes voisins'}</strong>
+            <span>➕</span> <strong>${t('circle_widget.share_handle_heading') || 'Partager mon compte libre avec mes voisins'}</strong>
           </summary>
           <form class="share-handle-form" id="neighborhoodShareHandleForm">
             <p class="share-handle-desc">${t('circle_widget.share_handle_desc') || 'Annoncez votre compte Mastodon, Pixelfed ou salon Matrix local pour que vos voisins puissent vous suivre et échanger :'}</p>

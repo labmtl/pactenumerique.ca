@@ -105,9 +105,9 @@ export async function renderGuestInviteWidget(circleHash, keyBytes) {
   widget.innerHTML = `
     <div class="guest-invite-card">
       <div class="guest-invite-header">
-        <span class="guest-badge">💌 Vous avez été invité(e) dans ce cercle privé</span>
-        <h3 class="guest-title">Faisons le saut ensemble vers un réseau libre</h3>
-        <p class="guest-desc">Votre proche a initié ce départ collectif. Aucun courriel requis : rejoignez le départ en un clic et échangez dans la boîte morte chiffrée.</p>
+        <span class="guest-badge">💌 Invitation d'un proche</span>
+        <h3 class="guest-title">On quitte les réseaux commerciaux ensemble ?</h3>
+        <p class="guest-desc">Un ami vous invite à faire le saut vers un réseau libre dès que le groupe est complet. Aucun compte ni courriel requis.</p>
       </div>
 
       <!-- Jauge de progression du cercle d'amis -->
@@ -115,15 +115,22 @@ export async function renderGuestInviteWidget(circleHash, keyBytes) {
 
       <div class="guest-join-action" style="text-align:center; margin: 1.25rem 0;">
         <button type="button" class="btn-submit" id="btnGuestJoinCircle" style="max-width: 420px; margin: 0 auto;">
-          <span>🤝</span> <span>Rejoindre ce départ (sans inscription)</span>
+          <span>🤝</span> <span>J'embarque dans le groupe (1 clic)</span>
         </button>
       </div>
 
-      <!-- Boîte morte chiffrée -->
-      <div id="guestRelayChat"></div>
-      
       <!-- Guide de migration si déjà débloqué -->
       <div id="guestMigrationGuide"></div>
+
+      <!-- Mur de messages privé repliable -->
+      <details class="circle-section-details" style="margin-top: 1rem;">
+        <summary class="circle-section-summary">
+          <span>💬</span>
+          <span>Messages privés du groupe</span>
+          <span class="summary-hint">Écrire un mot à vos amis</span>
+        </summary>
+        <div id="guestRelayChat" class="circle-section-body"></div>
+      </details>
     </div>
   `;
 
@@ -292,105 +299,83 @@ export async function renderMyCircleWidget() {
       <div>
         <h3 class="my-circle-title">
           <span>⚜️ 🍁</span>
-          <span>${t('circle_widget.title') || 'Mon cercle d\'action souverain'}</span>
+          <span>${t('circle_widget.title') || 'Mon groupe de départ'}</span>
         </h3>
         <p class="my-circle-subtitle">
-          ${t('circle_widget.subtitle') || 'Votre engagement est sauvegardé dans ce fureteur. Partagez votre lien privé pour faire le saut ensemble.'} ${chosenText}
+          ${t('circle_widget.subtitle') || 'Invitez vos proches ci-dessous : vous ferez le saut ensemble dès que le groupe est complet.'} ${chosenText}
         </p>
       </div>
       <div>${statusBadge}</div>
     </div>
 
-    <!-- Sélecteur d'onglets : Cercle privé vs Voisins du quartier -->
-    <div class="circle-view-tabs" role="tablist">
-      <button type="button" class="circle-tab ${state.activeCircleTab !== 'neighborhood' ? 'active' : ''}" id="tabPrivateCircle" role="tab" aria-selected="${state.activeCircleTab !== 'neighborhood'}">
-        👥 <span>${t('circle_widget.tab_my_circle') || 'Mon cercle privé'}</span>
-        <span class="tab-badge">${currentCount}/${targetCount}</span>
-      </button>
-      <button type="button" class="circle-tab ${state.activeCircleTab === 'neighborhood' ? 'active' : ''}" id="tabNeighborhoodGroup" role="tab" aria-selected="${state.activeCircleTab === 'neighborhood'}">
-        📍 <span>${t('circle_widget.tab_neighborhood') || 'Voisins du quartier'} (${saved.fsa || 'H2T'})</span>
-      </button>
+    <!-- Jauge de masse critique visuelle et intuitive -->
+    ${renderCriticalMassGauge(currentCount, targetCount, unlocked)}
+
+    <!-- Guide de migration coordonnée (déverrouillé au seuil) -->
+    <div id="myCircleMigrationGuideContainer" style="margin-top: 1rem;"></div>
+
+    <!-- Boîte de message tout prêt pour inviter les proches -->
+    ${renderReadyShareBox(inviteUrl, targetCount, saved.leavingNetworks, 'myCircle')}
+
+    <!-- Alerte simple sur l'appareil (proposée après signature) -->
+    <div class="circle-push-bar" id="myCirclePushStatus">
+      ${state.isPushActive 
+        ? `<span style="color:var(--accent-emerald); font-weight:600;">${t('circle_widget.push_active') || '🔔 Alerte activée sur cet appareil'}</span>
+           <button type="button" id="btnTestMyCirclePush" class="my-circle-btn-text" style="color:var(--accent-teal, #0d9488); font-size:0.8rem;">Tester</button>`
+        : `<span>🔔 ${t('form.push_desc') || 'Recevoir une alerte sur cet appareil dès que votre groupe est complet ?'}</span>
+           <button type="button" id="btnQuickEnablePush" class="btn-toggle-push" style="padding:0.35rem 0.85rem; font-size:0.8rem;">${t('circle_widget.enable_push_btn') || 'M\'alerter'}</button>`}
     </div>
 
-    <!-- VUE 1 : Mon cercle privé -->
-    <div id="panePrivateCircle" class="circle-view-pane" style="display: ${state.activeCircleTab !== 'neighborhood' ? 'block' : 'none'};">
-      <!-- Jauge de masse critique visuelle et intuitive -->
-      ${renderCriticalMassGauge(currentCount, targetCount, unlocked)}
+    <!-- Sections complémentaires repliables (Divulgation progressive) -->
+    <div class="circle-accordions-group">
+      <details class="circle-section-details" name="circle-extra-panel" id="detailsPrivateChat" ${unlocked ? 'open' : ''}>
+        <summary class="circle-section-summary">
+          <span>💬</span>
+          <span>${t('relay_chat.title') || 'Messages privés du groupe'}</span>
+          <span class="summary-hint">${state.lang === 'fr' ? 'Coordonnez-vous avec vos amis' : 'Coordinate with your friends'}</span>
+        </summary>
+        <div id="myCircleRelayChatContainer" class="circle-section-body"></div>
+      </details>
 
-      <!-- Boîte de message tout prêt pour X, Facebook, LinkedIn, SMS ou WhatsApp -->
-      ${renderReadyShareBox(inviteUrl, targetCount, saved.leavingNetworks, 'myCircle')}
-
-      <!-- Boîte morte chiffrée (Mini-clavardage asynchrone Zero-Knowledge) -->
-      <div id="myCircleRelayChatContainer" style="margin-top: 1.25rem;"></div>
-
-      <!-- Guide de migration coordonnée (déverrouillé au seuil) -->
-      <div id="myCircleMigrationGuideContainer" style="margin-top: 1.25rem;"></div>
-    </div>
-
-    <!-- VUE 2 : Groupe géolocalisé de quartier (Voisins) -->
-    <div id="paneNeighborhoodGroup" class="circle-view-pane" style="display: ${state.activeCircleTab === 'neighborhood' ? 'block' : 'none'};">
-      <div id="myNeighborhoodChatContainer" style="margin-top: 0.5rem;"></div>
-    </div>
-
-    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem; margin-top:1rem;">
-      <div id="myCirclePushStatus" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-        ${state.isPushActive 
-          ? `<span style="color:var(--accent-emerald); font-weight:600;">${t('circle_widget.push_active') || '🔔 Notifications actives pour ce cercle'}</span>`
-          : `<span style="color:var(--text-muted);">${t('circle_widget.push_inactive') || '🔕 Notifications inactives'}</span> <button type="button" id="btnQuickEnablePush" class="btn-toggle-push" style="padding:0.25rem 0.65rem; font-size:0.75rem;">${t('circle_widget.enable_push_btn') || 'Activer'}</button>`}
-        <button type="button" id="btnTestMyCirclePush" class="my-circle-btn-text" style="color:var(--accent-teal, #0d9488); font-size:0.8rem; margin-left:0.25rem;">🔔 ${t('circle_widget.test_push_btn') || 'Tester mes notifications'}</button>
-      </div>
+      <details class="circle-section-details" name="circle-extra-panel" id="detailsNeighborhood" ${state.activeCircleTab === 'neighborhood' ? 'open' : ''}>
+        <summary class="circle-section-summary" id="tabNeighborhoodGroup">
+          <span>📍</span>
+          <span>${t('circle_widget.tab_neighborhood') || 'Voisins du secteur'} (${saved.fsa || 'H2T'})</span>
+          <span class="summary-hint">${state.lang === 'fr' ? 'Comptes libres près de chez vous' : 'Local open accounts'}</span>
+        </summary>
+        <div id="myNeighborhoodChatContainer" class="circle-section-body"></div>
+      </details>
     </div>
 
     <div class="my-circle-actions">
       <button type="button" id="btnTogglePactForm" class="my-circle-btn-text">
-        ${state.isFormManuallyShown ? (t('circle_widget.toggle_form_hide') || 'Masquer le formulaire') : (t('circle_widget.toggle_form_show') || 'Afficher le formulaire d\'engagement')}
+        ${state.isFormManuallyShown ? (t('circle_widget.toggle_form_hide') || 'Masquer le formulaire') : (t('circle_widget.toggle_form_show') || 'Modifier mon engagement')}
       </button>
       <button type="button" id="btnResetMyCircle" class="my-circle-btn-text" style="color:var(--accent-rose, #e11d48);">
-        ${t('circle_widget.reset_btn') || 'Nouveau cercle / Réinitialiser'}
+        ${t('circle_widget.reset_btn') || 'Recommencer à zéro'}
       </button>
     </div>
   `;
 
-  // Gestion des onglets
-  const tabPrivateBtn = widget.querySelector('#tabPrivateCircle');
-  const tabNeighborhoodBtn = widget.querySelector('#tabNeighborhoodGroup');
-  const panePrivate = widget.querySelector('#panePrivateCircle');
-  const paneNeighborhood = widget.querySelector('#paneNeighborhoodGroup');
+  // Chargement à la demande du groupe de quartier lors de l'ouverture du panneau <details>
+  const detailsNeighborhood = widget.querySelector('#detailsNeighborhood');
   const neighContainer = widget.querySelector('#myNeighborhoodChatContainer');
-
-  function switchTab(targetTab) {
-    state.activeCircleTab = targetTab;
-    if (targetTab === 'neighborhood') {
-      tabPrivateBtn?.classList.remove('active');
-      tabPrivateBtn?.setAttribute('aria-selected', 'false');
-      tabNeighborhoodBtn?.classList.add('active');
-      tabNeighborhoodBtn?.setAttribute('aria-selected', 'true');
-      if (panePrivate) panePrivate.style.display = 'none';
-      if (paneNeighborhood) paneNeighborhood.style.display = 'block';
-      if (neighContainer) {
+  if (detailsNeighborhood && neighContainer) {
+    if (detailsNeighborhood.open) {
+      renderNeighborhoodGroupChat(neighContainer, saved.fsa || 'H2T');
+    }
+    detailsNeighborhood.addEventListener('toggle', () => {
+      state.activeCircleTab = detailsNeighborhood.open ? 'neighborhood' : 'private';
+      if (detailsNeighborhood.open && !neighContainer.hasChildNodes()) {
         renderNeighborhoodGroupChat(neighContainer, saved.fsa || 'H2T');
       }
-    } else {
-      tabNeighborhoodBtn?.classList.remove('active');
-      tabNeighborhoodBtn?.setAttribute('aria-selected', 'false');
-      tabPrivateBtn?.classList.add('active');
-      tabPrivateBtn?.setAttribute('aria-selected', 'true');
-      if (paneNeighborhood) paneNeighborhood.style.display = 'none';
-      if (panePrivate) panePrivate.style.display = 'block';
-    }
-  }
-
-  tabPrivateBtn?.addEventListener('click', () => switchTab('private'));
-  tabNeighborhoodBtn?.addEventListener('click', () => switchTab('neighborhood'));
-
-  if (state.activeCircleTab === 'neighborhood' && neighContainer) {
-    renderNeighborhoodGroupChat(neighContainer, saved.fsa || 'H2T');
+    });
   }
 
   // Attache les écouteurs pour la boîte de partage (X, Facebook, LinkedIn, SMS, WhatsApp)
   attachShareBoxListeners('myCircle', inviteUrl, getReadyInviteMessage(inviteUrl, targetCount, saved.leavingNetworks));
 
-  // Rendu de la boîte morte chiffrée
+  // Rendu du mur de messages privé du groupe
   if (state.circleKeyBytes) {
     const chatContainer = widget.querySelector('#myCircleRelayChatContainer');
     if (chatContainer) {
@@ -602,34 +587,30 @@ export async function handlePactSubmit(e) {
       console.warn('[Relais] Message initial non déposé:', relayErr);
     }
 
-    // Afficher le widget de progression en direct
+    // Masquer le formulaire et afficher directement le tableau de bord du groupe
+    state.isFormManuallyShown = false;
     await renderMyCircleWidget();
+    document.getElementById('myCircleWidget')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showToast(
+      state.lang === 'fr'
+        ? '🎉 Pacte signé ! Partagez maintenant l\'invitation avec vos proches.'
+        : '🎉 Pledge signed! Share the invite below with your friends.',
+      5000
+    );
 
-    // Afficher la jauge intuitive dans le modal
-    const modalGaugeBox = document.getElementById('modalGaugeContainer');
-    if (modalGaugeBox) {
-      modalGaugeBox.innerHTML = renderCriticalMassGauge(1, state.targetCount, false);
-    }
-
-    // Afficher le message tout prêt pour SMS ou WhatsApp
-    const modalReadyText = document.getElementById('modalReadyShareText');
-    const readyMsg = getReadyInviteMessage(inviteUrl, state.targetCount, Array.from(state.selectedNetworks));
-    if (modalReadyText) {
-      modalReadyText.textContent = readyMsg;
-    }
-    attachShareBoxListeners('modal', inviteUrl, readyMsg);
-
-    // Afficher la destination ciblée dans le modal sans jargon
-    const chosenAlt = state.alternatives?.find(a => a.id === state.chosenAlternativeId);
-    const modalTargetBox = document.getElementById('modalTargetRecom');
-    const modalTargetText = document.getElementById('modalTargetRecomText');
-    if (chosenAlt && modalTargetBox && modalTargetText) {
-      modalTargetBox.style.display = 'block';
-      modalTargetText.textContent = ` ${chosenAlt.name} (${getUsageLabel(chosenAlt)}) - ${chosenAlt.url}`;
-    }
-
+    // Rétrocompatibilité si un modal existe dans le DOM
     const successModal = document.getElementById('successModal');
     if (successModal) {
+      const modalGaugeBox = document.getElementById('modalGaugeContainer');
+      if (modalGaugeBox) {
+        modalGaugeBox.innerHTML = renderCriticalMassGauge(1, state.targetCount, false);
+      }
+      const modalReadyText = document.getElementById('modalReadyShareText');
+      const readyMsg = getReadyInviteMessage(inviteUrl, state.targetCount, Array.from(state.selectedNetworks));
+      if (modalReadyText) {
+        modalReadyText.textContent = readyMsg;
+      }
+      attachShareBoxListeners('modal', inviteUrl, readyMsg);
       successModal.classList.add('show');
     }
 

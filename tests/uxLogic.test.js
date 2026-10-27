@@ -168,5 +168,11 @@ describe('Logique UX & Simplification Citoyenne (app.js)', () => {
       assert.ok(!html.includes('id="counterHost"'), `${name} ne doit plus avoir la carte WHC dans les compteurs du haut`);
       assert.ok(html.includes('footer-sovereign-badge'), `${name} doit afficher le badge d'hébergement souverain WHC dans le pied de page`);
     }
+
+    // Vérification de la simplification de l'interface d'engagement
+    assert.ok(!engagementHtml.includes('id="successModal"'), 'engagement.html ne doit plus dupliquer le tableau de bord dans un modal surgissant redondant');
+    assert.ok(!engagementHtml.includes('3 caractères de la RTA'), 'engagement.html ne doit plus imposer de jargon administratif (RTA)');
+    assert.ok(!engagementHtml.includes('Je veux quitter '), 'les cartes de plateformes doivent être concises sans répéter "Je veux quitter"');
+    assert.ok(engagementHtml.includes('pact-optional-details'), 'les options secondaires doivent être repliées dans un accordéon <details> par défaut');
   });
 });

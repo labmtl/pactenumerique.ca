@@ -62,7 +62,7 @@ export function renderCriticalMassGauge(currentCount, targetCount, isUnlocked) {
         <div class="gauge-bar-fill" style="width: ${percent}%;"></div>
       </div>
 
-      <div class="gauge-avatars-row">
+      <div class="gauge-avatars-row ${displayLimit > 7 ? 'compact-avatars' : ''}">
         ${avatars.join('')}
       </div>
 
@@ -146,7 +146,7 @@ export function renderReadyShareBox(inviteUrl, targetCount, leavingNetworks, pre
   return `
     <div class="ready-share-box">
       <div class="ready-share-header">
-        <strong>📣 ${t('circle_widget.share_ready_title') || 'Publiez votre appel de départ ou envoyez-le directement :'}</strong>
+        <strong>📣 ${t('circle_widget.share_ready_title') || 'Invitez vos proches à rejoindre votre groupe :'}</strong>
       </div>
       <div class="ready-share-bubble">
         <p id="${prefix}ShareBubbleText">${socialMessage}</p>
@@ -154,18 +154,18 @@ export function renderReadyShareBox(inviteUrl, targetCount, leavingNetworks, pre
 
       <!-- Actions de diffusion sociale ciblée & messageries -->
       <div class="ready-share-actions">
-        ${originPlatformBtn}
+        <button type="button" class="btn-share-social copy" id="${prefix}BtnCopyMessage">
+          <span>📋</span> <span>${t('circle_widget.btn_copy_message') || 'Copier l\'invitation'}</span>
+        </button>
         <button type="button" class="btn-share-social whatsapp" id="${prefix}BtnWhatsApp">
           <span>💬</span> <span>WhatsApp</span>
         </button>
         <button type="button" class="btn-share-social sms" id="${prefix}BtnSMS">
           <span>📱</span> <span>SMS</span>
         </button>
-        <button type="button" class="btn-share-social copy" id="${prefix}BtnCopyMessage">
-          <span>📋</span> <span>${t('circle_widget.btn_copy_message') || 'Copier le message'}</span>
-        </button>
+        ${originPlatformBtn}
         <button type="button" class="btn-share-social link-only" id="${prefix}BtnCopyLink">
-          <span>🔗</span> <span>${t('circle_widget.btn_copy_link') || 'Copier le lien'}</span>
+          <span>🔗</span> <span>${t('circle_widget.btn_copy_link') || 'Lien seul'}</span>
         </button>
       </div>
     </div>

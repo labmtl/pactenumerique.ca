@@ -2199,9 +2199,9 @@ button {
    ========================================================================== */
 .origin-platform-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
-  margin: 1rem 0;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem;
+  margin: 0.75rem 0 0;
 }
 
 .origin-platform-card {
@@ -3267,6 +3267,169 @@ button {
 }
 
 /* Ajustements jauge pour 21 avatars */
+.gauge-avatars-row.compact-avatars {
+  gap: 0.45rem;
+}
+
+.gauge-avatars-row.compact-avatars .gauge-avatar {
+  width: 34px;
+  height: 34px;
+}
+
+.gauge-avatars-row.compact-avatars .gauge-avatar .avatar-icon {
+  font-size: 0.95rem;
+}
+
+.gauge-avatars-row.compact-avatars .gauge-avatar .avatar-label {
+  display: none;
+}
+
+/* Formulaire simplifié & Options facultatives (<details>) */
+.location-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.location-input-row .input-field {
+  flex: 1;
+  min-width: 220px;
+}
+
+.location-input-row .geo-badge {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+.pact-optional-details {
+  margin-bottom: 1.25rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.pact-optional-summary {
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.pact-optional-summary::-webkit-details-marker {
+  display: none;
+}
+
+.pact-optional-summary::after {
+  content: '▼';
+  font-size: 0.65rem;
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.pact-optional-details[open] .pact-optional-summary::after {
+  transform: rotate(180deg);
+}
+
+.pact-optional-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.85rem;
+  background: #ffffff;
+}
+
+/* Barre d'alerte appareil et accordéons post-signature */
+.circle-push-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: rgba(79, 70, 229, 0.05);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  margin: 0.85rem 0;
+}
+
+.circle-accordions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.circle-section-details {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.circle-section-summary {
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.circle-section-summary::-webkit-details-marker {
+  display: none;
+}
+
+.circle-section-summary .summary-hint {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: auto;
+  margin-right: 0.5rem;
+}
+
+.circle-section-summary::after {
+  content: '▼';
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.circle-section-details[open] .circle-section-summary {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.circle-section-details[open] .circle-section-summary::after {
+  transform: rotate(180deg);
+}
+
+.circle-section-body {
+  padding: 0.85rem;
+  background: #ffffff;
+}
+
+.circle-section-body .relay-chat-card,
+.circle-section-body .neighborhood-group-card {
+  margin-top: 0;
+  border: none;
+  box-shadow: none;
+  padding: 0.25rem;
+}
+
 @media (max-width: 640px) {
   .gauge-avatars-row {
     gap: 0.45rem;
@@ -3281,6 +3444,9 @@ button {
   .circle-tab {
     font-size: 0.78rem;
     padding: 0.5rem 0.65rem;
+  }
+  .circle-section-summary .summary-hint {
+    display: none;
   }
 }
 
