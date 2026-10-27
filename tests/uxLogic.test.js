@@ -139,4 +139,34 @@ describe('Logique UX & Simplification Citoyenne (app.js)', () => {
     assert.strictEqual(formatLongevity(null), null);
     assert.strictEqual(formatLongevity('2024'), null);
   });
+
+  it('place le formulaire d\'engagement dans sa propre section de menu (/engagement) et l\'hébergement WHC en pied de page', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const publicDir = path.resolve(import.meta.dirname, '../public');
+
+    const indexHtml = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+    const howHtml = fs.readFileSync(path.join(publicDir, 'comment-ca-marche.html'), 'utf8');
+    const engagementHtml = fs.readFileSync(path.join(publicDir, 'engagement.html'), 'utf8');
+    const repertoireHtml = fs.readFileSync(path.join(publicDir, 'repertoire.html'), 'utf8');
+    const statsHtml = fs.readFileSync(path.join(publicDir, 'statistiques.html'), 'utf8');
+
+    // Le formulaire #pactForm ne doit être présent que sur engagement.html
+    assert.ok(engagementHtml.includes('id="pactForm"'), 'engagement.html doit contenir #pactForm');
+    assert.ok(!indexHtml.includes('id="pactForm"'), 'index.html (Notre vision) ne doit pas dupliquer #pactForm');
+    assert.ok(!howHtml.includes('id="pactForm"'), 'comment-ca-marche.html ne doit pas dupliquer #pactForm');
+
+    // Toutes les pages doivent avoir le lien de menu vers /engagement (nav.pledge) et le badge WHC en bas de page (footer)
+    for (const [name, html] of [
+      ['index.html', indexHtml],
+      ['comment-ca-marche.html', howHtml],
+      ['engagement.html', engagementHtml],
+      ['repertoire.html', repertoireHtml],
+      ['statistiques.html', statsHtml]
+    ]) {
+      assert.ok(html.includes('href="/engagement"') && html.includes('data-i18n="nav.pledge"'), `${name} doit inclure la section de menu /engagement`);
+      assert.ok(!html.includes('id="counterHost"'), `${name} ne doit plus avoir la carte WHC dans les compteurs du haut`);
+      assert.ok(html.includes('footer-sovereign-badge'), `${name} doit afficher le badge d'hébergement souverain WHC dans le pied de page`);
+    }
+  });
 });

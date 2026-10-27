@@ -392,8 +392,8 @@ export function renderDirectory() {
           localStorage.setItem('pacte_preselected_alt', altId);
         }
 
-        if (window.location.pathname.includes('/repertoire')) {
-          window.location.href = '/#engagement';
+        if (!document.getElementById('engagement') || window.location.pathname.includes('/repertoire')) {
+          window.location.href = '/engagement';
           return;
         }
 

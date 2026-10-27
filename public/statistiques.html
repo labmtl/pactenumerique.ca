@@ -24,10 +24,11 @@
       </a>
       <div class="nav-actions">
         <ul class="nav-links">
-          <li><a href="/" data-i18n="nav.mission">Le Pacte</a></li>
-          <li><a href="/#comment-ca-marche" data-i18n="nav.how_it_works">Comment ça marche</a></li>
+          <li><a href="/" data-i18n="nav.mission">Notre vision</a></li>
+          <li><a href="/comment-ca-marche" data-i18n="nav.how_it_works">Comment ça marche</a></li>
+          <li><a href="/engagement" data-i18n="nav.pledge">Signer le pacte</a></li>
           <li><a href="/repertoire" data-i18n="nav.directory">Répertoire souverain</a></li>
-          <li><a href="/statistiques" style="color:var(--accent-red); font-weight:700;" data-i18n="nav.territories">Mobilisation & Stats</a></li>
+          <li><a href="/statistiques" style="color:var(--accent-red); font-weight:700;" aria-current="page" data-i18n="nav.territories">Mobilisation par région</a></li>
         </ul>
         <button id="btnLangToggle" class="btn-lang" aria-label="Changer de langue">EN</button>
       </div>
@@ -48,10 +49,6 @@
         <div class="counter-card">
           <div class="counter-num" id="counterCircles">100%</div>
           <div class="counter-label" data-i18n="stats.zero_knowledge">Anonyme & Confidentiel</div>
-        </div>
-        <div class="counter-card">
-          <div class="counter-num" id="counterHost">⚜️ 🍁 WHC</div>
-          <div class="counter-label" data-i18n="stats.sovereign_hosting">Hébergement souverain (QC & CA)</div>
         </div>
       </div>
     </section>
@@ -78,9 +75,9 @@
       <div class="discovery-card" style="margin-top: 2.5rem; text-align: center; align-items: center;">
         <h3>Mobilisez votre région !</h3>
         <p style="max-width: 650px; margin: 0.5rem auto 1.5rem;">
-          Votre quartier n'est pas encore dans le classement ? Créez votre cercle citoyen en 30 secondes et invitez 5 amis proches pour déclencher le signal de départ ensemble.
+          Votre quartier n'est pas encore dans le classement ? Créez votre cercle citoyen en 30 secondes et invitez vos amis proches pour déclencher le signal de départ ensemble.
         </p>
-        <a href="/#engagement" class="btn-subpage-cta">
+        <a href="/engagement" class="btn-subpage-cta">
           <span>✍️</span> <span>Signer le pacte dans ma région</span>
         </a>
       </div>
@@ -89,7 +86,10 @@
 
   <!-- Pied de page -->
   <footer class="footer">
-    <p data-i18n="footer.hosted_in_canada">⚜️ 🍁 Fièrement hébergé au Québec et au Canada chez Web Hosting Canada (WHC.ca)</p>
+    <div class="footer-sovereign-badge">
+      <span class="footer-whc-pill" data-i18n="stats.sovereign_hosting">⚜️ 🍁 Hébergement souverain (QC & CA) — WHC</span>
+      <p data-i18n="footer.hosted_in_canada">⚜️ 🍁 Fièrement hébergé au Québec et au Canada chez Web Hosting Canada (WHC.ca)</p>
+    </div>
     <p data-i18n="footer.open_source">Projet civique à code ouvert sous licence MIT.</p>
     <p data-i18n="footer.rights">© 2026 Pacte numérique Québec & Canada. Tous droits réservés.</p>
   </footer>

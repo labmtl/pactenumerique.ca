@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signer le pacte numérique | PacteNumérique.ca</title>
+  <meta name="description" content="Engagez-vous conditionnellement à quitter la Big Tech américaine dès que vos proches et votre région au Québec et au Canada sont prêts. 100% Anonyme & Privé.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.82em%22 font-size=%2246%22>⚜️🍁</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo" id="brandLogo">
+        <span class="brand-emblems" aria-label="Québec et Canada">
+          <span class="emblem-qc">⚜️</span><span class="emblem-ca">🍁</span>
+        </span>
+        <span>PacteNumérique<span class="brand-suffix">.ca</span></span>
+      </a>
+      <div class="nav-actions">
+        <ul class="nav-links">
+          <li><a href="/" data-i18n="nav.mission">Notre vision</a></li>
+          <li><a href="/comment-ca-marche" data-i18n="nav.how_it_works">Comment ça marche</a></li>
+          <li><a href="/engagement" style="color:var(--accent-red); font-weight:700;" aria-current="page" data-i18n="nav.pledge">Signer le pacte</a></li>
+          <li><a href="/repertoire" data-i18n="nav.directory">Répertoire souverain</a></li>
+          <li><a href="/statistiques" data-i18n="nav.territories">Mobilisation par région</a></li>
+        </ul>
+        <button id="btnLangToggle" class="btn-lang" aria-label="Changer de langue">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Bannière d'invitation privée (quand invité par lien ami) -->
+  <div id="inviteBanner" class="invite-alert" style="display: none;">
+    <span class="invite-badge" data-i18n="invite_banner.badge">Cercle privé d'amis détecté</span>
+    <div class="invite-text">
+      <h4 data-i18n="invite_banner.title">Vous avez été invité(e) par un ami !</h4>
+      <p data-i18n="invite_banner.text">Un de vos proches vous a partagé son pacte de libération numérique. En signant ci-dessous, vous vous engagez à faire le saut vers un réseau social souverain avec lui dès que votre cercle est au complet.</p>
+    </div>
+  </div>
+
+  <main>
+    <!-- Section Engagement -->
+    <section id="engagement" class="form-section" style="margin-top: 2.5rem;">
+      <div class="pact-card">
+        <div class="card-header">
+          <h1 data-i18n="form.title" style="font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem; color: var(--text-main);">Votre engagement conditionnel</h1>
+          <p data-i18n="form.subtitle">Vos données restent strictement privées. Aucun profilage, aucune publicité, aucune revente.</p>
+        </div>
+
+        <!-- Panneau de progression du cercle sauvegardé localement -->
+        <div id="myCircleWidget" class="my-circle-widget" style="display: none;"></div>
+
+        <!-- Formulaire d'engagement en 2 étapes simples -->
+        <form id="pactForm">
+          
+          <!-- ÉTAPE 1 : Quelle plateforme voulez-vous quitter ? -->
+          <div class="form-group-block">
+            <h3 class="block-title" data-i18n="form.step1_title">1. Quelle plateforme voulez-vous quitter ?</h3>
+            <p class="input-help" data-i18n="form.step_networks_desc">Sélectionnez la plateforme commerciale dont vous voulez vous libérer :</p>
+            
+            <div class="origin-platform-grid" id="originPlatformGrid">
+              <button type="button" class="origin-platform-card active" data-network="X / Twitter">
+                <span class="platform-icon">🐦</span>
+                <span class="platform-label">Je veux quitter X / Twitter</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="Facebook">
+                <span class="platform-icon">👥</span>
+                <span class="platform-label">Je veux quitter Facebook</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="Instagram">
+                <span class="platform-icon">📸</span>
+                <span class="platform-label">Je veux quitter Instagram</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="LinkedIn">
+                <span class="platform-icon">💼</span>
+                <span class="platform-label">Je veux quitter LinkedIn</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="YouTube">
+                <span class="platform-icon">🎬</span>
+                <span class="platform-label">Je veux quitter YouTube / TikTok</span>
+              </button>
+              <button type="button" class="origin-platform-card" data-network="WhatsApp">
+                <span class="platform-icon">💬</span>
+                <span class="platform-label">Je veux quitter WhatsApp / Discord</span>
+              </button>
+            </div>
+            <p class="input-help" style="margin-top: 0.65rem; font-size: 0.85rem; color: var(--text-muted);">
+              ✨ <em>L'instance d'accueil souveraine vous sera suggérée lors du déclenchement final de la bascule.</em>
+            </p>
+
+            <!-- Identifiant ou profil public sur la plateforme source (Zero-Knowledge, chiffré de bout en bout) -->
+            <div class="source-profile-box" style="margin-top: 1.15rem; background: var(--bg-card-subtle); padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <label for="sourceProfileInput" class="input-help" style="font-weight: 600; color: var(--text-main); display: block; margin-bottom: 0.35rem;" id="sourceProfileLabel">
+                Lien de votre profil sur la plateforme à quitter <span style="font-weight: 400; color: var(--text-muted);">(optionnel)</span>
+              </label>
+              <div class="source-profile-input-wrapper" style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.3rem 0.6rem;">
+                <span class="source-profile-prefix-icon" id="sourceProfilePrefixIcon" style="font-size: 1.1rem;">🐦</span>
+                <input 
+                  type="text" 
+                  id="sourceProfileInput" 
+                  class="source-profile-field" 
+                  placeholder="ex: https://x.com/rngadam ou @rngadam"
+                  autocomplete="username"
+                  maxlength="120"
+                  style="border: none; outline: none; width: 100%; font-family: inherit; font-size: 0.9rem; color: var(--text-main); background: transparent;"
+                >
+              </div>
+              <p class="input-help" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.45rem; line-height: 1.4;">
+                🔒 <strong>Preuve sociale chiffrée de bout en bout :</strong> Seuls vos proches détenant la clé du cercle pourront voir ce lien pour valider votre départ. Notre serveur ne reçoit aucun profil en clair.
+              </p>
+            </div>
+          </div>
+
+          <!-- ÉTAPE 2 : Avec combien d'amis voulez-vous partir ? -->
+          <div class="form-group-block">
+            <h3 class="block-title" data-i18n="form.step2_title">2. Avec combien d'amis voulez-vous partir ?</h3>
+            
+            <p class="input-help" style="margin-bottom: 0.75rem;" data-i18n="form.threshold_label">Combien d'amis doivent vous rejoindre pour déclencher votre départ ?</p>
+            <div class="threshold-options">
+              <button type="button" class="threshold-btn" data-threshold="7">
+                7 amis
+                <span data-i18n="form.threshold_opt_7">Noyau actif</span>
+              </button>
+              <button type="button" class="threshold-btn active" data-threshold="13">
+                13 amis
+                <span data-i18n="form.threshold_opt_13">Recommandé</span>
+              </button>
+              <button type="button" class="threshold-btn" data-threshold="21">
+                21 amis
+                <span data-i18n="form.threshold_opt_21">Mouvement local</span>
+              </button>
+            </div>
+
+            <!-- Région allégée (3 caractères de la RTA ou ville) - Aucun courriel requis -->
+            <div style="margin-top: 1.5rem;">
+              <label for="postalCodeInput" class="input-help" style="font-weight:600; color:var(--text-main);" data-i18n="form.postal_label">Votre quartier (3 caractères de la RTA) ou ville</label>
+              <input 
+                type="text" 
+                id="postalCodeInput" 
+                class="input-field" 
+                placeholder="ex: H2T, G1K, Montréal, Québec..." 
+                data-i18n-placeholder="form.postal_placeholder"
+                maxlength="30"
+                autocomplete="address-level2"
+                value="H2T"
+              >
+              <div id="geoBadge" class="geo-badge" style="display: none;"></div>
+              
+              <!-- Puces de sélection rapide de la RTA -->
+              <div class="fsa-quick-pills" id="fsaQuickPills">
+                <span style="font-size:0.75rem; color:var(--text-muted); align-self:center;">RTA rapides :</span>
+                <button type="button" class="fsa-pill active" data-fsa="H2T">H2T (Plateau)</button>
+                <button type="button" class="fsa-pill" data-fsa="G1K">G1K (Québec)</button>
+                <button type="button" class="fsa-pill" data-fsa="H1W">H1W (Hochelaga)</button>
+                <button type="button" class="fsa-pill" data-fsa="J4H">J4H (Longueuil)</button>
+                <button type="button" class="fsa-pill" data-fsa="K1P">K1P (Gatineau/Ottawa)</button>
+              </div>
+
+              <p class="input-help" data-i18n="form.postal_help">Aucune adresse exacte requise. Permet uniquement de regrouper les engagements citoyens de votre secteur.</p>
+
+              <!-- Option groupe de quartier souverain géolocalisé -->
+              <div class="neighborhood-optin-box" id="neighborhoodOptinBox">
+                <label class="custom-checkbox-label" for="joinNeighborhoodInput">
+                  <input type="checkbox" id="joinNeighborhoodInput" checked>
+                  <span class="custom-checkbox-text">
+                    <span>📍 <strong data-i18n="form.neighborhood_optin_title">Rejoindre le groupe local de mon secteur (<span id="optinFsaLabel">H2T (Plateau)</span>)</strong></span>
+                    <span class="neighborhood-help-text" data-i18n="form.neighborhood_optin_desc">Échangez avec vos voisins et partagez vos identifiants vers des plateformes souveraines (Mastodon, Matrix, Lemmy) pour créer des petits groupes sociaux géolocalisés.</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Option notification appareil (optionnelle, sans compte ni courriel) -->
+            <div class="push-toggle-box" style="margin-top: 1.25rem;">
+              <div class="push-info">
+                <h5 data-i18n="form.push_title">Alerte discrète sur cet appareil</h5>
+                <p data-i18n="form.push_desc">Recevez une alerte discrète dès que votre cercle a atteint sa masse critique.</p>
+              </div>
+              <button type="button" id="btnTogglePush" class="btn-toggle-push" data-i18n="form.enable_push">
+                M'alerter sur cet appareil
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="btnSubmitPact" class="btn-submit">
+            <span>✍️</span>
+            <span data-i18n="form.submit_btn">Signer le pacte numérique</span>
+          </button>
+
+          <p class="legal-notice" data-i18n="form.legal_notice">
+            Respect total de votre vie privée (Zéro-connaissance).
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Modal de Succès avec Jauge Intuitive & Partage SMS / WhatsApp -->
+    <div id="successModal" class="modal-backdrop">
+      <div class="modal-dialog">
+        <h3 data-i18n="modal_success.title">🎉 Félicitations, vous faites partie du pacte !</h3>
+        <p data-i18n="modal_success.subtitle">Voici votre cercle privé. Partagez le message tout prêt avec vos proches pour faire le saut ensemble.</p>
+
+        <!-- Jauge intuitive insérée dynamiquement -->
+        <div id="modalGaugeContainer"></div>
+
+        <!-- Boîte de partage SMS / WhatsApp tout prêt -->
+        <div class="ready-share-box">
+          <div class="ready-share-header">
+            <strong>💬 <span data-i18n="circle_widget.share_ready_title">Message tout prêt à envoyer à vos proches :</span></strong>
+          </div>
+          <div class="ready-share-bubble">
+            <p id="modalReadyShareText"></p>
+          </div>
+          <div class="ready-share-actions">
+            <button type="button" class="btn-share-social whatsapp" id="modalBtnWhatsApp">
+              <span>💬</span> <span>WhatsApp</span>
+            </button>
+            <button type="button" class="btn-share-social sms" id="modalBtnSMS">
+              <span>📱</span> <span>SMS</span>
+            </button>
+            <button type="button" class="btn-share-social copy" id="modalBtnCopyMessage">
+              <span>📋</span> <span data-i18n="circle_widget.btn_copy_message">Copier le message</span>
+            </button>
+            <button type="button" class="btn-share-social link-only" id="modalBtnCopyLink">
+              <span>🔗</span> <span data-i18n="circle_widget.btn_copy_link">Copier le lien</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="modalTargetRecom" class="modal-privacy-callout" style="display:none; margin-bottom:1rem; border-left:3px solid var(--accent-emerald);">
+          <strong>🎯 Serveur sélectionné pour votre cercle :</strong>
+          <span id="modalTargetRecomText"></span>
+        </div>
+
+        <div class="modal-privacy-callout">
+          🔒 Confidentialité totale : Le lien est sécurisé directement dans votre fureteur. Notre serveur ne sait pas qui sont vos amis.
+        </div>
+
+        <button id="btnModalClose" class="btn-modal-close" data-i18n="modal_success.close_btn">Voir mon tableau de bord</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Pied de page -->
+  <footer class="footer">
+    <div class="footer-sovereign-badge">
+      <span class="footer-whc-pill" data-i18n="stats.sovereign_hosting">⚜️ 🍁 Hébergement souverain (QC & CA) — WHC</span>
+      <p data-i18n="footer.hosted_in_canada">⚜️ 🍁 Fièrement hébergé au Québec et au Canada chez Web Hosting Canada (WHC.ca)</p>
+    </div>
+    <p data-i18n="footer.open_source">Projet civique à code ouvert sous licence MIT.</p>
+    <p data-i18n="footer.rights">© 2026 Pacte numérique Québec & Canada. Tous droits réservés.</p>
+  </footer>
+
+  <!-- Conteneur pour toasts -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
+

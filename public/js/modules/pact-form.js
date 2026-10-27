@@ -43,6 +43,13 @@ export async function detectInviteHash() {
   const k = params.get('k') || params.get('cle');
 
   if (cercle && /^[a-f0-9]{64}$/i.test(cercle)) {
+    // Si l'utilisateur ouvre un lien d'invitation sur une page sans le module d'engagement (ex: /#cercle=...),
+    // rediriger vers la page dédiée /engagement en conservant le fragment Zero-Knowledge intact.
+    if (typeof document !== 'undefined' && !document.getElementById('myCircleWidget')) {
+      window.location.replace(`/engagement${window.location.hash}`);
+      return;
+    }
+
     state.inviterCircleId = cercle;
     if (k) {
       try {

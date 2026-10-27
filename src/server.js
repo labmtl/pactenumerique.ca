@@ -29,8 +29,8 @@ app.use((req, res, next) => {
 const publicDir = path.join(__dirname, '../public');
 app.use(express.static(publicDir, {
   setHeaders: (res, filePath) => {
-    // Ne pas mettre en cache le Service Worker ni la page d'accueil
-    if (filePath.endsWith('sw.js') || filePath.endsWith('index.html')) {
+    // Ne pas mettre en cache le Service Worker ni les pages HTML
+    if (filePath.endsWith('sw.js') || filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
   }
@@ -57,6 +57,14 @@ app.all('/api/*', (req, res) => {
 });
 
 // Routes de pages dédiées
+app.get('/comment-ca-marche', (req, res) => {
+  res.sendFile(path.join(publicDir, 'comment-ca-marche.html'));
+});
+
+app.get('/engagement', (req, res) => {
+  res.sendFile(path.join(publicDir, 'engagement.html'));
+});
+
 app.get('/repertoire', (req, res) => {
   res.sendFile(path.join(publicDir, 'repertoire.html'));
 });

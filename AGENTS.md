@@ -18,7 +18,9 @@
 
 | Domaine | Fichier Source | Description |
 | :--- | :--- | :--- |
-| **Accueil (Action Citoyenne)** | `public/index.html` | Page principale : engagement en 2 étapes, jauge visuelle, partage SMS/WhatsApp. |
+| **Accueil (Notre vision)** | `public/index.html` | Page de vision citoyenne : manifeste, compteurs et écosystème souverain (sans formulaire dupliqué). |
+| **Comment ça marche** | `public/comment-ca-marche.html` | Page dédiée expliquant le fonctionnement en 3 étapes et la confidentialité zéro-connaissance. |
+| **Formulaire d'Engagement** | `public/engagement.html` | Page dédiée « Signer le pacte » : engagement en 2 étapes, jauge visuelle, partage SMS/WhatsApp et cercle privé. |
 | **Répertoire Dédié** | `public/repertoire.html` | Catalogue complet des instances avec recherche, filtres et détails d'infrastructure repliables. |
 | **Statistiques Dédiées** | `public/statistiques.html` | Compteur national, progression provinciale et palmarès des RTA/quartiers. |
 | **Logique Client (Entrée)** | `public/js/app.js` | Point d'entrée léger (< 250 lignes), orchestrateur et ré-exportation de l'API. |
